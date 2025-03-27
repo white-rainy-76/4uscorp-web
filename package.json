@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
+    "@microsoft/signalr": "^8.0.7",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@sentry/nextjs": "^9.9.0",
@@ -28,6 +29,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
     "sass": "^1.77.8",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",
