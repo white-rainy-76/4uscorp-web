@@ -1,6 +1,14 @@
 {
   "home": {
-    "test": "Test"
+    "test": "Test",
+    "calculate": "Calculate",
+    "departure": "Place of departure",
+    "destination": "Destination",
+    "errors": {
+      "departure_required_error": "Select a starting point",
+      "destination_required_error": "Select a destination point",
+      "different_points": "Starting and destination points must be different"
+    }
   },
   "doctors": {
     "test": "Test"
