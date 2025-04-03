@@ -6,8 +6,10 @@ import { RouteSearchFormValues, routeSearchSchema } from '../model/schema'
 import { AutocompleteCustom } from './autocomplete'
 import { GooglePlace } from '@/shared/types/place'
 import useDictionary from '@/shared/lib/hooks/use-dictionary'
+import { useRouteStore } from '../model/route-store'
 
 export const RouteSearchForm = () => {
+  const { setDestination, setOrigin } = useRouteStore()
   const { dictionary } = useDictionary()
   const [selectedStartPoint, setSelectedStartPoint] =
     useState<GooglePlace | null>(null)
@@ -19,6 +21,7 @@ export const RouteSearchForm = () => {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
     reset,
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
@@ -36,17 +39,31 @@ export const RouteSearchForm = () => {
         return dictionary.home.errors.destination_required_error
       case 'differentPoints':
         return dictionary.home.errors.different_points
+      case 'valid':
+        return dictionary.home.errors.valid
       default:
         return key
     }
   }
 
   const onSubmit = (data: RouteSearchFormValues) => {
-    console.log('Данные формы:', data)
-    console.log('Выбранное место отправки:', selectedStartPoint)
-    console.log('Выбранное место прибытия:', selectedEndPoint)
+    let hasErrors = false
+    console.log(selectedStartPoint)
+    console.log(selectedEndPoint)
+    if (!selectedStartPoint && selectedStartPoint == null) {
+      setError('startPoint', { type: 'manual', message: 'valid' })
+      hasErrors = true
+    }
 
-    reset()
+    if (!selectedEndPoint && selectedEndPoint == null) {
+      setError('endPoint', { type: 'manual', message: 'valid' })
+      hasErrors = true
+    }
+
+    if (!hasErrors) {
+      setOrigin(data.startPoint)
+      setDestination(data.endPoint)
+    }
   }
 
   return (

@@ -1,8 +1,14 @@
 {
   "home": {
-    "test": "Тест"
-  },
-  "doctors": {
-    "test": "Тест"
+    "test": "Тест",
+    "calculate": "Рассчитать",
+    "departure": "Место отправления",
+    "destination": "Место назначения",
+    "errors": {
+      "departure_required_error": "Выберите точку отправления",
+      "destination_required_error": "Выберите точку назначения",
+      "different_points": "Точки отправления и назначения должны различаться",
+      "valid": "Введите корректный адрес"
+    }
   }
 }

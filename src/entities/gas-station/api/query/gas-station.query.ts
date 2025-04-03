@@ -1,4 +1,5 @@
 export type GasStationQuery = {
-  origin: string
+  source: string
   destination: string
+  radius: number
 }

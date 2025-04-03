@@ -7,8 +7,8 @@ export interface GasStationDto {
   state?: string
   price?: number
   discount?: number
-  price_after_discount?: string
-  distance_to_location?: number
+  priceAfterDiscount?: string
+  distanceToLocation?: number
   image?: {
     tile?: string
   }

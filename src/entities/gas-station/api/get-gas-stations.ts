@@ -5,11 +5,14 @@ import { GasStationDto } from './dto/gas-station.dto'
 import { GasStationQuery } from './query/gas-station.query'
 
 export const getGasStations = async ({
-  origin,
+  source,
   destination,
+  radius,
 }: GasStationQuery): Promise<GasStation[]> => {
-  const query: GasStationQuery = { origin, destination }
-  const result = await apiClient.get<GasStationDto>(`/gas-stations`, query)
-
+  const query: GasStationQuery = { source, destination, radius }
+  const result = await apiClient.get<GasStationDto[]>(
+    `/api/FuelStation/get-by-radius`,
+    query,
+  )
   return mapGasStations(result)
 }

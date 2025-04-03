@@ -8,7 +8,12 @@ export const gasStationQueries = {
   lists: () => [...gasStationQueries.all(), 'list'],
   list: (query: GasStationQuery) =>
     queryOptions({
-      queryKey: [...gasStationQueries.lists(), query.origin, query.destination],
+      queryKey: [
+        ...gasStationQueries.lists(),
+        query.source,
+        query.destination,
+        query.radius,
+      ],
       queryFn: () => getGasStations(query),
       placeholderData: keepPreviousData,
     }),

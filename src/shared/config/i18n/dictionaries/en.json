@@ -7,10 +7,8 @@
     "errors": {
       "departure_required_error": "Select a starting point",
       "destination_required_error": "Select a destination point",
-      "different_points": "Starting and destination points must be different"
+      "different_points": "Starting and destination points must be different",
+      "valid": "Enter valid address"
     }
-  },
-  "doctors": {
-    "test": "Test"
   }
 }
