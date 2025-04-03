@@ -10,8 +10,5 @@
       "different_points": "Starting and destination points must be different",
       "valid": "Enter valid address"
     }
-  },
-  "doctors": {
-    "test": "Test"
   }
 }
