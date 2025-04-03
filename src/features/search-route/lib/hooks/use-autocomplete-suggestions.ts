@@ -1,5 +1,5 @@
 import { useMapsLibrary } from '@vis.gl/react-google-maps'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export type UseAutocompleteSuggestionsReturn = {
   suggestions: google.maps.places.AutocompleteSuggestion[]
@@ -8,19 +8,21 @@ export type UseAutocompleteSuggestionsReturn = {
 }
 
 /**
- * A reusable hook that retrieves autocomplete suggestions from the Google Places API.
- * The data is loaded from the new Autocomplete Data API.
+ * A reusable hook to retrieve autocomplete suggestions from the Google Places API.
+ * It utilizes the new Autocomplete Data API.
  * (https://developers.google.com/maps/documentation/javascript/place-autocomplete-data)
  *
  * @param inputString The input string for which to fetch autocomplete suggestions.
- * @param requestOptions Additional options for the autocomplete request
+ * @param requestOptions Additional options for the autocomplete request.
  *   (See {@link https://developers.google.com/maps/documentation/javascript/reference/autocomplete-data#AutocompleteRequest}).
  *
- * @returns An object containing the autocomplete suggestions, the current loading-status,
- *   and a function to reset the session.
+ * @returns An object containing:
+ *   - `suggestions`: An array of autocomplete suggestions.
+ *   - `isLoading`: A boolean indicating whether a request is in progress.
+ *   - `resetSession`: A function to reset the current session.
  *
  * @example
- * ```jsx
+ * ```tsx
  * const MyComponent = () => {
  *   const [input, setInput] = useState('');
  *   const { suggestions, isLoading, resetSession } = useAutocompleteSuggestions(input, {
@@ -31,7 +33,7 @@ export type UseAutocompleteSuggestionsReturn = {
  *     <div>
  *       <input value={input} onChange={(e) => setInput(e.target.value)} />
  *       <ul>
- *         {suggestions.map(({placePrediction}) => (
+ *         {suggestions.map(({ placePrediction }) => (
  *           <li key={placePrediction.placeId}>{placePrediction.text.text}</li>
  *         ))}
  *       </ul>
@@ -46,55 +48,62 @@ export function useAutocompleteSuggestions(
 ): UseAutocompleteSuggestionsReturn {
   const placesLib = useMapsLibrary('places')
 
-  // stores the current sessionToken
-  const sessionTokenRef =
-    useRef<google.maps.places.AutocompleteSessionToken>(null)
+  // Stores the current session token (now managed with useState)
+  const [sessionToken, setSessionToken] =
+    useState<google.maps.places.AutocompleteSessionToken | null>(null)
 
-  // the suggestions based on the specified input
+  // Stores the autocomplete suggestions
   const [suggestions, setSuggestions] = useState<
     google.maps.places.AutocompleteSuggestion[]
   >([])
 
-  // indicates if there is currently an incomplete request to the places API
+  // Indicates if an API request is in progress
   const [isLoading, setIsLoading] = useState(false)
 
-  // once the PlacesLibrary is loaded and whenever the input changes, a query
-  // is sent to the Autocomplete Data API.
+  // Effect that runs when the Places library is loaded or the input changes
   useEffect(() => {
     if (!placesLib) return
 
     const { AutocompleteSessionToken, AutocompleteSuggestion } = placesLib
 
-    // Create a new session if one doesn't already exist. This has to be reset
-    // after `fetchFields` for one of the returned places is called by calling
-    // the `resetSession` function returned from this hook.
-    if (!sessionTokenRef.current) {
-      sessionTokenRef.current = new AutocompleteSessionToken()
+    // Create a new session token if it doesn't exist
+    if (!sessionToken) {
+      setSessionToken(new AutocompleteSessionToken())
     }
 
-    const request: google.maps.places.AutocompleteRequest = {
-      ...requestOptions,
-      input: inputString,
-      sessionToken: sessionTokenRef.current,
-    }
-
+    // If input is empty, reset suggestions and exit
     if (inputString === '') {
       if (suggestions.length > 0) setSuggestions([])
       return
     }
 
+    // Create a request object with the input string and session token
+    const request: google.maps.places.AutocompleteRequest = {
+      ...requestOptions,
+      input: inputString,
+      sessionToken: sessionToken!, // Ensure token is not null before using
+    }
+
     setIsLoading(true)
-    AutocompleteSuggestion.fetchAutocompleteSuggestions(request).then((res) => {
-      setSuggestions(res.suggestions)
-      setIsLoading(false)
-    })
-  }, [placesLib, inputString])
+
+    // Fetch autocomplete suggestions from the API
+    AutocompleteSuggestion.fetchAutocompleteSuggestions(request)
+      .then((res) => {
+        setSuggestions(res.suggestions)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch autocomplete suggestions:', error)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [placesLib, inputString, sessionToken])
 
   return {
     suggestions,
     isLoading,
     resetSession: () => {
-      sessionTokenRef.current = null
+      setSessionToken(null)
       setSuggestions([])
     },
   }
