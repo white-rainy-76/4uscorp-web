@@ -1,10 +1,44 @@
 export interface SpritesMap {
-  // common:
+  gasStations:
+    | 'TA'
+    | 'Petro'
+    | 'Loves'
+    | 'TA Express'
+    | 'Compass Travel Center'
+    | 'Sapp Bros'
+    | 'Pilot'
+    | 'Flying J'
+    | 'Mr. Fuel'
+    | 'Road Rangers'
+    | 'Palmetto'
 }
 
 export const SPRITES_META: {
-  // common: Array<
-  // >
+  gasStations: Array<
+    | 'TA'
+    | 'Petro'
+    | 'Loves'
+    | 'TA Express'
+    | 'Compass Travel Center'
+    | 'Sapp Bros'
+    | 'Pilot'
+    | 'Flying J'
+    | 'Mr. Fuel'
+    | 'Road Rangers'
+    | 'Palmetto'
+  >
 } = {
-  common: [],
+  gasStations: [
+    'TA',
+    'Petro',
+    'Loves',
+    'TA Express',
+    'Compass Travel Center',
+    'Sapp Bros',
+    'Pilot',
+    'Flying J',
+    'Mr. Fuel',
+    'Road Rangers',
+    'Palmetto',
+  ],
 }
