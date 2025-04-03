@@ -2,8 +2,12 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Poppins as FontSans } from 'next/font/google'
 import { cn } from '@/shared/ui/utils'
-import { AppProvider } from './providers/ThemeProvider'
-import { DictionaryProvider } from './providers'
+import {
+  DictionaryProvider,
+  ThemeProvider,
+  SocketProvider,
+  GoogleMapApiProvider,
+} from './providers'
 import { getDictionary } from '@/shared/config/i18n'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/shared/api/query-client'
@@ -30,19 +34,24 @@ export default async function RootLayout({
   return (
     <html lang={lang}>
       <body
+        suppressHydrationWarning
         className={cn(
           'min-h-screen bg-background font-sans antialiased',
           fontSans.variable,
         )}>
         <QueryClientProvider client={queryClient}>
-          <AppProvider>
-            <DictionaryProvider
-              lang={'en'}
-              initialDictionary={await getDictionary('en')}>
-              {children}
-            </DictionaryProvider>
-          </AppProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+          <SocketProvider>
+            <GoogleMapApiProvider>
+              <ThemeProvider>
+                <DictionaryProvider
+                  lang={'en'}
+                  initialDictionary={await getDictionary('en')}>
+                  {children}
+                </DictionaryProvider>
+              </ThemeProvider>
+            </GoogleMapApiProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </SocketProvider>
         </QueryClientProvider>
       </body>
     </html>

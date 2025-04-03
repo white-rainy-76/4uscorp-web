@@ -1,5 +1,3 @@
-import { API_URL } from '../config/indext'
-
 export class ApiClient {
   private baseUrl: string
 
@@ -57,4 +55,6 @@ export class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_URL)
+export const apiClient = new ApiClient(
+  process.env.NEXT_PUBLIC_SERVER_URL_TEMP ?? 'http://localhost:5002',
+)
