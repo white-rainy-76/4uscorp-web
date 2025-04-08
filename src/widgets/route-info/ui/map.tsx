@@ -2,12 +2,12 @@
 import React, { useState } from 'react'
 import { Map } from '@vis.gl/react-google-maps'
 import { mapOptions } from '../constants/map-options'
-import { RouteSearchForm } from '@/features/search-route/ui/route-search-form'
-import { Directions } from '@/features/directions/ui/directions'
-import { GasStationMarker } from '@/entities/gas-station/ui/gas-station-marker'
+import { RouteSearchForm } from '@/features/search-route'
+import { Directions } from '@/features/directions'
+import { GasStationMarker } from '@/entities/gas-station'
 import { useQuery } from '@tanstack/react-query'
-import { gasStationQueries } from '@/entities/gas-station/api'
-import { useRouteStore } from '@/features/search-route/model/route-store'
+import { gasStationQueries } from '@/entities/gas-station'
+import { useRouteStore } from '@/shared/store/route-store'
 import { v4 as uuidv4 } from 'uuid'
 
 export const MapWidget = () => {
@@ -23,7 +23,7 @@ export const MapWidget = () => {
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.Place | null>(null)
   return (
-    <>
+    <div>
       <RouteSearchForm />
       <Map colorScheme="LIGHT" {...mapOptions}>
         <Directions />
@@ -42,7 +42,7 @@ export const MapWidget = () => {
             <GasStationMarker key={uuidv4()} gasStation={gasStation} />
           ))}
       </Map>
-    </>
+    </div>
   )
 }
 

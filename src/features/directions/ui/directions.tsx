@@ -1,4 +1,4 @@
-import { useRouteStore } from '@/features/search-route/model/route-store'
+import { useRouteStore } from '@/shared/store/route-store'
 import { useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
 import React, { useEffect, useState } from 'react'
 

@@ -5,8 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { RouteSearchFormValues, routeSearchSchema } from '../model/schema'
 import { AutocompleteCustom } from './autocomplete'
 import { GooglePlace } from '@/shared/types/place'
-import useDictionary from '@/shared/lib/hooks/use-dictionary'
-import { useRouteStore } from '../model/route-store'
+import { useRouteStore } from '@/shared/store/route-store'
+import { useDictionary } from '@/shared/lib/hooks'
 
 export const RouteSearchForm = () => {
   const { setDestination, setOrigin } = useRouteStore()
