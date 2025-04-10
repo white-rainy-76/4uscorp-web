@@ -30,12 +30,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
       newConnection.onclose(() => {
         setIsConnected(false)
-        console.log('SignalR connection closed')
       })
 
       newConnection.onreconnecting(() => {
         setIsConnected(false)
-        console.log('SignalR reconnecting')
       })
       try {
         await newConnection.start()
