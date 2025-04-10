@@ -1,212 +1,189 @@
-import { useRouteStore } from '@/shared/store/route-store'
-import { useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
 import React, { useEffect, useState } from 'react'
+import { Marker } from '@vis.gl/react-google-maps'
+import { convertToLatLngLiteral } from '../lib'
+import { rawData } from '../const/rawData'
+import { Polyline } from '@/shared/ui/map'
 
 export const Directions = () => {
-  const map = useMap()
-  const { origin, destination } = useRouteStore()
-  const routesLibrary = useMapsLibrary('routes')
-  const [directionsService, setDirectionsService] =
-    useState<google.maps.DirectionsService>()
-  const [mainRenderer, setMainRenderer] =
-    useState<google.maps.DirectionsRenderer>()
-  const [altRenderers, setAltRenderers] = useState<
-    google.maps.DirectionsRenderer[]
+  const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
+  const [alternativeRoutes, setAlternativeRoutes] = useState<
+    google.maps.LatLngLiteral[][]
   >([])
-  const [routes, setRoutes] = useState<google.maps.DirectionsRoute[]>([])
-  const [routeIndex, setRouteIndex] = useState(0)
+  const [hoverMarker, setHoverMarker] =
+    useState<google.maps.LatLngLiteral | null>(null)
+  const [wayPoints, setWayPoints] = useState<google.maps.LatLngLiteral[]>([])
+  const [startMarker, setStartMarker] =
+    useState<google.maps.LatLngLiteral | null>(null)
+  const [endMarker, setEndMarker] = useState<google.maps.LatLngLiteral | null>(
+    null,
+  )
 
-  const selectedRoute = routes[routeIndex]
-  const leg = selectedRoute?.legs[0]
-
-  const mainColor = '#2c2cea'
-  const altColors = [
-    '#e538359f',
-    '#43A047',
-    '#ffb300af',
-    '#9b27b09d',
-    '#00abc1ab',
-  ]
-
-  // Initialize the directions service
   useEffect(() => {
-    if (!routesLibrary) return
-    setDirectionsService(new routesLibrary.DirectionsService())
-  }, [routesLibrary])
+    const data = JSON.parse(rawData.data)
+    const allRouteSections = data.routes.waypointsAndShapes.filter(
+      (item: any) => item.objectType === 'routeSection',
+    )
 
-  // Clear all renderers
-  const clearAllRenderers = () => {
-    if (mainRenderer) {
-      mainRenderer.setMap(null)
-      setMainRenderer(undefined)
-    }
+    const allShapes: google.maps.LatLngLiteral[][] = []
 
-    altRenderers.forEach((renderer) => renderer.setMap(null))
-    setAltRenderers([])
-  }
-
-  // Fetch and display routes
-  useEffect(() => {
-    if (!directionsService || !map || !routesLibrary || !origin || !destination)
-      return
-
-    // Clear previous renderers
-    clearAllRenderers()
-
-    directionsService
-      .route({
-        origin: origin,
-        destination: destination,
-        travelMode: google.maps.TravelMode.DRIVING,
-        provideRouteAlternatives: true,
+    allRouteSections.forEach((routeSection: any) => {
+      routeSection.sections.forEach((section: any) => {
+        if (section.showShape) {
+          allShapes.push(convertToLatLngLiteral(section.showShape))
+        }
       })
-      .then((response) => {
-        setRoutes(response.routes)
-
-        // Create the main renderer for the selected route
-        const newMainRenderer = new routesLibrary.DirectionsRenderer({
-          directions: response,
-          routeIndex: routeIndex,
-          map,
-          polylineOptions: {
-            strokeColor: mainColor,
-            strokeOpacity: 1.0,
-            strokeWeight: 4,
-          },
-          // Disable dragging
-          draggable: false,
-        })
-        setMainRenderer(newMainRenderer)
-
-        // Create renderers for alternative routes
-        const newAltRenderers = response.routes
-          .map((_, index) => {
-            if (index === routeIndex) return null // Skip the main route
-
-            return new routesLibrary.DirectionsRenderer({
-              directions: response,
-              routeIndex: index,
-              map,
-              polylineOptions: {
-                strokeColor: altColors[index % altColors.length],
-                strokeOpacity: 0.7,
-                strokeWeight: 3,
-              },
-              suppressMarkers: true,
-              preserveViewport: true,
-            })
-          })
-          .filter(Boolean) as google.maps.DirectionsRenderer[]
-
-        setAltRenderers(newAltRenderers)
-      })
-      .catch((error) => {
-        console.error('Error fetching routes:', error)
-      })
-  }, [directionsService, map, routesLibrary, origin, destination])
-
-  // Update on route index change
-  useEffect(() => {
-    if (!mainRenderer || !map || !routesLibrary || routes.length === 0) return
-
-    // Clear all renderers
-    clearAllRenderers()
-
-    // Get the current directions result
-    const directions = mainRenderer.getDirections()
-    if (!directions) return
-
-    // Create a new main renderer
-    const newMainRenderer = new routesLibrary.DirectionsRenderer({
-      directions: directions,
-      routeIndex: routeIndex,
-      map,
-      polylineOptions: {
-        strokeColor: mainColor,
-        strokeOpacity: 1.0,
-        strokeWeight: 4,
-      },
-      draggable: false,
     })
-    setMainRenderer(newMainRenderer)
 
-    // Create new renderers for alternative routes
-    const newAltRenderers = directions.routes
-      .map((_, index) => {
-        if (index === routeIndex) return null // Skip the main route
-
-        return new routesLibrary.DirectionsRenderer({
-          directions: directions,
-          routeIndex: index,
-          map,
-          polylineOptions: {
-            strokeColor: altColors[index % altColors.length],
-            strokeOpacity: 0.7,
-            strokeWeight: 3,
-          },
-          suppressMarkers: true,
-          // preserveViewport: true,
-        })
-      })
-      .filter(Boolean) as google.maps.DirectionsRenderer[]
-
-    setAltRenderers(newAltRenderers)
-  }, [routeIndex, map, routesLibrary])
-
-  // Cleanup on component unmount
-  useEffect(() => {
-    return () => {
-      clearAllRenderers()
+    if (allShapes.length > 0) {
+      setMainRoute(allShapes[0])
+      setAlternativeRoutes(allShapes.slice(1))
+      setStartMarker(allShapes[0][0])
+      setEndMarker(allShapes[0][allShapes[0].length - 1])
     }
   }, [])
 
-  // Route change handler
-  const handleRouteChange = (index: number) => {
-    setRouteIndex(index)
+  const handleAltRouteClick = (index: number) => {
+    setMainRoute(alternativeRoutes[index]) // делаем выбранный маршрут основным
+    setAlternativeRoutes((prevRoutes) => {
+      const newAlts = [...prevRoutes]
+      newAlts.splice(index, 1) // удаляем выбранный из альтернативных
+      return [mainRoute, ...newAlts] // перемещаем старый основной в начало
+    })
+  }
+  const handleExistingMarkerOnDragEnd = (
+    index: number,
+    e: google.maps.MapMouseEvent,
+  ) => {
+    if (!e.latLng) return
+
+    const newMarkers = [...wayPoints]
+    console.log('A Lat: ' + newMarkers[index].lat)
+    console.log('A Lng: ' + newMarkers[index].lng)
+    console.log('B Lat: ' + e.latLng.lat())
+    console.log('B Lng: ' + e.latLng.lng())
+    newMarkers[index] = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    }
+    setWayPoints(newMarkers)
+  }
+  const handleMarkerOnDragEnd = (e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return
+    const newPosition = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    }
+    console.log('A Lat: ' + e.latLng.lat())
+    console.log('A Lng: ' + e.latLng.lng())
+    setWayPoints((prev) => [...prev, newPosition])
+    setHoverMarker(null)
   }
 
-  if (!leg) return null
-
   return (
-    <div className="directions p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-2">{selectedRoute?.summary}</h2>
-      <>
-        <p className="mb-1">
-          {leg.start_address?.split(',')[0]} → {leg.end_address?.split(',')[0]}
-        </p>
-        <p className="mb-1">Distance: {leg.distance?.text}</p>
-        <p className="mb-3">Duration: {leg.duration?.text}</p>
-      </>
+    <>
+      {mainRoute.length > 0 && (
+        <Polyline
+          path={mainRoute}
+          strokeColor="#0000FF"
+          strokeOpacity={0.8}
+          strokeWeight={6}
+          onMouseMove={(e: any) => {
+            if (e.latLng) {
+              setHoverMarker({
+                lat: e.latLng.lat(),
+                lng: e.latLng.lng(),
+              })
+            }
+          }}
+          onMouseOut={() => {
+            setHoverMarker(null)
+          }}
+        />
+      )}
 
-      <h3 className="text-lg font-semibold mt-4 mb-2">Alternative Routes</h3>
-      <ul className="space-y-2">
-        {routes.map((route, index) => (
-          <li key={`route-${index}`}>
-            <button
-              onClick={() => handleRouteChange(index)}
-              className={`flex w-full text-left p-2 rounded ${
-                index === routeIndex
-                  ? 'bg-gray-100 font-medium'
-                  : 'hover:bg-gray-50'
-              }`}
-              style={{
-                borderLeft: `4px solid ${
-                  index === routeIndex
-                    ? mainColor
-                    : altColors[index % altColors.length]
-                }`,
-              }}>
-              <div>
-                <div className="font-medium">{route.summary}</div>
-                <div className="text-sm text-gray-600">
-                  {route.legs[0].distance?.text} ·{' '}
-                  {route.legs[0].duration?.text}
-                </div>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {/* Отрисовка маркера под курсором */}
+      {hoverMarker && (
+        <Marker
+          position={hoverMarker}
+          draggable
+          onDragStart={() => {
+            setAlternativeRoutes([])
+          }}
+          onDragEnd={(e) => {
+            handleMarkerOnDragEnd(e)
+          }}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 6,
+            fillColor: '#FF0000',
+            fillOpacity: 1,
+            strokeWeight: 2,
+          }}
+        />
+      )}
+      {wayPoints.map((marker, index) => (
+        <Marker
+          key={`draggable-${index}`}
+          position={marker}
+          draggable
+          onDragEnd={(e) => handleExistingMarkerOnDragEnd(index, e)}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 6,
+            fillColor: '#00AA00',
+            fillOpacity: 1,
+            strokeWeight: 2,
+          }}
+        />
+      ))}
+      {alternativeRoutes.map((altRoute, index) => (
+        <Polyline
+          key={`alt-route-${index}`}
+          path={altRoute}
+          strokeColor="#141414"
+          strokeOpacity={0.5}
+          strokeWeight={3}
+          onClick={() => handleAltRouteClick(index)}
+        />
+      ))}
+
+      {startMarker && (
+        <Marker
+          position={startMarker}
+          label={{
+            text: 'A',
+            color: 'white',
+            fontSize: '16px',
+          }}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: 'green',
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: 'white',
+          }}
+        />
+      )}
+
+      {endMarker && (
+        <Marker
+          position={endMarker}
+          label={{
+            text: 'B',
+            color: 'white',
+            fontSize: '16px',
+          }}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: 'red',
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: 'white',
+          }}
+        />
+      )}
+    </>
   )
 }

@@ -2,7 +2,6 @@ import { GasStationDto } from '../dto/gas-station.dto'
 import { GasStation } from '../../model/gas-station'
 
 export const mapGasStations = (dto: GasStationDto[]): GasStation[] => {
-  console.log(dto)
   return dto.map((stationDto) => ({
     id: String(stationDto.id),
     name: stationDto.name,
