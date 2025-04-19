@@ -2,11 +2,11 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
 import { TruckCard } from '../model/truckCard'
-import { Icon } from '@/shared/ui/Icon'
+import { Icon } from '@/shared/ui'
 
-const Card = ({
+export const Card = ({
   avatarImage,
   unitNumber,
   name,
@@ -72,5 +72,3 @@ const Card = ({
     </div>
   )
 }
-
-export default Card

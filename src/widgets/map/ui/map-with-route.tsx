@@ -1,5 +1,5 @@
 import { Directions } from '@/features/directions'
-import { MapBase } from '@/shared/ui/map'
+import { MapBase } from '@/shared/ui'
 
 export const MapWithRoute = () => {
   // const { origin, destination } = useRouteStore()
