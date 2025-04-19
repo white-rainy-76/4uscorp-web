@@ -1,4 +1,4 @@
-import { RouteIndicator } from '@/shared/ui/route-indicator'
+import { RouteIndicator } from '@/shared/ui'
 import React from 'react'
 import { FuelStopInfo } from './card'
 interface FuelStop {

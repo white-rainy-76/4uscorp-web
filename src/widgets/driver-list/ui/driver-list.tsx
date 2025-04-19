@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Input } from '@/shared/ui/input'
+import { Input } from '@/shared/ui'
 import { TruckCard, TruckStatus } from '@/entities/truck'
-import Card from '@/entities/truck/ui'
+import { Card } from '@/entities/truck'
 
 // Фейковые данные
 const fakeTrucks: Omit<TruckCard, 'isActive' | 'setIsActive'>[] = [

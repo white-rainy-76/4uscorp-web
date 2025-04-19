@@ -1,6 +1,6 @@
-import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar'
-import { Icon } from '@/shared/ui/Icon'
-import { InfoCard } from '@/shared/ui/info-card'
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui'
+import { Icon } from '@/shared/ui'
+import { InfoCard } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
 
 export const DriverInfo = () => {

@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from 'react'
 import { useMapsLibrary } from '@vis.gl/react-google-maps'
-import { Input } from '@/shared/ui/input'
+import { Input } from '@/shared/ui'
 import { GooglePlace, GoogleSuggestion } from '@/shared/types/place'
 import { useAutocompleteSuggestions } from '../lib/hooks'
 

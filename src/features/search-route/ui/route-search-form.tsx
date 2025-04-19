@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { Button } from '@/shared/ui/button/button'
+import { Button } from '@/shared/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RouteSearchFormValues, routeSearchSchema } from '../model/schema'
 import { AutocompleteCustom } from './autocomplete'
@@ -8,9 +8,9 @@ import { GooglePlace } from '@/shared/types/place'
 import { useRouteStore } from '@/shared/store/route-store'
 import { useDictionary } from '@/shared/lib/hooks'
 import { getLocalizedErrorMessage } from '../lib'
-import { Input } from '@/shared/ui/input'
-import { FuelSlider } from '@/shared/ui/slider'
-import { Icon } from '@/shared/ui/Icon'
+import { Input } from '@/shared/ui'
+import { FuelSlider } from '@/shared/ui'
+import { Icon } from '@/shared/ui'
 
 export const RouteSearchForm = () => {
   const { setDestination, setOrigin } = useRouteStore()
