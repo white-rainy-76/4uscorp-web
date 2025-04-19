@@ -11,6 +11,7 @@ export interface SpritesMap {
     | 'Mr. Fuel'
     | 'Road Rangers'
     | 'Palmetto'
+  common: 'logo' | 'fuel' | 'marker' | 'weight' | 'dollar'
 }
 
 export const SPRITES_META: {
@@ -27,6 +28,7 @@ export const SPRITES_META: {
     | 'Road Rangers'
     | 'Palmetto'
   >
+  common: Array<'logo' | 'fuel' | 'marker' | 'weight' | 'dollar'>
 } = {
   gasStations: [
     'TA',
@@ -41,4 +43,5 @@ export const SPRITES_META: {
     'Road Rangers',
     'Palmetto',
   ],
+  common: ['logo', 'fuel', 'marker', 'weight', 'dollar'],
 }

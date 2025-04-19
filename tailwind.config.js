@@ -16,6 +16,8 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        // avenir: ['Avenir', 'sans-serif'],
+        // archivo: ['"Archivo Black"', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -51,6 +53,31 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
+        },
+
+        text: {
+          heading: 'hsl(var(--text-heading))',
+          strong: 'hsl(var(--text-strong))',
+          muted: 'hsl(var(--text-muted))',
+          'muted-alt': 'hsl(var(--text-muted-alt))',
+        },
+        placeholder: {
+          DEFAULT: 'hsl(var(--placeholder))',
+          alt: 'hsl(var(--placeholder-alt))',
+        },
+        surface: 'hsl(var(--surface))',
+        'input-bg': 'hsl(var(--input-bg))',
+        separator: 'hsl(var(--separator))',
+        scroll: 'hsl(var(--scroll))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -59,12 +86,20 @@ module.exports = {
       },
       keyframes: {
         'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
         },
         'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
         },
       },
       animation: {
@@ -73,5 +108,28 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    function ({ addBase }) {
+      addBase({
+        '.custom-scroll::-webkit-scrollbar': {
+          width: '4px',
+        },
+        '.custom-scroll::-webkit-scrollbar-track': {
+          'border-radius': '9999px',
+          'background-color': '#F3F4F6',
+        },
+        '.custom-scroll::-webkit-scrollbar-thumb': {
+          'border-radius': '9999px',
+          'background-color': '#E1E5EA',
+        },
+        '.dark .custom-scroll::-webkit-scrollbar-track': {
+          'background-color': '#374151',
+        },
+        '.dark .custom-scroll::-webkit-scrollbar-thumb': {
+          'background-color': '#4B5563',
+        },
+      })
+    },
+  ],
 }

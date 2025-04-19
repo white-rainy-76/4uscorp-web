@@ -1,2 +1,3 @@
 export * from './model/gas-station'
-export * as gasStationApi from './api'
+export * from './api'
+export * from './ui'

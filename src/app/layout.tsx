@@ -1,14 +1,12 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Poppins as FontSans } from 'next/font/google'
+import { Nunito as FontSans } from 'next/font/google'
 import { cn } from '@/shared/ui/utils'
 import {
-  DictionaryProvider,
   ThemeProvider,
   SocketProvider,
   GoogleMapApiProvider,
 } from './providers'
-import { getDictionary } from '@/shared/config/i18n'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/shared/api/query-client'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -20,19 +18,17 @@ export const metadata: Metadata = {
 
 const fontSans = FontSans({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400', '500', '700', '800', '900'],
   variable: '--font-sans',
 })
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-  lang,
-}: Readonly<{
+}: {
   children: React.ReactNode
-  lang: string
-}>) {
+}) {
   return (
-    <html lang={lang}>
+    <html lang="en">
       <body
         suppressHydrationWarning
         className={cn(
@@ -42,13 +38,7 @@ export default async function RootLayout({
         <QueryClientProvider client={queryClient}>
           <SocketProvider>
             <GoogleMapApiProvider>
-              <ThemeProvider>
-                <DictionaryProvider
-                  lang={'en'}
-                  initialDictionary={await getDictionary('en')}>
-                  {children}
-                </DictionaryProvider>
-              </ThemeProvider>
+              <ThemeProvider>{children}</ThemeProvider>
             </GoogleMapApiProvider>
             <ReactQueryDevtools initialIsOpen={false} />
           </SocketProvider>

@@ -8,6 +8,20 @@ export const routeSearchSchema = z
     endPoint: z.string().min(1, 'arrival').refine(Boolean, {
       message: 'arrival',
     }),
+    weight: z
+      .string()
+      .optional()
+      .refine(
+        (val) =>
+          !val ||
+          (Number(val) >= 0 && Number(val) <= 100_000 && !isNaN(Number(val))),
+        'invalidWeight',
+      ),
+    fuelPercent: z
+      .number({ invalid_type_error: 'invalidFuel' })
+      .min(0, 'minFuel')
+      .max(100, 'maxFuel')
+      .optional(),
   })
   .refine((data) => data.startPoint !== data.endPoint, {
     message: 'differentPoints',
