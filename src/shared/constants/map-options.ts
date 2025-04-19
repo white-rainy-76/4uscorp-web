@@ -1,7 +1,7 @@
 export const mapOptions = {
   mapId: '4ee90b61d9b1d559',
   style: {
-    width: '100vw',
+    width: 'auto',
     height: '100vh',
   },
   defaultCenter: { lat: 22, lng: 0 },

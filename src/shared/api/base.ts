@@ -56,5 +56,5 @@ export class ApiClient {
 }
 
 export const apiClient = new ApiClient(
-  process.env.NEXT_PUBLIC_SERVER_URL_TEMP ?? 'http://localhost:5002',
+  process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:5002',
 )

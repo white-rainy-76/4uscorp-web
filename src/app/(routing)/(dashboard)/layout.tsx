@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger } from '@/shared/ui/sidebar'
+import { SidebarProvider } from '@/shared/ui/sidebar'
 import { AppSidebar } from '@/widgets/sidebar'
 
 export default function Layout({ children }: { children: React.ReactNode }) {

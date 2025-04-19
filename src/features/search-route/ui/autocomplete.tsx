@@ -17,12 +17,14 @@ interface Props {
   value: string
   /** Callback function that is called when the input value changes. */
   onChange: (value: string) => void
+  placeholder: string
 }
 
 export const AutocompleteCustom = ({
   onPlaceSelect,
   value,
   onChange,
+  placeholder,
 }: Props) => {
   const places = useMapsLibrary('places')
   const [isOpen, setIsOpen] = useState(false)
@@ -100,15 +102,16 @@ export const AutocompleteCustom = ({
   )
 
   return (
-    <div className="flex flex-col w-full md:w-96">
+    <div className="relative flex flex-col w-full md:w-96">
       <Input
+        variant="gray"
         value={value}
         onInput={(event) => handleInput(event)}
-        placeholder="Search for a place"
+        placeholder={placeholder}
       />
 
       {isOpen && suggestions.length > 0 && (
-        <ul className="relative z-10 w-full bg-white border border-gray-300 rounded-md shadow-md mt-1">
+        <ul className="absolute top-14 z-10 w-full bg-white border border-gray-300 rounded-md shadow-md ">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}

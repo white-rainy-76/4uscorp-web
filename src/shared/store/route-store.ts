@@ -1,15 +1,20 @@
 import { create } from 'zustand'
 
-type RouteStore = {
-  origin: string
-  destination: string
-  setOrigin: (place: string) => void
-  setDestination: (place: string) => void
+interface Coordinate {
+  latitude: number
+  longitude: number
 }
 
-export const useRouteStore = create<RouteStore>((set) => ({
-  origin: '',
-  destination: '',
-  setOrigin: (place) => set({ origin: place }),
-  setDestination: (place) => set({ destination: place }),
+interface RouteState {
+  origin: Coordinate | null
+  destination: Coordinate | null
+  setOrigin: (origin: Coordinate) => void
+  setDestination: (destination: Coordinate) => void
+}
+
+export const useRouteStore = create<RouteState>((set) => ({
+  origin: null,
+  destination: null,
+  setOrigin: (origin) => set({ origin }),
+  setDestination: (destination) => set({ destination }),
 }))

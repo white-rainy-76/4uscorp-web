@@ -17,7 +17,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 export function AppSidebar() {
-  const [activeItem, setActiveItem] = useState<string | null>(null)
+  const [activeItem, setActiveItem] = useState<string | null>('home')
   const handleItemClick = (itemId: string) => {
     setActiveItem(itemId)
   }

@@ -3,6 +3,10 @@ import { Marker } from '@vis.gl/react-google-maps'
 import { convertToLatLngLiteral } from '../lib'
 import { rawData } from '../const/rawData'
 import { Polyline } from '@/shared/ui/map'
+import { useRouteStore } from '@/shared/store/route-store'
+import { useQuery } from '@tanstack/react-query'
+import { directionsQueries } from '../api/directions.queries'
+import { Coordinates } from '../api/payload/directions.payload'
 
 export const Directions = () => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
@@ -18,29 +22,47 @@ export const Directions = () => {
     null,
   )
 
+  const { origin, destination } = useRouteStore()
+
+  const { data, isLoading, isError, error } = useQuery({
+    ...directionsQueries.detailsQuery({
+      origin: origin as Coordinates,
+      destination: destination as Coordinates,
+    }),
+    enabled: !!origin && !!destination,
+  })
+
   useEffect(() => {
-    const data = JSON.parse(rawData.data)
-    const allRouteSections = data.routes.waypointsAndShapes.filter(
-      (item: any) => item.objectType === 'routeSection',
-    )
+    if (!data?.routeIds || data.routeIds.length === 0) return
 
-    const allShapes: google.maps.LatLngLiteral[][] = []
+    try {
+      // Обрабатываем маршруты на основе предоставленной структуры данных
+      const allShapes: google.maps.LatLngLiteral[][] = data.routeIds.map(
+        (route) => {
+          // Используем функцию convertToLatLngLiteral для преобразования координат
+          return convertToLatLngLiteral(route.mapPoints)
+        },
+      )
 
-    allRouteSections.forEach((routeSection: any) => {
-      routeSection.sections.forEach((section: any) => {
-        if (section.showShape) {
-          allShapes.push(convertToLatLngLiteral(section.showShape))
+      console.log('Extracted routes:', allShapes)
+
+      if (allShapes.length > 0) {
+        // Устанавливаем основной маршрут и альтернативные
+        setMainRoute([...allShapes[0]])
+        setAlternativeRoutes(
+          allShapes.length > 1 ? [...allShapes.slice(1)] : [],
+        )
+
+        // Устанавливаем маркеры начала и конца маршрута
+        if (allShapes[0].length > 0) {
+          setStartMarker({ ...allShapes[0][0] })
+          setEndMarker({ ...allShapes[0][allShapes[0].length - 1] })
         }
-      })
-    })
-
-    if (allShapes.length > 0) {
-      setMainRoute(allShapes[0])
-      setAlternativeRoutes(allShapes.slice(1))
-      setStartMarker(allShapes[0][0])
-      setEndMarker(allShapes[0][allShapes[0].length - 1])
+      }
+    } catch (error) {
+      console.error('Error processing route data:', error)
     }
-  }, [])
+  }, [data])
 
   const handleAltRouteClick = (index: number) => {
     setMainRoute(alternativeRoutes[index]) // делаем выбранный маршрут основным

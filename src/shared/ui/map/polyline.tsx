@@ -61,10 +61,11 @@ function usePolyline(props: PolylineProps) {
   }, [polyline, polylineOptions])
 
   // Устанавливаем путь маршрута
-  useMemo(() => {
-    if (!path) return
-    polyline.setPath(path)
-  }, [polyline, path])
+  useEffect(() => {
+    if (path) {
+      polyline.setPath(path)
+    }
+  }, [path])
 
   const map = useContext(GoogleMapsContext)?.map
 

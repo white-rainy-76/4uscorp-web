@@ -17,7 +17,7 @@ export const DictionaryProvider: FC<DictionaryProviderProps> = ({
 }) => {
   const [dictionary, setDictionary] =
     useState<DictionaryType>(initialDictionary)
-  899963
+
   useEffect(() => {
     const fetchDictionary = async () => {
       const dict = await getDictionary(lang)
