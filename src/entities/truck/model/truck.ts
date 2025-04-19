@@ -1,7 +1,15 @@
+import { TruckStatus } from './truckStatus'
+
+export interface Driver {
+  id: string
+  fullName: string
+}
+
 export interface Truck {
-  unitNumber: string
-  isActive: boolean
-  fuelLeft: string
-  longitude: number
-  latitude: number
+  id: string
+  ulid: string
+  licensePlate: string
+  status: TruckStatus
+  driverId: string
+  driver: Driver | null
 }

@@ -13,12 +13,12 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const connectionRef = useRef<HubConnection | null>(null)
 
   const serverUrl =
-    process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5001'
+    process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000'
 
   useEffect(() => {
     const connect = async () => {
       const newConnection = new HubConnectionBuilder()
-        .withUrl(`${serverUrl}/truck-tracking`, {
+        .withUrl(`${serverUrl}/truckstracking-api/truck-tracking`, {
           skipNegotiation: true, // Optional: for same-origin or specific configurations
           transport: HttpTransportType.WebSockets, // Optional: specify transport
         })
