@@ -1,6 +1,10 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { RouteRequestPayload } from './payload/directions.payload'
+import {
+  PointRequestPayload,
+  RouteRequestPayload,
+} from './payload/directions.payload'
 import { getDirections } from './get-directions'
+import { getNearestDropPoint } from './get-nearest-drop-point'
 
 export const directionsQueries = {
   all: () => ['directions'],
@@ -11,8 +15,19 @@ export const directionsQueries = {
         ...directionsQueries.details(),
         payload.origin,
         payload.destination,
+        payload.ViaPoints,
       ],
       queryFn: () => getDirections(payload),
       placeholderData: keepPreviousData,
+    }),
+  dropPoint: () => [...directionsQueries.all(), 'drop-point'],
+  dropPointQuery: (payload: PointRequestPayload) =>
+    queryOptions({
+      queryKey: [
+        ...directionsQueries.dropPoint(),
+        payload.latitude,
+        payload.longitude,
+      ],
+      queryFn: () => getNearestDropPoint(payload),
     }),
 }

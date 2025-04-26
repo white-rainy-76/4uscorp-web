@@ -1,1 +1,1 @@
-export { Directions } from './ui/directions'
+export { Directions } from './ui'
