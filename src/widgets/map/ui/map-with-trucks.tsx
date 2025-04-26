@@ -1,5 +1,10 @@
+import { TrackTruckMarkers } from '@/features/truck-track'
 import { MapBase } from '@/shared/ui'
 
 export const MapWithTrucks = () => {
-  return <MapBase>{/* <TruckMarkers /> */}</MapBase>
+  return (
+    <MapBase>
+      <TrackTruckMarkers />
+    </MapBase>
+  )
 }

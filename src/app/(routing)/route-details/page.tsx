@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react'
 
 export default function RouteDetails() {
   const { connection, isConnected } = useConnection()
-  const [trucks, setTrucks] = useState<Record<string, TruckLocationUpdate>>({})
+  const [truck, setTruck] = useState<TruckLocationUpdate>()
 
   useEffect(() => {
     if (!connection || !isConnected) return
@@ -22,10 +22,7 @@ export default function RouteDetails() {
 
     connection.on('ReceiveTruckLocationUpdate', (data: TruckLocationUpdate) => {
       console.log(data)
-      setTrucks((prev) => ({
-        ...prev,
-        [data.truckId]: data,
-      }))
+      setTruck(data)
     })
 
     return () => {
@@ -33,25 +30,16 @@ export default function RouteDetails() {
     }
   }, [connection, isConnected])
 
-  const trucksArray = Object.values(trucks)
-
   return (
     <div>
       {isConnected ? (
-        trucksArray.length > 0 ? (
-          <ul>
-            {trucksArray.map((truck) => (
-              <li key={truck.truckId}>
-                Truck Id: {truck.truckId}, Lat: {truck.latitude}, Lon:{' '}
-                {truck.longitude}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div>Ожидание данных...</div>
-        )
+        <ul>
+          <div>
+            {truck?.truckId} {truck?.longitude} {truck?.latitude}
+          </div>
+        </ul>
       ) : (
-        <div>Нет подключения к серверу</div>
+        <div>Ожидание данных...</div>
       )}
     </div>
   )
