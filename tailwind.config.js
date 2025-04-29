@@ -67,6 +67,7 @@ module.exports = {
         text: {
           heading: 'hsl(var(--text-heading))',
           strong: 'hsl(var(--text-strong))',
+          neutral: 'hsl(var(--text-neutral))',
           muted: 'hsl(var(--text-muted))',
           'muted-alt': 'hsl(var(--text-muted-alt))',
         },
