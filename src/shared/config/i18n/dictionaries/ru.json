@@ -1,21 +1,42 @@
 {
   "home": {
-    "test": "Тест",
-    "calculate": "Рассчитать",
-    "departure": "Место отправления",
-    "destination": "Место назначения",
+    "buttons": {
+      "calculate": "Рассчитать",
+      "send_route": "Отправить маршрут",
+      "create": "Создать маршрут",
+      "adjust": "Изменить маршрут",
+      "loading": "Пожалуйста, подождите"
+    },
     "errors": {
       "departure_required_error": "Выберите точку отправления",
       "destination_required_error": "Выберите точку назначения",
-      "different_points": "Точки отправления и назначения должны различаться",
-      "invalid_weight": "Введите правильный вес",
-      "invalid_fuel": "Введите правильно значения топлива",
+      "different_points": "Точки отправления и назначения должны быть разными",
+      "invalid_weight": "Пожалуйста, введите корректный вес",
+      "invalid_fuel": "Пожалуйста, введите корректный объем топлива",
       "valid": "Введите корректный адрес"
+    },
+    "input_fields": {
+      "find_unit_placeholder": "Поиск по номеру юнита",
+      "departure_placeholder": "Место отправления",
+      "destination_placeholder": "Пункт назначения",
+      "weight": "Вес",
+      "weight_placeholder": "Введите вес"
+    },
+    "headings": {
+      "driver_info": "Информация о водителе",
+      "route_info": "Информация о маршруте",
+      "details_info": "Детали заправки"
+    },
+    "status": {
+      "active": "В пути",
+      "inactive": "Неактивен",
+      "available": "Свободен"
+    },
+    "driver_info": {
+      "fuel": "Топливо",
+      "bonus": "Бонусы",
+      "unit_number": "Номер юнита",
+      "truck": "Тягач"
     }
-  },
-  "button": {
-    "loading": "Пожалуйста, подождите",
-    "estimate": "Оценить",
-    "adjust": "Изменить маршрут"
   }
 }

@@ -5,15 +5,21 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { RouteSearchFormValues, routeSearchSchema } from '../model/schema'
 import { AutocompleteCustom } from './autocomplete'
 import { GooglePlace } from '@/shared/types/place'
-import { useRouteStore } from '@/shared/store/route-store'
 import { useDictionary } from '@/shared/lib/hooks'
 import { getLocalizedErrorMessage } from '../lib'
 import { Input } from '@/shared/ui'
 import { FuelSlider } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
+import { Coordinate } from '@/shared/types'
+interface RouteSearchFormProps {
+  setOrigin: (value: Coordinate | null) => void
+  setDestination: (value: Coordinate | null) => void
+}
 
-export const RouteSearchForm = () => {
-  const { setDestination, setOrigin } = useRouteStore()
+export const RouteSearchForm = ({
+  setOrigin,
+  setDestination,
+}: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
   const [selectedStartPoint, setSelectedStartPoint] =
     useState<GooglePlace | null>(null)
@@ -38,22 +44,15 @@ export const RouteSearchForm = () => {
   })
 
   const onSubmit = (data: RouteSearchFormValues) => {
-    console.log(data)
-
-    if (!selectedStartPoint && selectedStartPoint == null) {
+    if (!selectedStartPoint) {
       setError('startPoint', { type: 'manual', message: 'valid' })
     }
 
-    if (!selectedEndPoint && selectedEndPoint == null) {
+    if (!selectedEndPoint) {
       setError('endPoint', { type: 'manual', message: 'valid' })
     }
 
-    if (
-      selectedStartPoint &&
-      selectedStartPoint.location &&
-      selectedEndPoint &&
-      selectedEndPoint.location
-    ) {
+    if (selectedStartPoint?.location && selectedEndPoint?.location) {
       setOrigin({
         latitude: selectedStartPoint.location.lat(),
         longitude: selectedStartPoint.location.lng(),
@@ -65,6 +64,13 @@ export const RouteSearchForm = () => {
     }
   }
 
+  const FieldError = ({ error }: { error?: { message?: string } }) =>
+    error?.message ? (
+      <p className="text-red-500 text-sm mt-1">
+        {getLocalizedErrorMessage(error.message, dictionary)}
+      </p>
+    ) : null
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -73,7 +79,7 @@ export const RouteSearchForm = () => {
         {/* Start Point */}
         <div className="flex items-center space-x-2">
           <div className="w-8 flex justify-center">
-            <Icon name="common/marker" width={24} height={24} />
+            <Icon name="common/marker-yellow" width={24} height={24} />
           </div>
 
           <Controller
@@ -84,20 +90,17 @@ export const RouteSearchForm = () => {
                 value={field.value}
                 onChange={field.onChange}
                 onPlaceSelect={(place) => setSelectedStartPoint(place)}
-                placeholder="Отправка"
+                placeholder={dictionary.home.input_fields.departure_placeholder}
               />
             )}
           />
         </div>
-        {errors.startPoint && errors.startPoint.message && (
-          <p className="text-red-500 text-sm mt-1">
-            {getLocalizedErrorMessage(errors.startPoint.message, dictionary)}
-          </p>
-        )}
+        <FieldError error={errors.startPoint} />
+
         {/* End Point */}
         <div className="flex items-center space-x-2">
           <div className="w-8 flex justify-center">
-            <Icon name="common/marker" width={24} height={24} />
+            <Icon name="common/marker-blue" width={24} height={24} />
           </div>
 
           <Controller
@@ -108,42 +111,35 @@ export const RouteSearchForm = () => {
                 value={field.value}
                 onChange={field.onChange}
                 onPlaceSelect={(place) => setSelectedEndPoint(place)}
-                placeholder="Доставка"
+                placeholder={
+                  dictionary.home.input_fields.destination_placeholder
+                }
               />
             )}
           />
         </div>
-        {errors.endPoint && errors.endPoint.message && (
-          <p className="text-red-500 text-sm mt-1">
-            {getLocalizedErrorMessage(errors.endPoint.message, dictionary)}
-          </p>
-        )}
+        <FieldError error={errors.endPoint} />
         {/* Weight */}
         <div className="flex items-center space-x-2">
           <div className="w-8 flex justify-center">
             <Icon name="common/weight" width={24} height={24} />
           </div>
-          <div className="flex-1 bg-gray-100 rounded-full px-4  flex items-center">
-            <span className="text-gray-700 text-sm mr-2">Вес</span>
-            <Controller
-              name="weight"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  variant="gray"
-                  placeholder={'Введите вес'}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name="weight"
+            control={control}
+            render={({ field }) => (
+              <Input
+                className="w-full md:w-96"
+                prefixText={dictionary.home.input_fields.weight}
+                variant="gray"
+                placeholder={dictionary.home.input_fields.weight_placeholder}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </div>
-        {errors.weight && errors.weight.message && (
-          <p className="text-red-500 text-sm mt-1">
-            {getLocalizedErrorMessage(errors.weight.message, dictionary)}
-          </p>
-        )}
+        <FieldError error={errors.weight} />
 
         {/* Fuel Slider */}
         <div className="flex items-center space-x-2 mt-4">
@@ -166,13 +162,9 @@ export const RouteSearchForm = () => {
           </div>
         </div>
       </div>
-      {errors.fuelPercent && errors.fuelPercent.message && (
-        <p className="text-red-500 text-sm mt-1">
-          {getLocalizedErrorMessage(errors.fuelPercent.message, dictionary)}
-        </p>
-      )}
+      <FieldError error={errors.fuelPercent} />
       <Button type="submit" className="w-full mt-4">
-        {dictionary.home.calculate}
+        {dictionary.home.buttons.calculate}
       </Button>
     </form>
   )

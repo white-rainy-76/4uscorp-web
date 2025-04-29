@@ -59,7 +59,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {prefixText && (
           <div className="flex items-center gap-2 text-sm font-medium">
-            <span>{prefixText}</span>
+            <span className="text-[hsl(var(--text-strong))]">{prefixText}</span>
             <span className="h-4 w-px bg-[hsl(var(--separator))]" />
           </div>
         )}

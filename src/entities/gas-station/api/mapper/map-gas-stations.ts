@@ -11,9 +11,19 @@ export const mapGasStations = (dto: GasStationDto[]): GasStation[] => {
     },
     address: stationDto.address,
     fuelPrice: {
-      price: stationDto.price?.toString() || undefined, // Handle potential null/undefined
-      discount: stationDto.discount?.toString() || undefined, // Handle potential null/undefined
-      finalPrice: stationDto.priceAfterDiscount,
+      price:
+        stationDto.price !== undefined && stationDto.price !== null
+          ? Number(stationDto.price).toFixed(4)
+          : undefined,
+      discount:
+        stationDto.discount !== undefined && stationDto.discount !== null
+          ? Number(stationDto.discount).toFixed(4)
+          : undefined,
+      finalPrice:
+        stationDto.priceAfterDiscount !== undefined &&
+        stationDto.priceAfterDiscount !== null
+          ? Number(stationDto.priceAfterDiscount).toFixed(4)
+          : undefined,
     },
   }))
 }
