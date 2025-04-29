@@ -1,21 +1,42 @@
 {
   "home": {
-    "test": "Test",
-    "calculate": "Calculate",
-    "departure": "Place of departure",
-    "destination": "Destination",
+    "buttons": {
+      "calculate": "Calculate",
+      "send_route": "Send route",
+      "create": "Create route",
+      "adjust": "Adjust route",
+      "loading": "Please wait"
+    },
     "errors": {
-      "departure_required_error": "Select a starting point",
+      "departure_required_error": "Select a departure point",
       "destination_required_error": "Select a destination point",
-      "different_points": "Starting and destination points must be different",
-      "invalid_weight": "Please enter valid weight",
-      "invalid_fuel": "Please enter valid fuel",
-      "valid": "Enter valid address"
+      "different_points": "Departure and destination points must be different",
+      "invalid_weight": "Please enter a valid weight",
+      "invalid_fuel": "Please enter a valid fuel amount",
+      "valid": "Enter a valid address"
+    },
+    "input_fields": {
+      "find_unit_placeholder": "Search by unit number",
+      "departure_placeholder": "Departure point",
+      "destination_placeholder": "Destination point",
+      "weight": "Weight",
+      "weight_placeholder": "Enter weight"
+    },
+    "headings": {
+      "driver_info": "Driver information",
+      "route_info": "Route information",
+      "details_info": "Refueling details"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "available": "Available"
+    },
+    "driver_info": {
+      "fuel": "Fuel",
+      "bonus": "Bonuses",
+      "unit_number": "Unit number",
+      "truck": "Truck"
     }
-  },
-  "button": {
-    "loading": "Please wait",
-    "estimate": "Estimate",
-    "adjust": "Adjust the route"
   }
 }

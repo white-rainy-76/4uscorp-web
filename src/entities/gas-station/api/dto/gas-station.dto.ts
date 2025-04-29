@@ -9,8 +9,5 @@ export interface GasStationDto {
   discount?: number
   priceAfterDiscount?: string
   distanceToLocation?: number
-  image?: {
-    tile?: string
-  }
   route?: number
 }

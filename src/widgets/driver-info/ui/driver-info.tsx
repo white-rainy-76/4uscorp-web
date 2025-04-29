@@ -1,11 +1,17 @@
+import { Driver } from '@/entities/driver'
+import { useDictionary } from '@/shared/lib/hooks'
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { InfoCard } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
 
-export const DriverInfo = () => {
+type DriverInfoProps = {
+  driver?: Driver
+}
+export const DriverInfo = ({ driver }: DriverInfoProps) => {
+  const { dictionary } = useDictionary()
   return (
-    <InfoCard title="Информация о водителе">
+    <InfoCard title={dictionary.home.headings.driver_info}>
       {/* Верхний блок с тремя колонками */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {/* Водитель */}
@@ -31,7 +37,7 @@ export const DriverInfo = () => {
                 50%
               </div>
               <div className="text-sm text-[hsl(var(--text-muted-alt))]">
-                Топливо
+                {dictionary.home.driver_info.fuel}
               </div>
             </div>
           </div>
@@ -46,7 +52,7 @@ export const DriverInfo = () => {
               <path d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6l4 4v2h8v-2l4-4z" />
             </svg>
             <span className="text-base font-bold text-[#FFAF2A] whitespace-nowrap">
-              5000 - Бонусы
+              5000 - {dictionary.home.driver_info.bonus}
             </span>
           </div>
         </div>
@@ -66,7 +72,7 @@ export const DriverInfo = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6 pt-4 text-sm">
         <div>
           <span className="text-xs text-[hsl(var(--text-muted))] font-medium">
-            Юнит номер
+            {dictionary.home.driver_info.unit_number}
           </span>
           <div className="text-xs font-bold text-[hsl(var(--text-heading))]">
             # 111
@@ -74,7 +80,7 @@ export const DriverInfo = () => {
         </div>
         <div className="border-l pl-4">
           <span className="text-[hsl(var(--text-muted))] font-medium">
-            Truck
+            {dictionary.home.driver_info.truck}
           </span>
           <div className="font-bold text-[hsl(var(--text-heading))]">
             2025 FREIGHTLINER CASCADIA

@@ -22,7 +22,9 @@ export const CustomPin = (
           height={32}
           className="mx-auto"
         />
-        <p className="text-sm font-semibold mt-1">{gasStation.address}</p>
+        <p className="text-sm font-semibold mt-1 text-[hsl(var(--text-strong))]">
+          {gasStation.address}
+        </p>
         <div className="mt-2 p-2 bg-gray-100 rounded-md text-xs">
           <p className="text-gray-600">
             Цена:{' '}
@@ -32,7 +34,7 @@ export const CustomPin = (
           </p>
           <p className="text-gray-600">
             Скидка:{' '}
-            <span className="font-bold">
+            <span className="font-bold text-orange-600">
               {gasStation.fuelPrice?.discount ?? 'N/A'}₴
             </span>
           </p>

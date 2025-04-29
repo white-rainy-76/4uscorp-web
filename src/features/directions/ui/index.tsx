@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { convertToLatLngLiteral } from '../lib'
-import { useRouteStore } from '@/shared/store/route-store'
 import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query'
 
 import { Directions as DirectionType } from '../model'
@@ -9,6 +8,7 @@ import { RouteMarkers } from './markers'
 
 import { getNearestDropPoint } from '../api/get-nearest-drop-point'
 import { RouteRequestPayload } from '../api/payload/directions.payload'
+import { Coordinate } from '@/shared/types'
 
 interface DirectionsProps {
   data?: DirectionType | undefined
@@ -18,9 +18,16 @@ interface DirectionsProps {
     RouteRequestPayload,
     unknown
   >
+  origin: Coordinate | null
+  destination: Coordinate | null
 }
 
-export const Directions = ({ data, directionsMutation }: DirectionsProps) => {
+export const Directions = ({
+  data,
+  directionsMutation,
+  origin,
+  destination,
+}: DirectionsProps) => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
     google.maps.LatLngLiteral[][]
@@ -33,8 +40,6 @@ export const Directions = ({ data, directionsMutation }: DirectionsProps) => {
   const [endMarker, setEndMarker] = useState<google.maps.LatLngLiteral | null>(
     null,
   )
-
-  const { origin, destination } = useRouteStore()
 
   const dropPointMutation = useMutation({
     mutationFn: getNearestDropPoint,
@@ -50,9 +55,10 @@ export const Directions = ({ data, directionsMutation }: DirectionsProps) => {
 
   // Обработка данных маршрута
   useEffect(() => {
-    if (!data?.routeIds || data.routeIds.length === 0) return
+    console.log(data?.routeDtos)
+    if (!data?.routeDtos || data.routeDtos.length === 0) return
     try {
-      const allShapes: google.maps.LatLngLiteral[][] = data.routeIds.map(
+      const allShapes: google.maps.LatLngLiteral[][] = data.routeDtos.map(
         (route) => {
           return convertToLatLngLiteral(route.mapPoints)
         },

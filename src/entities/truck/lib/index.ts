@@ -1,1 +1,1 @@
-export * from './convertStringToTruckStatus'
+export * from './convert-string-to-truck-status'

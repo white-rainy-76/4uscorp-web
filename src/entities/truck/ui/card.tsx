@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
 import { TruckCard } from '../model/truckCard'
 import { Icon } from '@/shared/ui'
+import { StatusLabel } from '@/shared/ui'
 
 export const Card = ({
   avatarImage,
@@ -16,7 +17,6 @@ export const Card = ({
   setIsActive,
 }: TruckCard) => {
   const router = useRouter()
-
   const handleClick = () => {
     setIsActive()
     setTimeout(() => {
@@ -28,9 +28,9 @@ export const Card = ({
     <div
       className={`h-[104px] rounded-[24px] cursor-pointer transition-colors duration-200 flex items-center justify-between px-4 
       bg-[hsl(var(--background))] 
-      ${isActive ? 'ring-2 ring-[hsl(var(--primary))]' : ''} 
+      ${isActive && 'ring-2 ring-[hsl(var(--primary))]'} 
       hover:bg-[hsl(var(--muted))] 
-      ${isActive ? 'hover:bg-[hsl(var(--accent))]' : ''}`}
+      ${isActive && 'hover:bg-[hsl(var(--accent))]'}`}
       onClick={handleClick}>
       {/* Left part */}
       <div className="flex items-center gap-4">
@@ -57,16 +57,7 @@ export const Card = ({
           </span>
         </div>
         <div className="w-[90px] text-right">
-          <span
-            className={`text-sm font-bold ${
-              status === 'EN_ROUTE'
-                ? 'text-green-600'
-                : status === 'IDLE'
-                  ? 'text-yellow-500'
-                  : 'text-red-500'
-            }`}>
-            {status}
-          </span>
+          <StatusLabel status={status} />
         </div>
       </div>
     </div>

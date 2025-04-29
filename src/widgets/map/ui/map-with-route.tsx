@@ -1,12 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Directions } from '@/features/directions'
 import { MapBase, Spinner } from '@/shared/ui'
-import { useRouteStore } from '@/shared/store/route-store'
 import { getDirections } from '@/features/directions/api/get-directions'
 import { useEffect } from 'react'
+import { GasStationMarker } from '@/entities/gas-station'
+import { Coordinate } from '@/shared/types'
+interface MapWithRouteProps {
+  origin: Coordinate | null
+  destination: Coordinate | null
+}
 
-export const MapWithRoute = () => {
-  const { origin, destination } = useRouteStore()
+export const MapWithRoute = ({ origin, destination }: MapWithRouteProps) => {
   console.log('Render')
   const { mutateAsync, data, isPending } = useMutation({
     mutationFn: getDirections,
@@ -28,12 +32,22 @@ export const MapWithRoute = () => {
             <Spinner />
           </div>
         )}
-        <Directions data={data} directionsMutation={mutateAsync} />
+        <Directions
+          origin={origin}
+          destination={destination}
+          data={data}
+          directionsMutation={mutateAsync}
+        />
+        {data?.gasStations &&
+          data.gasStations.map((gasStation) => (
+            <GasStationMarker key={gasStation.id} gasStation={gasStation} />
+          ))}
       </MapBase>
     </div>
   )
 }
 
+// <ClusteredGasStationMarkers gasStations={data?.gasStations} />
 // const { data, isLoading, isError, error } = useQuery({
 //   ...gasStationQueries.list({
 //     radius: 15,

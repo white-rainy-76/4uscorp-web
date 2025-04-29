@@ -1,4 +1,4 @@
-import { rawTruckStatusToTruckStatus } from '../../lib/convertStringToTruckStatus'
+import { rawTruckStatusToTruckStatus } from '../../lib/convert-string-to-truck-status'
 import { Driver, Truck } from '../../model/truck'
 
 import { TruckDto } from '../dto/truck.dto'
