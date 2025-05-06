@@ -9,30 +9,30 @@ import type { Marker } from '@googlemaps/markerclusterer'
 
 interface Props {
   gasStation: GasStation
-  // setMarkerRef: (marker: Marker | null, key: string) => void
+  setMarkerRef: (marker: Marker | null, key: string) => void
 }
 
 export const GasStationMarker: React.FC<Props> = ({
   gasStation,
-  // setMarkerRef,
+  setMarkerRef,
 }) => {
   const [clicked, setClicked] = useState(false)
   const [hovered, setHovered] = useState(false)
 
   const isAlgorithm = useMemo(() => Math.random() < 0.2, []) // симуляция алгоритма
 
-  // const ref = useCallback(
-  //   (marker: google.maps.marker.AdvancedMarkerElement) =>
-  //     setMarkerRef(marker, gasStation.id),
-  //   [setMarkerRef, gasStation.id],
-  // )
+  const ref = useCallback(
+    (marker: google.maps.marker.AdvancedMarkerElement) =>
+      setMarkerRef(marker, gasStation.id),
+    [setMarkerRef, gasStation.id],
+  )
   return (
     <AdvancedMarker
       position={gasStation.position}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => setClicked(!clicked)}
-      // ref={ref}
+      ref={ref}
       className={classNames('gas-station-marker', { clicked, hovered })}
       zIndex={clicked ? 2000 : isAlgorithm ? 2 : 1}>
       {clicked ? (

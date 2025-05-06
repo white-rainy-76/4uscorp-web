@@ -10,9 +10,17 @@ interface Props {
   lat: number
   lng: number
   unitNumber: string
+  clickedOutside: boolean
+  resetClick: () => void
 }
 
-export const TruckMarker = ({ lat, lng, unitNumber }: Props) => {
+export const TruckMarker = ({
+  lat,
+  lng,
+  unitNumber,
+  clickedOutside,
+  resetClick,
+}: Props) => {
   const [position, setPosition] = useState({ lat, lng })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [rotation, setRotation] = useState(0)
@@ -115,8 +123,15 @@ export const TruckMarker = ({ lat, lng, unitNumber }: Props) => {
 
     return () => cancelAnimationFrame(animationFrameId)
   }, [])
+  useEffect(() => {
+    if (clickedOutside && isMenuOpen) {
+      setIsMenuOpen(false)
+      resetClick()
+    }
+  }, [clickedOutside, isMenuOpen, resetClick])
 
-  const handleMarkerClick = () => {
+  const handleMarkerClick = (e: google.maps.MapMouseEvent) => {
+    e.domEvent?.stopPropagation()
     setIsMenuOpen(true)
   }
 
@@ -131,9 +146,7 @@ export const TruckMarker = ({ lat, lng, unitNumber }: Props) => {
           className="text-white fill-red-600"
           style={{ transform: `rotate(${rotation}deg)` }}
         />
-        <div
-          className="absolute top-[-25px] left-1/2 transform -translate-x-1/2 bg-gray-100 rounded-md px-2 py-1 text-xs font-bold text-gray-700 cursor-pointer z-10 whitespace-nowrap"
-          onClick={handleMarkerClick}>
+        <div className="absolute top-[-25px] left-1/2 transform -translate-x-1/2 bg-gray-100 rounded-md px-2 py-1 text-xs font-bold text-gray-700 cursor-pointer z-10 whitespace-nowrap">
           #{unitNumber}
         </div>
 

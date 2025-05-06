@@ -10,6 +10,8 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/shared/api/query-client'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import Script from 'next/script'
+import { ReactScan } from '@/shared/ui/react-scan'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -29,6 +31,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <Script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
+      <ReactScan />
       <body
         suppressHydrationWarning
         className={cn(

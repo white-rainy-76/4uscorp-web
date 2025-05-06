@@ -8,9 +8,16 @@ import { useEffect, useState } from 'react'
 interface Props {
   truckId: string
   unitNumber: string
+  clickedOutside: boolean
+  resetClick: () => void
 }
 
-export const TrackTruck = ({ truckId, unitNumber }: Props) => {
+export const TrackTruck = ({
+  truckId,
+  unitNumber,
+  clickedOutside,
+  resetClick,
+}: Props) => {
   const { connection, isConnected } = useConnection()
   const [location, setLocation] = useState<TruckLocationUpdate>()
 
@@ -39,6 +46,8 @@ export const TrackTruck = ({ truckId, unitNumber }: Props) => {
       unitNumber={unitNumber}
       lat={location.latitude}
       lng={location.longitude}
+      clickedOutside={clickedOutside}
+      resetClick={resetClick}
     />
   )
 }

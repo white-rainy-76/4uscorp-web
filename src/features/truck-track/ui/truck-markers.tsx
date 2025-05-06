@@ -1,4 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
 import { TrackTruck } from './tracked-truck'
+import { truckQueries } from '@/entities/truck/api'
 
 export const fakeTruckMarkers = [
   {
@@ -20,7 +22,16 @@ export const fakeTruckMarkers = [
     unitNumber: 'TX-103',
   },
 ]
-export const TrackTruckMarkers = () => {
+
+export const TrackTruckMarkers = ({
+  clickedOutside,
+  resetClick,
+}: {
+  clickedOutside: boolean
+  resetClick: () => void
+}) => {
+  const { data, isLoading } = useQuery({ ...truckQueries.list() })
+
   return (
     <>
       {fakeTruckMarkers.map((truck) => (
@@ -28,6 +39,8 @@ export const TrackTruckMarkers = () => {
           key={truck.truckId}
           truckId={truck.truckId}
           unitNumber={truck.unitNumber}
+          clickedOutside={clickedOutside}
+          resetClick={resetClick}
         />
       ))}
     </>
