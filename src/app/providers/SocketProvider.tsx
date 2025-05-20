@@ -1,5 +1,5 @@
 'use client'
-import { connectionContext } from '@/shared/api/socket'
+import { connectionContext } from '@/shared/lib/context/socket-context'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   HubConnectionBuilder,

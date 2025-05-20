@@ -1,13 +1,11 @@
-import { useMutation } from '@tanstack/react-query'
 import { Directions } from '@/features/directions'
 import { MapBase, Spinner } from '@/shared/ui'
-import { getDirections } from '@/features/directions/api/get-directions'
 import { useEffect, useRef } from 'react'
-import { GasStationMarker } from '@/entities/gas-station'
-import { Coordinate } from '@/shared/types'
 import { ClusteredGasStationMarkers } from '@/entities/gas-station/ui/clustered-gas-station-markers'
 import { FullScreenController } from './controlers/fullscreen'
 import { ZoomControl } from './controlers/zoom'
+import { Coordinate } from '@/shared/types'
+import { useGetDirectionsMutation } from '@/features/directions/api/get-direction.mutation'
 
 interface MapWithRouteProps {
   origin: Coordinate | null
@@ -16,9 +14,17 @@ interface MapWithRouteProps {
 
 export const MapWithRoute = ({ origin, destination }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
-  const { mutateAsync, data, isPending } = useMutation({
-    mutationFn: getDirections,
-  })
+  const { mutateAsync, data, isPending, context, reset } =
+    useGetDirectionsMutation({
+      onError: (error, variables, context) => {
+        console.log(`Directions mutation error: ${error}`)
+        if (context?.abortController) {
+          context.abortController.abort(
+            'Directions request cancelled due to error',
+          )
+        }
+      },
+    })
 
   useEffect(() => {
     if (origin && destination) {
@@ -26,6 +32,8 @@ export const MapWithRoute = ({ origin, destination }: MapWithRouteProps) => {
         origin,
         destination,
       })
+    } else {
+      reset()
     }
   }, [origin, destination])
 
@@ -52,7 +60,6 @@ export const MapWithRoute = ({ origin, destination }: MapWithRouteProps) => {
     </div>
   )
 }
-
 // {data?.gasStations && (
 //   <ClusteredGasStationMarkers gasStations={data?.gasStations} />
 // )}

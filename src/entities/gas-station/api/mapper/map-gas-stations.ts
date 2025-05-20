@@ -1,5 +1,5 @@
-import { GasStationDto } from '../dto/gas-station.dto'
-import { GasStation } from '../../model/gas-station'
+import { GasStation } from '../types/gas-station'
+import { GasStationDto } from '../types/gas-station.dto'
 
 export const mapGasStations = (dto: GasStationDto[]): GasStation[] => {
   return dto.map((stationDto) => ({

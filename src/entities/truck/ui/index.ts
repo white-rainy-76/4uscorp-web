@@ -1,3 +1,3 @@
-export * from './card'
-export * from './truck-marker'
-export * from './card-skeleton'
+export { Card } from './card'
+export { TruckMarker } from './truck-marker'
+export { CardSkeleton } from './card-skeleton'

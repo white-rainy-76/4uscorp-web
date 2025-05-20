@@ -1,27 +1,33 @@
-import { rawTruckStatusToTruckStatus } from '../../lib/convert-string-to-truck-status'
-import { Driver, Truck } from '../../model/truck'
-import { TruckDto } from '../dto/truck.dto'
+import { Driver, Truck, TruckStatus } from '../types/truck'
+import { TruckDto } from '../types/truck.dto'
 
-export const mapTrucks = (rawTrucks: TruckDto[]): Truck[] => {
-  return rawTrucks.map((rawTruck) => {
-    const mappedDriver: Driver | null = rawTruck.driver
-      ? {
-          id: rawTruck.driver.id,
-          fullName: rawTruck.driver.fullName,
-          status: rawTruck.driver.status,
-        }
-      : null
-    return {
-      id: rawTruck.id,
-      licensePlate: rawTruck.licensePlate,
-      status: rawTruckStatusToTruckStatus(rawTruck.status),
-      driverId: rawTruck.driverId,
-      vin: rawTruck.vin,
-      serial: rawTruck.serial,
-      make: rawTruck.make,
-      model: rawTruck.model,
-      year: rawTruck.year,
-      driver: mappedDriver,
-    }
-  })
+const statusMap: Record<string, TruckStatus> = {
+  Available: 'AVAILABLE',
+  EnRoute: 'EN_ROUTE',
+  Maintenance: 'MAINTENANCE',
+}
+
+export const mapTruck = (rawTruck: TruckDto): Truck => {
+  const mappedDriver: Driver | null = rawTruck.driver
+    ? {
+        id: rawTruck.driver.id,
+        fullName: rawTruck.driver.fullName,
+        status: rawTruck.driver.status,
+      }
+    : null
+
+  return {
+    id: rawTruck.id,
+    providerTruckId: rawTruck.providerTruckId,
+    licensePlate: rawTruck.licensePlate ? rawTruck.licensePlate : '',
+    status: statusMap[rawTruck.status] ?? 'INACTIVE',
+    driverId: rawTruck.driverId,
+    name: rawTruck.name,
+    vin: rawTruck.vin,
+    serial: rawTruck.serial ? rawTruck.serial : '',
+    make: rawTruck.make,
+    model: rawTruck.model,
+    year: rawTruck.year,
+    driver: mappedDriver,
+  }
 }

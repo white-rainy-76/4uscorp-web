@@ -1,1 +1,1 @@
-export * from './truck.queries'
+export { truckQueries } from './truck.queries'

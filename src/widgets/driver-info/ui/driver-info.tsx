@@ -1,4 +1,4 @@
-import { Driver } from '@/entities/driver'
+import { Truck } from '@/entities/truck'
 import { useDictionary } from '@/shared/lib/hooks'
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
@@ -6,15 +6,15 @@ import { InfoCard } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
 
 type DriverInfoProps = {
-  driver?: Driver
+  truck: Truck
 }
-export const DriverInfo = ({ driver }: DriverInfoProps) => {
+export const DriverInfo = ({ truck }: DriverInfoProps) => {
   const { dictionary } = useDictionary()
   return (
     <InfoCard title={dictionary.home.headings.driver_info}>
-      {/* Верхний блок с тремя колонками */}
+      {/* Top section with three columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {/* Водитель */}
+        {/* Driver information */}
         <div className="flex items-center gap-4">
           <Avatar className="w-12 h-12">
             <AvatarImage src={'https://github.com/shadcn.png'} />
@@ -28,7 +28,7 @@ export const DriverInfo = ({ driver }: DriverInfoProps) => {
           </div>
         </div>
 
-        {/* Топливо и бонусы */}
+        {/* Fuel and bonuses */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex items-center gap-2 border border-dashed rounded-xl pl-[14px] pr-14 py-2 border-spacing-10">
             <Icon name="common/fuel" width={26} height={31} />
@@ -57,7 +57,7 @@ export const DriverInfo = ({ driver }: DriverInfoProps) => {
           </div>
         </div>
 
-        {/* Действия */}
+        {/* Actions */}
         <div className="flex gap-3 justify-start sm:justify-end">
           <button className="w-10 h-10 rounded-full border text-[hsl(var(--text-heading))] hover:bg-gray-100 flex items-center justify-center border-[hsl(var(--separator))]">
             <Phone className="w-5 h-5" />
@@ -68,14 +68,14 @@ export const DriverInfo = ({ driver }: DriverInfoProps) => {
         </div>
       </div>
 
-      {/* Нижняя таблица */}
+      {/* Bottom table/details section */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6 pt-4 text-sm">
         <div>
           <span className="text-xs text-[hsl(var(--text-muted))] font-medium">
             {dictionary.home.driver_info.unit_number}
           </span>
           <div className="text-xs font-bold text-[hsl(var(--text-heading))]">
-            # 111
+            {truck.name}
           </div>
         </div>
         <div className="border-l pl-4">
@@ -83,10 +83,10 @@ export const DriverInfo = ({ driver }: DriverInfoProps) => {
             {dictionary.home.driver_info.truck}
           </span>
           <div className="font-bold text-[hsl(var(--text-heading))]">
-            2025 FREIGHTLINER CASCADIA
+            {truck.year} {truck.make} {truck.model}
           </div>
         </div>
-        <div /> {/* Пусто — под экшены, чтобы сохранить выравнивание */}
+        <div /> {/* Empty div to maintain alignment with actions */}
       </div>
     </InfoCard>
   )

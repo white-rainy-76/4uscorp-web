@@ -1,2 +1,2 @@
 export { DriversListHeader } from './header'
-export { DriversList } from './driver-list'
+export { TruckList } from './driver-list'

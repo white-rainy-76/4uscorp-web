@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { cn } from '@/shared/ui/utils'
 import { useDictionary } from '@/shared/lib/hooks'
+import { TruckStatus } from '@/entities/truck'
 
 interface StatusLabelProps extends React.HTMLAttributes<HTMLSpanElement> {
-  status: 'Available' | 'Active' | 'Inactive' | string
+  status: TruckStatus
 }
 
 const statusStyles = {

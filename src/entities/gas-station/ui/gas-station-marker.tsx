@@ -2,10 +2,10 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import { AdvancedMarker } from '@vis.gl/react-google-maps'
 import Image from 'next/image'
 import classNames from 'classnames'
-import { GasStation } from '../model/gas-station'
 import { CustomPin } from './custom-pin'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import type { Marker } from '@googlemaps/markerclusterer'
+import { GasStation } from '../api/types/gas-station'
 
 interface Props {
   gasStation: GasStation

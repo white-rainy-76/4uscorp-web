@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { convertToLatLngLiteral } from '../lib'
 import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query'
-
-import { Directions as DirectionType } from '../model'
+import { Directions as DirectionType, RouteRequestPayload } from '../api'
 import { RoutePolylines } from './directions'
 import { RouteMarkers } from './markers'
 
-import { getNearestDropPoint } from '../api/get-nearest-drop-point'
-import { RouteRequestPayload } from '../api/payload/directions.payload'
 import { Coordinate } from '@/shared/types'
+import { useGetNearestDropPointMutation } from '../api/get-nearest-drop-point.mutation'
+import { useCancelDirectionsCreationMutation } from '../api/useCancelDirectionsMutation'
+import { Marker } from '@vis.gl/react-google-maps'
 
 interface DirectionsProps {
   data?: DirectionType | undefined
@@ -41,10 +41,14 @@ export const Directions = ({
     null,
   )
 
-  const dropPointMutation = useMutation({
-    mutationFn: getNearestDropPoint,
+  const dropPointMutation = useGetNearestDropPointMutation({
     onError: (error, variables, context) => {
-      console.log(`${error}`)
+      console.log(`Drop point mutation error: ${error}`)
+      if (context?.abortController) {
+        context.abortController.abort(
+          'Drop point request cancelled due to error',
+        )
+      }
     },
   })
 
@@ -55,7 +59,6 @@ export const Directions = ({
 
   // Обработка данных маршрута
   useEffect(() => {
-    console.log(data?.routeDtos)
     if (!data?.routeDtos || data.routeDtos.length === 0) return
     try {
       const allShapes: google.maps.LatLngLiteral[][] = data.routeDtos.map(

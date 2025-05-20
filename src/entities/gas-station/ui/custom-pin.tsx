@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
-import { GasStation } from '../model/gas-station'
 import { getLogoUrl } from '../lib/getLogoUrl'
+import { GasStation } from '../api/types/gas-station'
 
 export const CustomPin = (
   setClicked: (value: boolean) => void,

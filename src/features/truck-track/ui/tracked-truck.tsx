@@ -1,7 +1,7 @@
 'use client'
 
 import { TruckMarker } from '@/entities/truck'
-import { useConnection } from '@/shared/api/socket'
+import { useConnection } from '@/shared/lib/context/socket-context'
 import { TruckLocationUpdate } from '@/shared/types/truck'
 import { useEffect, useState } from 'react'
 
@@ -19,33 +19,29 @@ export const TrackTruck = ({
   resetClick,
 }: Props) => {
   const { connection, isConnected } = useConnection()
-  const [location, setLocation] = useState<TruckLocationUpdate>()
-
+  const [truckInfo, setTruckInfo] = useState<TruckLocationUpdate>()
   useEffect(() => {
     if (!connection || !isConnected) return
-
     connection
       .invoke('JoinTruckGroup', truckId)
       .catch((err: any) => console.error('Join group error', err))
 
     connection.on('ReceiveTruckLocationUpdate', (data: TruckLocationUpdate) => {
       if (data.truckId === truckId) {
-        setLocation(data)
+        setTruckInfo(data)
       }
     })
-
     return () => {
       connection.off('ReceiveTruckLocationUpdate')
     }
-  }, [connection, isConnected, truckId])
+  }, [connection, isConnected, unitNumber])
 
-  if (!location) return null
+  if (!truckInfo) return null
 
   return (
     <TruckMarker
       unitNumber={unitNumber}
-      lat={location.latitude}
-      lng={location.longitude}
+      truckInfo={truckInfo}
       clickedOutside={clickedOutside}
       resetClick={resetClick}
     />

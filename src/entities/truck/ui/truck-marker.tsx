@@ -5,49 +5,56 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navigation2 } from 'lucide-react'
 import { Icon } from '@/shared/ui'
+import { TruckLocationUpdate } from '@/shared/types'
 
-interface Props {
-  lat: number
-  lng: number
+interface TruckMarkerProps {
+  truckInfo: TruckLocationUpdate
   unitNumber: string
   clickedOutside: boolean
   resetClick: () => void
 }
 
 export const TruckMarker = ({
-  lat,
-  lng,
+  truckInfo,
   unitNumber,
   clickedOutside,
   resetClick,
-}: Props) => {
-  const [position, setPosition] = useState({ lat, lng })
+}: TruckMarkerProps) => {
+  const [position, setPosition] = useState({
+    lat: truckInfo.latitude,
+    lng: truckInfo.longitude,
+  })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [rotation, setRotation] = useState(0)
+
   const router = useRouter()
 
-  // Очередь точек, которые приходят с сервера
-  const pointQueue = useRef<{ lat: number; lng: number }[]>([])
-  const currentPointRef = useRef<{ lat: number; lng: number } | null>(null)
-  const nextPointRef = useRef<{ lat: number; lng: number } | null>(null)
+  const pointQueue = useRef<
+    { lat: number; lng: number; headingDegrees: number }[]
+  >([])
+
+  const currentPointRef = useRef<{
+    lat: number
+    lng: number
+    headingDegrees: number
+  } | null>(null)
+
+  const nextPointRef = useRef<{
+    lat: number
+    lng: number
+    headingDegrees: number
+  } | null>(null)
+
   const startTimeRef = useRef<number | null>(null)
-  const duration = 1000 // 1 секунда интерполяции
+  const duration = 5000
 
-  // Приход новой координаты
+  // Добавление новой точки в очередь
   useEffect(() => {
-    pointQueue.current.push({ lat, lng })
-  }, [lat, lng])
-
-  // Вычисление угла между двумя точками
-  const calculateRotation = (
-    current: { lat: number; lng: number },
-    next: { lat: number; lng: number },
-  ) => {
-    const deltaLng = next.lng - current.lng
-    const deltaLat = next.lat - current.lat
-    const angle = Math.atan2(deltaLng, deltaLat) * (180 / Math.PI)
-    return angle
-  }
+    pointQueue.current.push({
+      lat: truckInfo.latitude,
+      lng: truckInfo.longitude,
+      headingDegrees: truckInfo.headingDegrees,
+    })
+  }, [truckInfo.latitude, truckInfo.longitude, truckInfo.headingDegrees])
 
   useEffect(() => {
     let animationFrameId: number
@@ -60,23 +67,9 @@ export const TruckMarker = ({
             ? pointQueue.current[0]
             : currentPointRef.current
           startTimeRef.current = timestamp
-          // Вычисляем угол при выборе новой точки
-          if (currentPointRef.current && nextPointRef.current) {
-            const angle = calculateRotation(
-              currentPointRef.current,
-              nextPointRef.current,
-            )
-            setRotation(angle)
-          }
         } else if (currentPointRef.current && pointQueue.current.length > 0) {
           nextPointRef.current = pointQueue.current[0]
           startTimeRef.current = timestamp
-          // Вычисляем угол при выборе новой точки
-          const angle = calculateRotation(
-            currentPointRef.current,
-            nextPointRef.current,
-          )
-          setRotation(angle)
         } else {
           animationFrameId = requestAnimationFrame(step)
           return
@@ -105,14 +98,6 @@ export const TruckMarker = ({
         if (progress === 1) {
           currentPointRef.current = pointQueue.current.shift() || null
           startTimeRef.current = null
-          // Вычисляем угол для следующей точки, если она есть
-          if (currentPointRef.current && pointQueue.current.length > 0) {
-            const angle = calculateRotation(
-              currentPointRef.current,
-              pointQueue.current[0],
-            )
-            setRotation(angle)
-          }
         }
       }
 
@@ -123,6 +108,7 @@ export const TruckMarker = ({
 
     return () => cancelAnimationFrame(animationFrameId)
   }, [])
+
   useEffect(() => {
     if (clickedOutside && isMenuOpen) {
       setIsMenuOpen(false)
@@ -144,7 +130,7 @@ export const TruckMarker = ({
       <div className="relative inline-block">
         <Navigation2
           className="text-white fill-red-600"
-          style={{ transform: `rotate(${rotation}deg)` }}
+          style={{ transform: `rotate(${truckInfo.headingDegrees}deg)` }}
         />
         <div className="absolute top-[-25px] left-1/2 transform -translate-x-1/2 bg-gray-100 rounded-md px-2 py-1 text-xs font-bold text-gray-700 cursor-pointer z-10 whitespace-nowrap">
           #{unitNumber}
