@@ -25,31 +25,62 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
 
     return new MarkerClusterer({
       map,
-      algorithm: new SuperClusterAlgorithm({
-        // maxZoom: 1,
-      }),
+      algorithm: new SuperClusterAlgorithm({}),
     })
   }, [map])
-
+  //console.log(gasStations)
+  // Очистка маркеров при изменении gasStations
   useEffect(() => {
     if (!clusterer) return
+
+    // Полная очистка всех маркеров и кластеров
     clusterer.clearMarkers()
-    clusterer.addMarkers(Object.values(markers))
+
+    // Очистка состояния маркеров
+    setMarkers({})
+  }, [gasStations, clusterer])
+
+  // Добавление маркеров в кластер при их изменении
+  useEffect(() => {
+    if (!clusterer) return
+
+    // Очищаем перед добавлением новых маркеров
+    clusterer.clearMarkers()
+
+    // Добавляем только существующие маркеры
+    const existingMarkers = Object.values(markers).filter(
+      (marker) => marker !== null,
+    )
+    if (existingMarkers.length > 0) {
+      clusterer.addMarkers(existingMarkers)
+    }
   }, [clusterer, markers])
 
   const setMarkerRef = useCallback((marker: Marker | null, key: string) => {
-    setMarkers((markers) => {
-      if ((marker && markers[key]) || (!marker && !markers[key])) return markers
+    setMarkers((prevMarkers) => {
+      // Если маркер уже существует и новый маркер такой же, не обновляем
+      if ((marker && prevMarkers[key]) || (!marker && !prevMarkers[key])) {
+        return prevMarkers
+      }
 
       if (marker) {
-        return { ...markers, [key]: marker }
+        return { ...prevMarkers, [key]: marker }
       } else {
-        const { [key]: _, ...newMarkers } = markers
-
+        // Удаляем маркер из состояния
+        const { [key]: removedMarker, ...newMarkers } = prevMarkers
         return newMarkers
       }
     })
   }, [])
+
+  // Cleanup при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      if (clusterer) {
+        clusterer.clearMarkers()
+      }
+    }
+  }, [clusterer])
 
   return (
     <>

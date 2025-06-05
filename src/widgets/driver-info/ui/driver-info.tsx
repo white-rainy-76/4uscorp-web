@@ -11,7 +11,7 @@ type DriverInfoProps = {
 export const DriverInfo = ({ truck }: DriverInfoProps) => {
   const { dictionary } = useDictionary()
   return (
-    <InfoCard title={dictionary.home.headings.driver_info}>
+    <>
       {/* Top section with three columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {/* Driver information */}
@@ -88,6 +88,6 @@ export const DriverInfo = ({ truck }: DriverInfoProps) => {
         </div>
         <div /> {/* Empty div to maintain alignment with actions */}
       </div>
-    </InfoCard>
+    </>
   )
 }

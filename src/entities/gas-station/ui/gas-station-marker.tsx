@@ -19,8 +19,6 @@ export const GasStationMarker: React.FC<Props> = ({
   const [clicked, setClicked] = useState(false)
   const [hovered, setHovered] = useState(false)
 
-  const isAlgorithm = useMemo(() => Math.random() < 0.2, []) // симуляция алгоритма
-
   const ref = useCallback(
     (marker: google.maps.marker.AdvancedMarkerElement) =>
       setMarkerRef(marker, gasStation.id),
@@ -34,14 +32,14 @@ export const GasStationMarker: React.FC<Props> = ({
       onClick={() => setClicked(!clicked)}
       ref={ref}
       className={classNames('gas-station-marker', { clicked, hovered })}
-      zIndex={clicked ? 2000 : isAlgorithm ? 2 : 1}>
+      zIndex={clicked ? 2000 : gasStation.isAlgorithm ? 2 : 1}>
       {clicked ? (
         CustomPin(setClicked, gasStation)
       ) : (
         <div
           className={classNames('rounded-md p-1 border text-center', {
-            'bg-yellow-100 border-yellow-400': isAlgorithm,
-            'bg-white border-gray-300': !isAlgorithm,
+            'bg-yellow-100 border-yellow-400': gasStation.isAlgorithm,
+            'bg-white border-gray-300': !gasStation.isAlgorithm,
           })}>
           <Image
             alt="gas-station"
@@ -52,8 +50,8 @@ export const GasStationMarker: React.FC<Props> = ({
           />
           <span
             className={classNames('block text-sm font-semibold', {
-              'text-yellow-600': isAlgorithm,
-              'text-gray-700': !isAlgorithm,
+              'text-yellow-600': gasStation.isAlgorithm,
+              'text-gray-700': !gasStation.isAlgorithm,
             })}>
             {gasStation.fuelPrice?.finalPrice}
           </span>

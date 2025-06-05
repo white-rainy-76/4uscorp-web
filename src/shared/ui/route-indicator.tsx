@@ -18,6 +18,7 @@ export const RouteIndicator = ({ pointCount }: RouteIndicatorProps) => {
               <div className="w-[3px] h-2 bg-blue-600 my-1 flex-shrink-0"></div>
               <div className="w-[3px] h-2 bg-blue-600 my-1 flex-shrink-0"></div>
               <div className="w-[3px] h-2 bg-blue-600 mt-1 flex-shrink-0"></div>
+              <div className="w-[3px] h-2 bg-blue-600 mt-1 flex-shrink-0"></div>
             </>
           )}
         </div>

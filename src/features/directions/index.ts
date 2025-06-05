@@ -1,1 +1,1 @@
-export { Directions } from './ui'
+export { Directions as DirectionsRoutes } from './ui'
