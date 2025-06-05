@@ -28,37 +28,36 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
       algorithm: new SuperClusterAlgorithm({}),
     })
   }, [map])
-  //console.log(gasStations)
+
   // Очистка маркеров при изменении gasStations
   useEffect(() => {
     if (!clusterer) return
 
     // Полная очистка всех маркеров и кластеров
     clusterer.clearMarkers()
-
-    // Очистка состояния маркеров
     setMarkers({})
   }, [gasStations, clusterer])
 
-  // Добавление маркеров в кластер при их изменении
+  // Добавление маркеров в кластер (исключая isAlgorithm: true)
   useEffect(() => {
     if (!clusterer) return
 
-    // Очищаем перед добавлением новых маркеров
     clusterer.clearMarkers()
 
-    // Добавляем только существующие маркеры
-    const existingMarkers = Object.values(markers).filter(
-      (marker) => marker !== null,
-    )
+    const existingMarkers = Object.entries(markers)
+      .filter(([key, marker]) => {
+        const station = gasStations.find((s) => s.id === key)
+        return marker && station && !station.isAlgorithm
+      })
+      .map(([, marker]) => marker!)
+
     if (existingMarkers.length > 0) {
       clusterer.addMarkers(existingMarkers)
     }
-  }, [clusterer, markers])
+  }, [clusterer, markers, gasStations])
 
   const setMarkerRef = useCallback((marker: Marker | null, key: string) => {
     setMarkers((prevMarkers) => {
-      // Если маркер уже существует и новый маркер такой же, не обновляем
       if ((marker && prevMarkers[key]) || (!marker && !prevMarkers[key])) {
         return prevMarkers
       }
@@ -66,14 +65,13 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
       if (marker) {
         return { ...prevMarkers, [key]: marker }
       } else {
-        // Удаляем маркер из состояния
-        const { [key]: removedMarker, ...newMarkers } = prevMarkers
+        const { [key]: _, ...newMarkers } = prevMarkers
         return newMarkers
       }
     })
   }, [])
 
-  // Cleanup при размонтировании компонента
+  // Очистка кластеров при размонтировании
   useEffect(() => {
     return () => {
       if (clusterer) {
