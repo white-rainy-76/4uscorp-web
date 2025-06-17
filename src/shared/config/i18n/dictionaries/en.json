@@ -37,6 +37,18 @@
       "bonus": "Bonuses",
       "unit_number": "Unit number",
       "truck": "Truck"
+    },
+    "details_info": {
+      "no_gas_stations": "No planned gas stations",
+      "gallons": "Gallons",
+      "adress": "Address",
+      "miles_next": "miles next",
+      "stop_order": "Stop order",
+      "price": "Price",
+      "save": "Save"
+    },
+    "trucks": {
+      "no_trucks_found": "No trucks found"
     }
   }
 }

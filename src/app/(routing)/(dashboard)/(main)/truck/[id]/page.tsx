@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { DriverInfo } from '@/widgets/driver-info'
 import { InfoCard } from '@/shared/ui/info-card'
 import { useDictionary } from '@/shared/lib/hooks'
@@ -22,68 +22,70 @@ export default function TruckInfo() {
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
 
-  const truckIdParam = params?.id
-  const truckId = typeof truckIdParam === 'string' ? truckIdParam : undefined
+  const truckId = useMemo(() => {
+    const truckIdParam = params?.id
+    return typeof truckIdParam === 'string' ? truckIdParam : undefined
+  }, [params?.id])
 
-  const { data, isLoading, isError } = useQuery({
+  const {
+    data: truckData,
+    isLoading: isTruckLoading,
+    isError: isTruckError,
+  } = useQuery({
     ...truckQueries.truck(truckId!),
     enabled: !!truckId,
   })
 
-  useEffect(() => {
-    if (!truckId || (isError && !isLoading)) {
-      router.replace('/404')
-    }
-  }, [truckId, isError, isLoading, router])
-
   const {
-    mutateAsync,
+    mutateAsync: getDirections,
     data: routeData,
-    isPending,
-    reset,
+    isPending: isRouteLoading,
+    reset: resetRoute,
   } = useGetDirectionsMutation({
-    onError: (error, variables, context) => {
-      console.log(`Directions mutation error: ${error}`)
-      if (context?.abortController) {
-        context.abortController.abort(
-          'Directions request cancelled due to error',
-        )
-      }
+    onError: (error) => {
+      console.error('Directions mutation error:', error)
     },
   })
 
   useEffect(() => {
-    if (origin && destination) {
-      mutateAsync({
-        origin,
-        destination,
-      })
-    } else {
-      reset()
+    if (!truckId || (isTruckError && !isTruckLoading)) {
+      router.replace('/404')
     }
-  }, [origin, destination, mutateAsync, reset])
+  }, [truckId, isTruckError, isTruckLoading, router])
+
+  useEffect(() => {
+    if (!truckData) return
+
+    const hasBothPoints = origin && destination
+    hasBothPoints ? getDirections({ origin, destination }) : resetRoute()
+  }, [origin, destination, truckData, getDirections, resetRoute])
 
   return (
     <>
       <InfoCard title={dictionary.home.headings.driver_info}>
-        {isLoading && <DriverInfoSkeleton />}
-        {data && <DriverInfo truck={data} />}
+        {isTruckLoading ? (
+          <DriverInfoSkeleton />
+        ) : (
+          truckData && <DriverInfo truck={truckData} />
+        )}
       </InfoCard>
 
-      {data && (
-        <TruckRouteInfo
-          truck={data}
-          setOrigin={setOrigin}
-          setDestination={setDestination}
-        />
+      {truckData && (
+        <InfoCard title={dictionary.home.headings.driver_info}>
+          <TruckRouteInfo
+            truck={truckData}
+            setOrigin={setOrigin}
+            setDestination={setDestination}
+          />
+        </InfoCard>
       )}
 
       <MapWithRoute
         origin={origin}
         destination={destination}
         routeData={routeData}
-        isPending={isPending}
-        mutateAsync={mutateAsync}
+        isPending={isRouteLoading}
+        mutateAsync={getDirections}
       />
       {routeData && (
         <InfoCard title={dictionary.home.headings.details_info}>

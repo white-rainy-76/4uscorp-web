@@ -1,12 +1,14 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Input } from '@/shared/ui'
 import { Card, CardSkeleton } from '@/entities/truck'
-import { useDictionary } from '@/shared/lib/hooks'
+import { useDebounce, useDictionary } from '@/shared/lib/hooks'
 import { useQuery } from '@tanstack/react-query'
 import { truckQueries } from '@/entities/truck/api'
 import { useParams } from 'next/navigation'
+import { TruckListFilters } from './truck-list-filters'
+import { TruckFilters } from '../types'
 
 export const TruckList = () => {
   const [filterText, setFilterText] = useState<string>('')
@@ -22,16 +24,19 @@ export const TruckList = () => {
     return trucks.filter((truck) => truck.name?.toLowerCase().includes(lower))
   }, [filterText, trucks])
 
+  const handleFilterChange = useCallback((filters: TruckFilters) => {
+    setFilterText(filters.search ?? '')
+  }, [])
+
   return (
-    <div className="flex flex-col space-y-6 h-full ">
-      <Input
-        showIcon={true}
+    <div className="flex flex-col space-y-6 h-full">
+      <TruckListFilters
+        onChange={handleFilterChange}
+        initialSearch={filterText}
         placeholder={dictionary.home.input_fields.find_unit_placeholder}
-        value={filterText}
-        onChange={(e) => setFilterText(e.target.value)}
       />
 
-      <div className="flex-1 overflow-y-auto p-1 pr-2 custom-scroll ">
+      <div className="flex-1 overflow-y-auto p-1 pr-2 custom-scroll">
         <div className="space-y-4 mb-[120px]">
           {isLoading ? (
             Array.from({ length: 12 }).map((_, index) => (
@@ -46,8 +51,8 @@ export const TruckList = () => {
               />
             ))
           ) : (
-            <p className="text-center text-[hsl(var(--muted-alt))]">
-              No trucks found.
+            <p className="text-center text-text-heading">
+              {dictionary.home.trucks.no_trucks_found}
             </p>
           )}
         </div>

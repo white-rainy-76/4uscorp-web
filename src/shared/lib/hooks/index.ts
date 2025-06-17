@@ -1,3 +1,5 @@
-export { useDictionary } from './use-dictionary'
-export { useIsMobile } from './use-mobile'
+export { useDictionary } from './useDictionary'
+export { useOnlineStatus } from './useOnlineStatus'
+export { useIsMobile } from './useMobile'
 export { ComposeChildren } from './react-hooks'
+export { useDebounce } from './useDebounce'

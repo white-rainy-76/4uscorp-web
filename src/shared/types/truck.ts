@@ -6,3 +6,7 @@ export type TruckLocationUpdate = {
   time: string
   truckName: string
 }
+export type TruckFuelUpdate = {
+  truckId: string
+  fuelPercentage: string
+}
