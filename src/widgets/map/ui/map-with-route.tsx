@@ -110,9 +110,10 @@ export const MapWithRoute = ({
 
     return gasStationsData.filter((station) => {
       const sameRouteSection = station.roadSectionId === selectedRouteId
+
       const providerMatch =
         selectedProviders.length === 0 ||
-        selectedProviders.includes(station.name)
+        (station.name !== null && selectedProviders.includes(station.name))
 
       return sameRouteSection && providerMatch
     })

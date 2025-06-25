@@ -98,13 +98,6 @@ export const CustomPin: React.FC<Props> = ({
 
         {/* Ввод и кнопки */}
         <div className="mt-2 flex items-center justify-between gap-2">
-          {/* <Input
-            className="w-full"
-            variant="gray"
-            placeholder="Литры"
-            value={refillLiters}
-            onChange={(e) => setRefillLiters(e.target.value)}
-          /> */}
           <input
             type="number"
             className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm text-black"
