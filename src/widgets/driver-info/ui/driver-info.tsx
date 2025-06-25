@@ -1,8 +1,11 @@
 import { Truck, TruckStatus } from '@/entities/truck'
-import { useDictionary } from '@/shared/lib/hooks'
-import { Avatar, AvatarImage, AvatarFallback, cn } from '@/shared/ui'
+import { useConnection } from '@/shared/lib/context'
+import { useDictionary, useTruckSignalR } from '@/shared/lib/hooks'
+import { TruckFuelUpdate } from '@/shared/types'
+import { Avatar, AvatarImage, AvatarFallback, cn, Spinner } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 type DriverInfoProps = {
   truck: Truck
@@ -10,6 +13,40 @@ type DriverInfoProps = {
 
 export const DriverInfo = ({ truck }: DriverInfoProps) => {
   const { dictionary } = useDictionary()
+  const { connection, isConnected } = useConnection()
+  const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
+
+  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
+
+  // useTruckSignalR({
+  //   connection,
+  //   isConnected,
+  //   truckId: truck.id,
+  //   onFuelUpdate: (data) => {
+  //     setFuel(data)
+  //     setIsLoadingFuel(false)
+  //   },
+  // })
+
+  useEffect(() => {
+    if (!connection || !isConnected) return
+
+    setIsLoadingFuel(true)
+
+    const handleFuelUpdate = (data: TruckFuelUpdate) => {
+      if (data.truckId === truck.id) {
+        setFuel(data)
+        setIsLoadingFuel(false)
+      }
+    }
+
+    connection.on('ReceiveTruckFuelUpdate', handleFuelUpdate)
+
+    return () => {
+      connection.off('ReceiveTruckFuelUpdate', handleFuelUpdate)
+    }
+  }, [connection, isConnected, truck.id])
+
   return (
     <>
       {/* Top section with responsive columns */}
@@ -23,8 +60,9 @@ export const DriverInfo = ({ truck }: DriverInfoProps) => {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <FuelIndicator
-            percentage={56}
+            percentage={fuel?.fuelPercentage}
             label={dictionary.home.driver_info.fuel}
+            isLoadingFuel={isLoadingFuel}
           />
           <BonusPoints
             points={5000}
@@ -83,11 +121,16 @@ const DriverProfile = ({
 )
 
 type FuelIndicatorProps = {
-  percentage: number
+  percentage: string | undefined
   label: string
+  isLoadingFuel: boolean
 }
 
-const FuelIndicator = ({ percentage, label }: FuelIndicatorProps) => (
+const FuelIndicator = ({
+  percentage,
+  label,
+  isLoadingFuel,
+}: FuelIndicatorProps) => (
   <div className="flex items-center gap-2 border border-dashed rounded-xl pl-[14px] pr-14 py-2 border-separator">
     <Icon
       name="common/fuel"
@@ -96,9 +139,15 @@ const FuelIndicator = ({ percentage, label }: FuelIndicatorProps) => (
       className="text-text-muted"
     />
     <div>
-      <div className="text-sm font-extrabold text-text-strong">
-        {percentage}%
-      </div>
+      {isLoadingFuel ? (
+        <Spinner size="sm" color="blue" />
+      ) : (
+        percentage && (
+          <div className="text-sm font-extrabold text-text-strong">
+            {percentage}%
+          </div>
+        )
+      )}
       <div className="text-sm text-text-muted-alt">{label}</div>
     </div>
   </div>

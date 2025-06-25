@@ -6,12 +6,16 @@ import { useDictionary } from '@/shared/lib/hooks'
 
 interface RouteListProps {
   gasStations: GasStation[]
+  selectedRouteId: string | null
 }
 
-export const RouteList = ({ gasStations }: RouteListProps) => {
+export const RouteList = ({ gasStations, selectedRouteId }: RouteListProps) => {
   const { dictionary } = useDictionary()
   const algorithmStations = gasStations
-    .filter((station) => station.isAlgorithm)
+    .filter(
+      (station) =>
+        station.roadSectionId === selectedRouteId && station.isAlgorithm,
+    )
     .sort((a, b) => (a.stopOrder || 0) - (b.stopOrder || 0))
 
   if (algorithmStations.length === 0) {

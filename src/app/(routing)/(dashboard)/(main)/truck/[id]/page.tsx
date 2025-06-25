@@ -13,12 +13,13 @@ import { RouteList } from '@/widgets/refueling-details'
 import { TruckRouteInfo } from '@/widgets/truck-route/ui'
 import { useGetDirectionsMutation } from '@/features/directions/api/get-direction.mutation'
 import { MapWithRoute } from '@/widgets/map'
+import { useUpdateGasStationsMutation } from '@/entities/gas-station/api/update-gas-station.mutation'
 
 export default function TruckInfo() {
   const { dictionary } = useDictionary()
   const params = useParams()
   const router = useRouter()
-
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
 
@@ -35,17 +36,45 @@ export default function TruckInfo() {
     ...truckQueries.truck(truckId!),
     enabled: !!truckId,
   })
-
+  const {
+    mutateAsync: updateGasStations,
+    data: gasStationsData,
+    isPending: isGasStationsLoading,
+  } = useUpdateGasStationsMutation({
+    onError: (error) => {
+      console.error('Directions mutation error:', error)
+    },
+  })
   const {
     mutateAsync: getDirections,
     data: routeData,
     isPending: isRouteLoading,
     reset: resetRoute,
   } = useGetDirectionsMutation({
+    onSuccess: (data) => {
+      if (data?.routeId) {
+        updateGasStations({
+          routeId: data.routeId,
+          routeSectionIds: data.route.map(
+            (routeDto) => routeDto.routeSectionId,
+          ),
+        })
+      } else {
+        console.warn(
+          'Missing data for updateGasStations after directions fetch.',
+        )
+      }
+    },
     onError: (error) => {
       console.error('Directions mutation error:', error)
     },
   })
+
+  const handleRouteClick = (routeIndex: number) => {
+    if (routeData?.route && routeData.route[routeIndex]) {
+      setSelectedRouteId(routeData.route[routeIndex].routeSectionId)
+    }
+  }
 
   useEffect(() => {
     if (!truckId || (isTruckError && !isTruckLoading)) {
@@ -60,38 +89,56 @@ export default function TruckInfo() {
     hasBothPoints ? getDirections({ origin, destination }) : resetRoute()
   }, [origin, destination, truckData, getDirections, resetRoute])
 
+  useEffect(() => {
+    if (routeData?.route && routeData.route.length > 0 && !selectedRouteId) {
+      setSelectedRouteId(routeData.route[0].routeSectionId)
+    }
+  }, [routeData, selectedRouteId])
+
   return (
-    <>
-      <InfoCard title={dictionary.home.headings.driver_info}>
-        {isTruckLoading ? (
-          <DriverInfoSkeleton />
-        ) : (
-          truckData && <DriverInfo truck={truckData} />
-        )}
-      </InfoCard>
-
-      {truckData && (
+    truckId && (
+      <>
         <InfoCard title={dictionary.home.headings.driver_info}>
-          <TruckRouteInfo
-            truck={truckData}
-            setOrigin={setOrigin}
-            setDestination={setDestination}
-          />
+          {isTruckLoading ? (
+            <DriverInfoSkeleton />
+          ) : (
+            truckData && <DriverInfo truck={truckData} />
+          )}
         </InfoCard>
-      )}
 
-      <MapWithRoute
-        origin={origin}
-        destination={destination}
-        routeData={routeData}
-        isPending={isRouteLoading}
-        mutateAsync={getDirections}
-      />
-      {routeData && (
-        <InfoCard title={dictionary.home.headings.details_info}>
-          <RouteList gasStations={routeData.gasStations} />
-        </InfoCard>
-      )}
-    </>
+        {truckData && (
+          <>
+            <InfoCard title={dictionary.home.headings.driver_info}>
+              <TruckRouteInfo
+                truck={truckData}
+                setOrigin={setOrigin}
+                setDestination={setDestination}
+              />
+            </InfoCard>
+            <MapWithRoute
+              origin={origin}
+              destination={destination}
+              routeData={routeData}
+              gasStationsData={gasStationsData}
+              isRoutePending={isRouteLoading}
+              isGasStationsPending={isGasStationsLoading}
+              mutateAsync={getDirections}
+              truck={truckData}
+              updateGasStations={updateGasStations}
+              selectedRouteId={selectedRouteId}
+              handleRouteClick={handleRouteClick}
+            />
+          </>
+        )}
+        {gasStationsData && (
+          <InfoCard title={dictionary.home.headings.details_info}>
+            <RouteList
+              gasStations={gasStationsData}
+              selectedRouteId={selectedRouteId}
+            />
+          </InfoCard>
+        )}
+      </>
+    )
   )
 }

@@ -12,17 +12,25 @@ import { GasStation } from '../api/types/gas-station'
 
 type Props = {
   gasStations: GasStation[]
+  //selectedRouteId?: string;
+  onAddToCart: (station: GasStation) => void
+  onRemoveFromCart: (stationId: string) => void
+  onUpdateRefillLiters: (stationId: string, liters: number) => void
+  cart: GasStation[]
 }
 
 export const ClusteredGasStationMarkers: React.FC<Props> = ({
   gasStations,
+  onAddToCart,
+  onRemoveFromCart,
+  onUpdateRefillLiters,
+  cart,
 }) => {
   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
   const map = useMap()
-
+  // console.log(gasStations)
   const clusterer = useMemo(() => {
     if (!map) return null
-
     return new MarkerClusterer({
       map,
       algorithm: new SuperClusterAlgorithm({}),
@@ -41,16 +49,13 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
   // Добавление маркеров в кластер (исключая isAlgorithm: true)
   useEffect(() => {
     if (!clusterer) return
-
     clusterer.clearMarkers()
-
     const existingMarkers = Object.entries(markers)
       .filter(([key, marker]) => {
         const station = gasStations.find((s) => s.id === key)
-        return marker && station && !station.isAlgorithm
+        return marker && station
       })
       .map(([, marker]) => marker!)
-
     if (existingMarkers.length > 0) {
       clusterer.addMarkers(existingMarkers)
     }
@@ -84,9 +89,13 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
     <>
       {gasStations.map((station) => (
         <GasStationMarker
-          key={station.id}
+          key={`${station.id}-${station.roadSectionId}`}
           gasStation={station}
           setMarkerRef={setMarkerRef}
+          onAddToCart={onAddToCart}
+          onRemoveFromCart={onRemoveFromCart}
+          onUpdateRefillLiters={onUpdateRefillLiters}
+          isInCart={cart.some((s) => s.id === station.id)}
         />
       ))}
     </>

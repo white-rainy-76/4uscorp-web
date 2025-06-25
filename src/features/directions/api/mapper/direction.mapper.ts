@@ -6,7 +6,7 @@ import { Directions } from '../types/directions'
 export const mapDirections = (
   dto: z.infer<typeof DirectionsDtoSchema>,
 ): Directions => ({
-  responseId: dto.responseId,
-  routeDtos: dto.routeDtos,
+  routeId: dto.routeId,
+  route: dto.routeDtos,
   gasStations: mapGasStations(dto.fuelStationDtos),
 })

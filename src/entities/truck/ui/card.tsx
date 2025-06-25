@@ -8,6 +8,7 @@ import { StatusLabel } from '@/shared/ui'
 import { Truck } from '../api/types/truck'
 import { useConnection } from '@/shared/lib/context'
 import { TruckFuelUpdate } from '@/shared/types'
+import { useTruckSignalR } from '@/shared/lib/hooks'
 
 interface CardProps {
   truck: Truck
@@ -16,8 +17,8 @@ interface CardProps {
 
 export const Card = ({ truck, isActive }: CardProps) => {
   const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
-  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
   const router = useRouter()
+  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
 
   const handleClick = () => {
     router.push(`/truck/${truck.id}`)
@@ -28,6 +29,15 @@ export const Card = ({ truck, isActive }: CardProps) => {
   }
 
   const { connection, isConnected } = useConnection()
+
+  // const isLoadingFuel = useTruckSignalR({
+  //   connection,
+  //   isConnected,
+  //   truckId: truck.id,
+  //   onFuelUpdate: (data) => {
+  //     setFuel(data)
+  //   },
+  // })
 
   useEffect(() => {
     if (!connection || !isConnected) return
@@ -44,10 +54,6 @@ export const Card = ({ truck, isActive }: CardProps) => {
         setIsLoadingFuel(false)
       }
     })
-
-    return () => {
-      connection.off('ReceiveTruckFuelUpdate')
-    }
   }, [connection, isConnected, truck.id])
 
   const driverInitials =
@@ -89,7 +95,7 @@ export const Card = ({ truck, isActive }: CardProps) => {
             <Spinner size="sm" color="blue" />
           ) : (
             fuel && (
-              <span className="text-sm font-extrabold text-[hsl(var(--text-strong))]">
+              <span className="text-sm font-extrabold text-text-strong">
                 {fuel.fuelPercentage}%
               </span>
             )

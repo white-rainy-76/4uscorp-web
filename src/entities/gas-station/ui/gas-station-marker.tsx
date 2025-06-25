@@ -10,11 +10,19 @@ import { GasStation } from '../api/types/gas-station'
 interface Props {
   gasStation: GasStation
   setMarkerRef: (marker: Marker | null, key: string) => void
+  onAddToCart: (station: GasStation) => void
+  onRemoveFromCart: (stationId: string) => void
+  onUpdateRefillLiters: (stationId: string, liters: number) => void
+  isInCart: boolean
 }
 
 export const GasStationMarker: React.FC<Props> = ({
   gasStation,
   setMarkerRef,
+  onAddToCart,
+  onRemoveFromCart,
+  onUpdateRefillLiters,
+  isInCart,
 }) => {
   const [clicked, setClicked] = useState(false)
   const [hovered, setHovered] = useState(false)
@@ -29,12 +37,19 @@ export const GasStationMarker: React.FC<Props> = ({
       position={gasStation.position}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => setClicked(!clicked)}
+      onClick={!clicked ? () => setClicked(true) : undefined}
       ref={ref}
       className={classNames('gas-station-marker', { clicked, hovered })}
       zIndex={clicked ? 2000 : gasStation.isAlgorithm ? 2 : 1}>
       {clicked ? (
-        CustomPin(setClicked, gasStation)
+        <CustomPin
+          gasStation={gasStation}
+          setClicked={setClicked}
+          isInCart={isInCart}
+          onAddToCart={onAddToCart}
+          onRemoveFromCart={onRemoveFromCart}
+          onUpdateRefillLiters={onUpdateRefillLiters}
+        />
       ) : (
         <div
           className={classNames('rounded-md p-1 border text-center', {

@@ -20,6 +20,7 @@ interface DirectionsProps {
   >
   origin: Coordinate | null
   destination: Coordinate | null
+  onRouteClick?: (routeIndex: number) => void
 }
 
 export const Directions = ({
@@ -27,11 +28,13 @@ export const Directions = ({
   directionsMutation,
   origin,
   destination,
+  onRouteClick,
 }: DirectionsProps) => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
     google.maps.LatLngLiteral[][]
   >([])
+  const [routeIndexMapping, setRouteIndexMapping] = useState<number[]>([])
   const [hoverMarker, setHoverMarker] =
     useState<google.maps.LatLngLiteral | null>(null)
   const [wayPoints, setWayPoints] = useState<google.maps.LatLngLiteral[]>([])
@@ -59,9 +62,9 @@ export const Directions = ({
 
   // Обработка данных маршрута
   useEffect(() => {
-    if (!data?.routeDtos || data.routeDtos.length === 0) return
+    if (!data?.route || data.route.length === 0) return
     try {
-      const allShapes: google.maps.LatLngLiteral[][] = data.routeDtos.map(
+      const allShapes: google.maps.LatLngLiteral[][] = data.route.map(
         (route) => {
           return convertToLatLngLiteral(route.mapPoints)
         },
@@ -73,6 +76,10 @@ export const Directions = ({
           allShapes.length > 1 ? [...allShapes.slice(1)] : [],
         )
 
+        // Инициализируем маппинг индексов маршрутов
+        const initialMapping = allShapes.map((_, index) => index)
+        setRouteIndexMapping(initialMapping)
+
         if (allShapes[0].length > 0) {
           setStartMarker({ ...allShapes[0][0] })
           setEndMarker({ ...allShapes[0][allShapes[0].length - 1] })
@@ -83,12 +90,39 @@ export const Directions = ({
     }
   }, [data])
 
+  // Уведомляем родительский компонент об изменении выбранного маршрута
+  useEffect(() => {
+    if (onRouteClick && routeIndexMapping.length > 0) {
+      const actualRouteIndex = routeIndexMapping[0] || 0
+      onRouteClick(actualRouteIndex)
+    }
+  }, [routeIndexMapping, onRouteClick])
+
   const handleAltRouteClick = (index: number) => {
+    // Сохраняем текущий главный маршрут
+    const currentMainRoute = [...mainRoute]
+    const currentMainRouteIndex = routeIndexMapping[0]
+
+    // Устанавливаем новый главный маршрут
     setMainRoute(alternativeRoutes[index])
+
+    // Обновляем альтернативные маршруты
     setAlternativeRoutes((prevRoutes) => {
       const newAlts = [...prevRoutes]
       newAlts.splice(index, 1)
-      return [mainRoute, ...newAlts]
+      return [currentMainRoute, ...newAlts]
+    })
+
+    // Обновляем маппинг индексов
+    setRouteIndexMapping((prevMapping) => {
+      const newMapping = [...prevMapping]
+      const selectedRouteOriginalIndex = newMapping[index + 1] // +1 потому что первый элемент - это главный маршрут
+
+      // Перемещаем выбранный маршрут в начало
+      newMapping.splice(index + 1, 1)
+      newMapping.unshift(selectedRouteOriginalIndex)
+
+      return newMapping
     })
   }
 

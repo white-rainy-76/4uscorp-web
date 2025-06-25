@@ -1,6 +1,5 @@
 import { api } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
-import { z } from 'zod'
 import { DirectionsDtoSchema } from './contracts/direction.contract.dto'
 import { mapDirections } from './mapper/direction.mapper'
 import { Directions } from './types/directions'
