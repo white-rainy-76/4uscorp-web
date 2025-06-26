@@ -32,6 +32,7 @@ interface MapWithRouteProps {
   updateGasStations: (
     variables: UpdateGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
+  finishFuel: number | undefined
 }
 
 export const MapWithRoute = ({
@@ -46,6 +47,7 @@ export const MapWithRoute = ({
   truck,
   mutateAsync,
   updateGasStations,
+  finishFuel,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -67,6 +69,7 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      FinishFuel: finishFuel,
     })
   }
 
@@ -81,6 +84,7 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      FinishFuel: finishFuel,
     })
   }
 
@@ -102,6 +106,7 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      FinishFuel: finishFuel,
     })
   }
 

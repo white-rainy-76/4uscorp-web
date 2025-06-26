@@ -130,6 +130,7 @@ export default function TruckInfo() {
               updateGasStations={updateGasStations}
               selectedRouteId={selectedRouteId}
               handleRouteClick={handleRouteClick}
+              finishFuel={finishFuel}
             />
           </>
         )}
