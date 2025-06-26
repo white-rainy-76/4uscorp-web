@@ -17,7 +17,7 @@ const Slider = React.forwardRef<
     <div className="relative pt-6">
       {showValueLabel && value && value.length > 0 && (
         <div
-          className="absolute top-[-5px] text-sm font-medium text-[hsl(var(--text-heading))] pointer-events-none select-none"
+          className="absolute top-[-5px] text-sm font-medium text-text-heading pointer-events-none select-none"
           style={{
             left: `calc(${percent}%)`,
             transform: `translateX(${percent * -1}%)`,

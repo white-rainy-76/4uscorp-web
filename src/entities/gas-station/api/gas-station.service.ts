@@ -2,15 +2,15 @@ import { api } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
 import { AxiosRequestConfig } from 'axios'
 import { UpdateGasStationsPayload } from './types/gas-station.payload'
-import { GasStation } from './types/gas-station'
+import { GetGasStationsResponse } from './types/gas-station'
 import { UpdateGasStationsPayloadSchema } from './payload/gas-stations.payload'
-import { mapGasStations } from './mapper/map-gas-stations'
-import { GasStationDtoSchema } from './contracts/gas-station.contract.dto'
+import { mapGetGasStationsResponseDtoToResponse } from './mapper/map-gas-stations'
+import { GetGasStationsResponseDtoSchema } from './contracts/gas-station.contract.dto'
 
 export const updateGasStations = async (
   payload: UpdateGasStationsPayload,
   signal?: AbortSignal,
-): Promise<GasStation[]> => {
+): Promise<GetGasStationsResponse> => {
   const validatedPayload = UpdateGasStationsPayloadSchema.parse(payload)
   const config: AxiosRequestConfig = { signal }
   const response = await api
@@ -19,7 +19,7 @@ export const updateGasStations = async (
       validatedPayload,
       config,
     )
-    .then(responseContract(GasStationDtoSchema.array()))
+    .then(responseContract(GetGasStationsResponseDtoSchema))
 
-  return mapGasStations(response.data)
+  return mapGetGasStationsResponseDtoToResponse(response.data)
 }

@@ -13,18 +13,24 @@ interface TruckRouteInfoProps {
   truck: Truck
   setOrigin: (c: Coordinate | null) => void
   setDestination: (c: Coordinate | null) => void
+  setFinishFuel: (v: number | undefined) => void
 }
 
 export const TruckRouteInfo = ({
   truck,
   setOrigin,
   setDestination,
+  setFinishFuel,
 }: TruckRouteInfoProps) => {
   const [editing, setEditing] = useState(false)
 
   if (editing) {
     return (
-      <RouteSearchForm setOrigin={setOrigin} setDestination={setDestination} />
+      <RouteSearchForm
+        setOrigin={setOrigin}
+        setDestination={setDestination}
+        setFinishFuel={setFinishFuel}
+      />
     )
   }
 

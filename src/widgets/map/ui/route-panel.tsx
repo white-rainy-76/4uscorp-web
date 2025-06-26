@@ -15,6 +15,7 @@ interface Props {
   directions?: DirectionsType
   selectedProviders: string[]
   cart: GasStation[]
+  fuelLeftOver: number | undefined
 }
 
 const FUEL_PROVIDERS = [
@@ -34,6 +35,7 @@ export const RoutePanelOnMap = ({
   directions,
   selectedProviders,
   cart,
+  fuelLeftOver,
 }: Props) => {
   const route = directions?.route.find(
     (r) => r.routeSectionId === selectedRouteId,
@@ -97,6 +99,12 @@ export const RoutePanelOnMap = ({
             <span className="font-normal ">Tolls:</span>
             <span className=" font-bold whitespace-nowrap">
               ${routeInfo?.tolls ?? '-'}
+            </span>
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-normal ">Fuel Left</span>
+            <span className=" font-bold whitespace-nowrap">
+              {fuelLeftOver?.toFixed(2) ?? '-'}
             </span>
           </div>
         </div>

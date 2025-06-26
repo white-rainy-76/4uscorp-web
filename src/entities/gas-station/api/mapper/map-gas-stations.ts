@@ -1,35 +1,73 @@
-import { GasStation } from '../types/gas-station'
-import { GasStationDto } from '../types/gas-station.dto'
+import { z } from 'zod' // Import z from zod
+import {
+  GasStationDto,
+  GetGasStationsResponseDto,
+} from '../types/gas-station.dto'
+import { GasStation, GetGasStationsResponse } from '../types/gas-station'
 
-export const mapGasStations = (dto: GasStationDto[]): GasStation[] => {
-  return dto.map((stationDto) => ({
-    id: String(stationDto.id),
-    name: stationDto.name,
+/**
+ * Maps a single GasStationDto from the API to a GasStation object.
+ * @param dto The GasStationDto object from the API response.
+ * @returns A mapped GasStation object.
+ */
+export const mapGasStationDtoToGasStation = (
+  dto: GasStationDto,
+): GasStation => {
+  const price = dto.price ? parseFloat(dto.price) : undefined
+  const discount = dto.discount ? parseFloat(dto.discount) : undefined
+  const finalPrice = dto.priceAfterDiscount
+    ? parseFloat(dto.priceAfterDiscount)
+    : undefined
+
+  const lat = parseFloat(dto.latitude)
+  const lng = parseFloat(dto.longitude)
+
+  return {
+    id: dto.id,
+    name: dto.name,
     position: {
-      lat: parseFloat(stationDto.latitude),
-      lng: parseFloat(stationDto.longitude),
+      lat: isNaN(lat) ? 0 : lat,
+      lng: isNaN(lng) ? 0 : lng,
     },
-    address: stationDto.address ?? null,
+    address: dto.address,
     fuelPrice: {
-      price: stationDto.price ? Number(stationDto.price).toFixed(4) : undefined,
-      discount: stationDto.discount
-        ? Number(stationDto.discount).toFixed(4)
-        : undefined,
-      finalPrice: stationDto.priceAfterDiscount
-        ? Number(stationDto.priceAfterDiscount).toFixed(4)
-        : undefined,
+      price:
+        price !== undefined && !isNaN(price) ? price.toFixed(4) : undefined,
+      discount:
+        discount !== undefined && !isNaN(discount)
+          ? discount.toFixed(4)
+          : undefined,
+      finalPrice:
+        finalPrice !== undefined && !isNaN(finalPrice)
+          ? finalPrice.toFixed(4)
+          : undefined,
     },
-    isAlgorithm: stationDto.isAlgorithm ?? null,
-    refill: stationDto.refill ?? null,
-    stopOrder: stationDto.stopOrder ?? null,
-    nextDistanceKm: stationDto.nextDistanceKm
-      ? Number(stationDto.nextDistanceKm)
-      : null,
-    roadSectionId: String(stationDto.roadSectionId),
-    fuelLeftBeforeRefill: stationDto.currentFuel ?? null,
-    // Legacy fields
-    // state: undefined,
-    // distanceToLocation: undefined,
-    // route: undefined,
-  }))
+    isAlgorithm: dto.isAlgorithm,
+    refill: dto.refill,
+    stopOrder: dto.stopOrder,
+
+    nextDistanceKm: dto.nextDistanceKm ? parseFloat(dto.nextDistanceKm) : null,
+    roadSectionId: dto.roadSectionId,
+    fuelLeftBeforeRefill: dto.currentFuel,
+    state: null, // Or undefined
+    distanceToLocation: null, // Or undefined
+    route: null, // Or undefined
+  }
+}
+
+/**
+ * Maps the full API response DTO (GetGasStationsResponseDto)
+ * to the desired application data structure (GetGasStationsResponse).
+ * @param dto The raw DTO object received from the server (already validated by Zod).
+ * @returns The mapped GetGasStationsResponse object.
+ */
+export const mapGetGasStationsResponseDtoToResponse = (
+  dto: GetGasStationsResponseDto,
+): GetGasStationsResponse => {
+  return {
+    fuelStations: dto.fuelStations.map(mapGasStationDtoToGasStation),
+    finishInfo: {
+      remainingFuelLiters: dto.finishInfo.remainingFuelLiters,
+    },
+  }
 }

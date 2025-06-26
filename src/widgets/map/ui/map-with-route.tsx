@@ -12,14 +12,14 @@ import { TrackTruck } from '@/features/truck-track/ui/tracked-truck'
 import { Truck } from '@/entities/truck'
 import { RoutePanelOnMap } from './route-panel'
 import { useMap } from '@vis.gl/react-google-maps'
-import { GasStation } from '@/entities/gas-station'
+import { GasStation, GetGasStationsResponse } from '@/entities/gas-station'
 import { UpdateGasStationsPayload } from '@/entities/gas-station/api/types/gas-station.payload'
 
 interface MapWithRouteProps {
   origin: Coordinate | null
   destination: Coordinate | null
   routeData: Directions | undefined
-  gasStationsData: GasStation[] | undefined
+  getGasStationsResponseData: GetGasStationsResponse | undefined
   isRoutePending: boolean
   isGasStationsPending: boolean
   truck: Truck
@@ -31,14 +31,14 @@ interface MapWithRouteProps {
   }) => Promise<Directions>
   updateGasStations: (
     variables: UpdateGasStationsPayload,
-  ) => Promise<GasStation[]>
+  ) => Promise<GetGasStationsResponse>
 }
 
 export const MapWithRoute = ({
   origin,
   destination,
   routeData,
-  gasStationsData,
+  getGasStationsResponseData,
   isRoutePending,
   isGasStationsPending,
   handleRouteClick,
@@ -106,9 +106,9 @@ export const MapWithRoute = ({
   }
 
   const filteredGasStations = useMemo(() => {
-    if (!gasStationsData || !selectedRouteId) return []
+    if (!getGasStationsResponseData?.fuelStations || !selectedRouteId) return []
 
-    return gasStationsData.filter((station) => {
+    return getGasStationsResponseData?.fuelStations.filter((station) => {
       const sameRouteSection = station.roadSectionId === selectedRouteId
 
       const providerMatch =
@@ -117,18 +117,22 @@ export const MapWithRoute = ({
 
       return sameRouteSection && providerMatch
     })
-  }, [gasStationsData, selectedRouteId, selectedProviders])
+  }, [
+    getGasStationsResponseData?.fuelStations,
+    selectedRouteId,
+    selectedProviders,
+  ])
 
   useEffect(() => {
-    if (!gasStationsData || !routeData) return
+    if (!getGasStationsResponseData?.fuelStations || !routeData) return
 
-    const newCart = gasStationsData.filter(
+    const newCart = getGasStationsResponseData?.fuelStations.filter(
       (station) =>
         station.isAlgorithm && station.roadSectionId === selectedRouteId,
     )
 
     setCart(newCart)
-  }, [gasStationsData, routeData, selectedRouteId])
+  }, [getGasStationsResponseData?.fuelStations, routeData, selectedRouteId])
 
   const handleFilterChange = (providers: string[]) => {
     setSelectedProviders(providers)
@@ -184,6 +188,9 @@ export const MapWithRoute = ({
           onFilterChange={handleFilterChange}
           onGasStationClick={handleGasStationClick}
           selectedProviders={selectedProviders}
+          fuelLeftOver={
+            getGasStationsResponseData?.finishInfo.remainingFuelLiters
+          }
           directions={routeData}
           cart={cart}
         />

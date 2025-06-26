@@ -14,11 +14,13 @@ import { Coordinate } from '@/shared/types'
 interface RouteSearchFormProps {
   setOrigin: (value: Coordinate | null) => void
   setDestination: (value: Coordinate | null) => void
+  setFinishFuel: (value: number | undefined) => void
 }
 
 export const RouteSearchForm = ({
   setOrigin,
   setDestination,
+  setFinishFuel,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
   const [selectedStartPoint, setSelectedStartPoint] =
@@ -61,6 +63,7 @@ export const RouteSearchForm = ({
         latitude: selectedEndPoint.location.lat(),
         longitude: selectedEndPoint.location.lng(),
       })
+      setFinishFuel(data.fuelPercent)
     }
   }
 

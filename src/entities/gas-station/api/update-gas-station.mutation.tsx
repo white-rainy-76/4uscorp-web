@@ -3,7 +3,7 @@ import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query'
-import { GasStation } from './types/gas-station'
+import { GetGasStationsResponse } from './types/gas-station'
 import { UpdateGasStationsPayload } from './types/gas-station.payload'
 import { UpdateGasStationsPayloadSchema } from './payload/gas-stations.payload'
 import { updateGasStations } from './gas-station.service'
@@ -11,7 +11,7 @@ import { updateGasStations } from './gas-station.service'
 export function useUpdateGasStationsMutation(
   options: Pick<
     UseMutationOptions<
-      GasStation[],
+      GetGasStationsResponse,
       DefaultError,
       UpdateGasStationsPayload,
       { abortController: AbortController }

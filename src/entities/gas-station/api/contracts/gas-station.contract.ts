@@ -27,3 +27,12 @@ export const GasStationSchema = z.object({
   distanceToLocation: z.number().nullable().optional(),
   route: z.number().nullable().optional(),
 })
+
+export const FinishInfoSchema = z.object({
+  remainingFuelLiters: z.number(), // remainingFuelLiters: 59.99
+})
+
+export const GetGasStationsResponseSchema = z.object({
+  fuelStations: z.array(GasStationSchema),
+  finishInfo: FinishInfoSchema,
+})

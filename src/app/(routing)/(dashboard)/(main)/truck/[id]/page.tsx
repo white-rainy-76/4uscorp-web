@@ -22,6 +22,7 @@ export default function TruckInfo() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
+  const [finishFuel, setFinishFuel] = useState<number | undefined>()
 
   const truckId = useMemo(() => {
     const truckIdParam = params?.id
@@ -58,6 +59,7 @@ export default function TruckInfo() {
           routeSectionIds: data.route.map(
             (routeDto) => routeDto.routeSectionId,
           ),
+          FinishFuel: finishFuel,
         })
       } else {
         console.warn(
@@ -113,13 +115,14 @@ export default function TruckInfo() {
                 truck={truckData}
                 setOrigin={setOrigin}
                 setDestination={setDestination}
+                setFinishFuel={setFinishFuel}
               />
             </InfoCard>
             <MapWithRoute
               origin={origin}
               destination={destination}
               routeData={routeData}
-              gasStationsData={gasStationsData}
+              getGasStationsResponseData={gasStationsData}
               isRoutePending={isRouteLoading}
               isGasStationsPending={isGasStationsLoading}
               mutateAsync={getDirections}
@@ -133,7 +136,7 @@ export default function TruckInfo() {
         {gasStationsData && (
           <InfoCard title={dictionary.home.headings.details_info}>
             <RouteList
-              gasStations={gasStationsData}
+              gasStations={gasStationsData.fuelStations}
               selectedRouteId={selectedRouteId}
             />
           </InfoCard>
