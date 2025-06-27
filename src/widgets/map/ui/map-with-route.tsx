@@ -153,7 +153,7 @@ export const MapWithRoute = ({
       })),
       FinishFuel: finishFuel,
       FuelProviderNameList: providers,
-      CurrentFuel: fuel,
+      CurrentFuel: fuel?.toString(),
     })
   }
 
