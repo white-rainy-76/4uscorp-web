@@ -4,8 +4,8 @@ export const mapOptions = {
     width: 'auto',
     height: '100vh',
   },
-  defaultCenter: { lat: 22, lng: 0 },
-  defaultZoom: 3,
+  defaultCenter: { lat: 39.8283, lng: -98.5795 },
+  defaultZoom: 5,
   gestureHandling: 'greedy',
   disableDefaultUI: true,
 }

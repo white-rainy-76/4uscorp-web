@@ -33,6 +33,9 @@ interface MapWithRouteProps {
     variables: UpdateGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
   finishFuel: number | undefined
+  selectedProviders: string[]
+  setSelectedProviders: (value: string[]) => void
+  fuel: string | undefined
 }
 
 export const MapWithRoute = ({
@@ -47,16 +50,24 @@ export const MapWithRoute = ({
   truck,
   mutateAsync,
   updateGasStations,
+  selectedProviders,
+  setSelectedProviders,
   finishFuel,
+  fuel,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
-
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
   const [markersKey, setMarkersKey] = useState(0)
   const [cart, setCart] = useState<GasStation[]>([])
 
   const map = useMap()
+
+  const filteredGasStations = useMemo(() => {
+    if (!getGasStationsResponseData?.fuelStations || !selectedRouteId) return []
+    return getGasStationsResponseData.fuelStations.filter(
+      (station) => station.roadSectionId === selectedRouteId,
+    )
+  }, [getGasStationsResponseData?.fuelStations, selectedRouteId])
 
   const handleAddToCart = async (station: GasStation) => {
     const newCart = [...cart, { ...station, refillLiters: station.refill || 0 }]
@@ -70,6 +81,8 @@ export const MapWithRoute = ({
         refillLiters: Number(s.refill || 0),
       })),
       FinishFuel: finishFuel,
+      FuelProviderNameList: selectedProviders,
+      CurrentFuel: fuel,
     })
   }
 
@@ -85,6 +98,8 @@ export const MapWithRoute = ({
         refillLiters: Number(s.refill || 0),
       })),
       FinishFuel: finishFuel,
+      FuelProviderNameList: selectedProviders,
+      CurrentFuel: fuel,
     })
   }
 
@@ -107,26 +122,10 @@ export const MapWithRoute = ({
         refillLiters: Number(s.refill || 0),
       })),
       FinishFuel: finishFuel,
+      FuelProviderNameList: selectedProviders,
+      CurrentFuel: fuel,
     })
   }
-
-  const filteredGasStations = useMemo(() => {
-    if (!getGasStationsResponseData?.fuelStations || !selectedRouteId) return []
-
-    return getGasStationsResponseData?.fuelStations.filter((station) => {
-      const sameRouteSection = station.roadSectionId === selectedRouteId
-
-      const providerMatch =
-        selectedProviders.length === 0 ||
-        (station.name !== null && selectedProviders.includes(station.name))
-
-      return sameRouteSection && providerMatch
-    })
-  }, [
-    getGasStationsResponseData?.fuelStations,
-    selectedRouteId,
-    selectedProviders,
-  ])
 
   useEffect(() => {
     if (!getGasStationsResponseData?.fuelStations || !routeData) return
@@ -139,9 +138,23 @@ export const MapWithRoute = ({
     setCart(newCart)
   }, [getGasStationsResponseData?.fuelStations, routeData, selectedRouteId])
 
-  const handleFilterChange = (providers: string[]) => {
+  const handleFilterChange = async (providers: string[]) => {
     setSelectedProviders(providers)
     setMarkersKey((prevKey) => prevKey + 1)
+
+    if (!routeData?.routeId || !routeData.route) return
+
+    await updateGasStations({
+      routeId: routeData.routeId,
+      routeSectionIds: routeData.route.map((r) => r.routeSectionId),
+      requiredFuelStations: cart.map((s) => ({
+        stationId: s.id,
+        refillLiters: Number(s.refill || 0),
+      })),
+      FinishFuel: finishFuel,
+      FuelProviderNameList: providers,
+      CurrentFuel: fuel,
+    })
   }
 
   const handleGasStationClick = (lat: number, lng: number) => {
@@ -172,7 +185,6 @@ export const MapWithRoute = ({
           <ClusteredGasStationMarkers
             key={markersKey}
             gasStations={filteredGasStations}
-            // selectedRouteId={selectedRouteId}
             onAddToCart={handleAddToCart}
             onRemoveFromCart={handleRemoveFromCart}
             onUpdateRefillLiters={handleUpdateRefillLiters}

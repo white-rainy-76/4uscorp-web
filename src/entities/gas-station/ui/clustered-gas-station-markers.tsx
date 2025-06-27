@@ -12,7 +12,6 @@ import { GasStation } from '../api/types/gas-station'
 
 type Props = {
   gasStations: GasStation[]
-  //selectedRouteId?: string;
   onAddToCart: (station: GasStation) => void
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
@@ -28,7 +27,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
 }) => {
   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
   const map = useMap()
-  // console.log(gasStations)
+
   const clusterer = useMemo(() => {
     if (!map) return null
     return new MarkerClusterer({
@@ -37,51 +36,43 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
     })
   }, [map])
 
-  // Очистка маркеров при изменении gasStations
+  // Очищаем маркеры и кластеры при изменении заправок
   useEffect(() => {
     if (!clusterer) return
-
-    // Полная очистка всех маркеров и кластеров
     clusterer.clearMarkers()
     setMarkers({})
   }, [gasStations, clusterer])
 
-  // Добавление маркеров в кластер (исключая isAlgorithm: true)
+  // Добавляем валидные маркеры в кластер (исключая isAlgorithm)
   useEffect(() => {
     if (!clusterer) return
-    clusterer.clearMarkers()
-    const existingMarkers = Object.entries(markers)
-      .filter(([key, marker]) => {
-        const station = gasStations.find((s) => s.id === key)
-        return marker && station
+
+    const validMarkers = Object.entries(markers)
+      .filter(([id]) => {
+        const station = gasStations.find((s) => s.id === id)
+        return station && !station.isAlgorithm
       })
-      .map(([, marker]) => marker!)
-    if (existingMarkers.length > 0) {
-      clusterer.addMarkers(existingMarkers)
+      .map(([, marker]) => marker)
+
+    if (validMarkers.length > 0) {
+      clusterer.addMarkers(validMarkers)
     }
   }, [clusterer, markers, gasStations])
 
-  const setMarkerRef = useCallback((marker: Marker | null, key: string) => {
-    setMarkers((prevMarkers) => {
-      if ((marker && prevMarkers[key]) || (!marker && !prevMarkers[key])) {
-        return prevMarkers
-      }
-
+  const setMarkerRef = useCallback((marker: Marker | null, id: string) => {
+    setMarkers((prev) => {
       if (marker) {
-        return { ...prevMarkers, [key]: marker }
+        return { ...prev, [id]: marker }
       } else {
-        const { [key]: _, ...newMarkers } = prevMarkers
-        return newMarkers
+        const { [id]: _, ...rest } = prev
+        return rest
       }
     })
   }, [])
 
-  // Очистка кластеров при размонтировании
   useEffect(() => {
     return () => {
-      if (clusterer) {
-        clusterer.clearMarkers()
-      }
+      clusterer?.clearMarkers()
     }
   }, [clusterer])
 
@@ -89,7 +80,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
     <>
       {gasStations.map((station) => (
         <GasStationMarker
-          key={`${station.id}-${station.roadSectionId}`}
+          key={station.id}
           gasStation={station}
           setMarkerRef={setMarkerRef}
           onAddToCart={onAddToCart}

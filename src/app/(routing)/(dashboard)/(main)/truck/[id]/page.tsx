@@ -6,7 +6,7 @@ import { InfoCard } from '@/shared/ui/info-card'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Coordinate } from '@/shared/types'
+import { Coordinate, TruckFuelUpdate } from '@/shared/types'
 import { truckQueries } from '@/entities/truck/api'
 import { DriverInfoSkeleton } from '@/widgets/driver-info/ui/driver-info.skeleton'
 import { RouteList } from '@/widgets/refueling-details'
@@ -14,6 +14,7 @@ import { TruckRouteInfo } from '@/widgets/truck-route/ui'
 import { useGetDirectionsMutation } from '@/features/directions/api/get-direction.mutation'
 import { MapWithRoute } from '@/widgets/map'
 import { useUpdateGasStationsMutation } from '@/entities/gas-station/api/update-gas-station.mutation'
+import { useConnection } from '@/shared/lib/context'
 
 export default function TruckInfo() {
   const { dictionary } = useDictionary()
@@ -23,6 +24,7 @@ export default function TruckInfo() {
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
   const [finishFuel, setFinishFuel] = useState<number | undefined>()
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
 
   const truckId = useMemo(() => {
     const truckIdParam = params?.id
@@ -37,6 +39,30 @@ export default function TruckInfo() {
     ...truckQueries.truck(truckId!),
     enabled: !!truckId,
   })
+  //! Delete trash
+  const { connection, isConnected } = useConnection()
+  const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
+  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
+  useEffect(() => {
+    if (!connection || !isConnected) return
+
+    setIsLoadingFuel(true)
+
+    const handleFuelUpdate = (data: TruckFuelUpdate) => {
+      if (truckData && data.truckId === truckData.id) {
+        setFuel(data)
+        setIsLoadingFuel(false)
+      }
+    }
+
+    connection.on('ReceiveTruckFuelUpdate', handleFuelUpdate)
+
+    return () => {
+      connection.off('ReceiveTruckFuelUpdate', handleFuelUpdate)
+    }
+  }, [connection, isConnected, truckData])
+
+  //!!
   const {
     mutateAsync: updateGasStations,
     data: gasStationsData,
@@ -60,6 +86,8 @@ export default function TruckInfo() {
             (routeDto) => routeDto.routeSectionId,
           ),
           FinishFuel: finishFuel,
+          FuelProviderNameList: selectedProviders,
+          CurrentFuel: fuel?.fuelPercentage,
         })
       } else {
         console.warn(
@@ -104,7 +132,13 @@ export default function TruckInfo() {
           {isTruckLoading ? (
             <DriverInfoSkeleton />
           ) : (
-            truckData && <DriverInfo truck={truckData} />
+            truckData && (
+              <DriverInfo
+                truck={truckData}
+                fuel={fuel}
+                isLoadingFuel={isLoadingFuel}
+              />
+            )
           )}
         </InfoCard>
 
@@ -131,6 +165,9 @@ export default function TruckInfo() {
               selectedRouteId={selectedRouteId}
               handleRouteClick={handleRouteClick}
               finishFuel={finishFuel}
+              selectedProviders={selectedProviders}
+              setSelectedProviders={setSelectedProviders}
+              fuel={fuel?.fuelPercentage}
             />
           </>
         )}

@@ -9,14 +9,16 @@ import { useEffect, useState } from 'react'
 
 type DriverInfoProps = {
   truck: Truck
+  fuel: TruckFuelUpdate | null
+  isLoadingFuel: boolean
 }
 
-export const DriverInfo = ({ truck }: DriverInfoProps) => {
+export const DriverInfo = ({ truck, fuel, isLoadingFuel }: DriverInfoProps) => {
   const { dictionary } = useDictionary()
-  const { connection, isConnected } = useConnection()
-  const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
+  // const { connection, isConnected } = useConnection()
+  // const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
 
-  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
+  // const [isLoadingFuel, setIsLoadingFuel] = useState(true)
 
   // useTruckSignalR({
   //   connection,
@@ -28,24 +30,24 @@ export const DriverInfo = ({ truck }: DriverInfoProps) => {
   //   },
   // })
 
-  useEffect(() => {
-    if (!connection || !isConnected) return
+  // useEffect(() => {
+  //   if (!connection || !isConnected) return
 
-    setIsLoadingFuel(true)
+  //   setIsLoadingFuel(true)
 
-    const handleFuelUpdate = (data: TruckFuelUpdate) => {
-      if (data.truckId === truck.id) {
-        setFuel(data)
-        setIsLoadingFuel(false)
-      }
-    }
+  //   const handleFuelUpdate = (data: TruckFuelUpdate) => {
+  //     if (data.truckId === truck.id) {
+  //       setFuel(data)
+  //       setIsLoadingFuel(false)
+  //     }
+  //   }
 
-    connection.on('ReceiveTruckFuelUpdate', handleFuelUpdate)
+  //   connection.on('ReceiveTruckFuelUpdate', handleFuelUpdate)
 
-    return () => {
-      connection.off('ReceiveTruckFuelUpdate', handleFuelUpdate)
-    }
-  }, [connection, isConnected, truck.id])
+  //   return () => {
+  //     connection.off('ReceiveTruckFuelUpdate', handleFuelUpdate)
+  //   }
+  // }, [connection, isConnected, truck.id])
 
   return (
     <>

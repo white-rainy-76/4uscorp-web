@@ -10,4 +10,6 @@ export const UpdateGasStationsPayloadSchema = z.object({
   routeSectionIds: z.array(z.string()),
   requiredFuelStations: z.array(RequiredFuelStationPayloadSchema).optional(),
   FinishFuel: z.number().optional(),
+  FuelProviderNameList: z.array(z.string()).optional(),
+  CurrentFuel: z.string().optional(),
 })
