@@ -82,7 +82,7 @@ export const MapWithRoute = ({
       })),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
-      CurrentFuel: fuel,
+      CurrentFuel: fuel?.toString(),
     })
   }
 
@@ -99,7 +99,7 @@ export const MapWithRoute = ({
       })),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
-      CurrentFuel: fuel,
+      CurrentFuel: fuel?.toString(),
     })
   }
 
@@ -123,7 +123,7 @@ export const MapWithRoute = ({
       })),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
-      CurrentFuel: fuel,
+      CurrentFuel: fuel?.toString(),
     })
   }
 

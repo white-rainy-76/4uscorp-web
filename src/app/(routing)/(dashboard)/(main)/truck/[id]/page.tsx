@@ -87,7 +87,7 @@ export default function TruckInfo() {
           ),
           FinishFuel: finishFuel,
           FuelProviderNameList: selectedProviders,
-          CurrentFuel: fuel?.fuelPercentage,
+          CurrentFuel: fuel?.fuelPercentage.toString(),
         })
       } else {
         console.warn(
