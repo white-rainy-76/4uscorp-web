@@ -147,7 +147,6 @@ export const MapWithRoute = ({
     await updateGasStations({
       routeId: routeData.routeId,
       routeSectionIds: routeData.route.map((r) => r.routeSectionId),
-      requiredFuelStations: [],
       FinishFuel: finishFuel,
       FuelProviderNameList: providers,
       CurrentFuel: fuel?.toString(),
