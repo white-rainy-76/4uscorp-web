@@ -8,10 +8,10 @@ interface StatusLabelProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const statusStyles = {
-  available: 'text-[#2AC78A]',
-  active: 'text-[#FFAF2A]',
-  inactive: 'text-[#808080]',
-}
+  active: 'text-green-500',
+  inactive: 'text-red-500',
+  idle: 'text-gray-500',
+} as const
 
 const StatusLabel = React.forwardRef<HTMLSpanElement, StatusLabelProps>(
   ({ className, status, ...props }, ref) => {

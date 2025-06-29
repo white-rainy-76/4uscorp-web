@@ -78,7 +78,7 @@ export const Card = ({ truck, isActive }: CardProps) => {
           <AvatarFallback> {driverInitials || '?'}</AvatarFallback>
         </Avatar>
         <div>
-          <h2 className="text-[24px] leading-[32px] font-black text-text-heading">
+          <h2 className="text-[18px] leading-[32px] font-black text-text-heading">
             #{truck.name}
           </h2>
           <p className="text-sm font-extrabold text-text-heading">

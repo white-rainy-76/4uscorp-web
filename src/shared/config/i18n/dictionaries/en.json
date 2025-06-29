@@ -30,7 +30,7 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive",
-      "available": "Available"
+      "idle": "Idle"
     },
     "driver_info": {
       "fuel": "Fuel",

@@ -28,9 +28,9 @@
       "details_info": "Детали заправки"
     },
     "status": {
-      "active": "В пути",
+      "active": "В дороге",
       "inactive": "Неактивен",
-      "available": "Свободен"
+      "idle": "Холостой ход"
     },
     "driver_info": {
       "fuel": "Топливо",

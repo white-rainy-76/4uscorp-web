@@ -1,15 +1,15 @@
 import { z } from 'zod'
 
 export const TruckStatusSchema = z.enum([
-  'AVAILABLE',
-  'EN_ROUTE',
-  'MAINTENANCE',
+  'INACTIVE', // 0
+  'ACTIVE', // 1
+  'IDLE', // 2
 ])
 
 export const DriverSchema = z.object({
   id: z.string(),
   fullName: z.string(),
-  status: z.string(),
+  status: z.number(),
 })
 
 export const TruckSchema = z.object({
