@@ -3,14 +3,14 @@ import { z } from 'zod'
 export const DriverDtoSchema = z.object({
   id: z.string(),
   fullName: z.string(),
-  status: z.string(),
+  status: z.number(),
 })
 
 export const TruckDtoSchema = z.object({
   id: z.string(),
   providerTruckId: z.string(),
   licensePlate: z.string().nullable(),
-  status: z.string(),
+  status: z.number(),
   driverId: z.string(),
   driver: z.nullable(DriverDtoSchema).optional(),
   name: z.string(),

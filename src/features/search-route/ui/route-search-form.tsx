@@ -15,12 +15,14 @@ interface RouteSearchFormProps {
   setOrigin: (value: Coordinate | null) => void
   setDestination: (value: Coordinate | null) => void
   setFinishFuel: (value: number | undefined) => void
+  setTruckWeight: (value: number | undefined) => void
 }
 
 export const RouteSearchForm = ({
   setOrigin,
   setDestination,
   setFinishFuel,
+  setTruckWeight,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
   const [selectedStartPoint, setSelectedStartPoint] =
@@ -64,6 +66,7 @@ export const RouteSearchForm = ({
         longitude: selectedEndPoint.location.lng(),
       })
       setFinishFuel(data.fuelPercent)
+      setTruckWeight(Number(data.weight))
     }
   }
 

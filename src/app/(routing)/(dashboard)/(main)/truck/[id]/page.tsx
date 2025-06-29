@@ -24,6 +24,7 @@ export default function TruckInfo() {
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
   const [finishFuel, setFinishFuel] = useState<number | undefined>()
+  const [truckWeight, setTruckWeight] = useState<number | undefined>()
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
 
   const truckId = useMemo(() => {
@@ -86,6 +87,8 @@ export default function TruckInfo() {
             (routeDto) => routeDto.routeSectionId,
           ),
           FinishFuel: finishFuel,
+          ...(truckWeight !== undefined &&
+            truckWeight !== 0 && { Weight: truckWeight }),
           FuelProviderNameList: selectedProviders,
           CurrentFuel: fuel?.fuelPercentage.toString(),
         })
@@ -116,7 +119,9 @@ export default function TruckInfo() {
     if (!truckData) return
 
     const hasBothPoints = origin && destination
-    hasBothPoints ? getDirections({ origin, destination }) : resetRoute()
+    hasBothPoints
+      ? getDirections({ origin, destination, TruckId: truckData.id })
+      : resetRoute()
   }, [origin, destination, truckData, getDirections, resetRoute])
 
   useEffect(() => {
@@ -150,6 +155,7 @@ export default function TruckInfo() {
                 setOrigin={setOrigin}
                 setDestination={setDestination}
                 setFinishFuel={setFinishFuel}
+                setTruckWeight={setTruckWeight}
               />
             </InfoCard>
             <MapWithRoute
@@ -161,6 +167,7 @@ export default function TruckInfo() {
               isGasStationsPending={isGasStationsLoading}
               mutateAsync={getDirections}
               truck={truckData}
+              truckWeight={truckWeight}
               updateGasStations={updateGasStations}
               selectedRouteId={selectedRouteId}
               handleRouteClick={handleRouteClick}

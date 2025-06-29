@@ -14,6 +14,7 @@ interface TruckRouteInfoProps {
   setOrigin: (c: Coordinate | null) => void
   setDestination: (c: Coordinate | null) => void
   setFinishFuel: (v: number | undefined) => void
+  setTruckWeight: (v: number | undefined) => void
 }
 
 export const TruckRouteInfo = ({
@@ -21,6 +22,7 @@ export const TruckRouteInfo = ({
   setOrigin,
   setDestination,
   setFinishFuel,
+  setTruckWeight,
 }: TruckRouteInfoProps) => {
   const [editing, setEditing] = useState(false)
 
@@ -30,6 +32,7 @@ export const TruckRouteInfo = ({
         setOrigin={setOrigin}
         setDestination={setDestination}
         setFinishFuel={setFinishFuel}
+        setTruckWeight={setTruckWeight}
       />
     )
   }
