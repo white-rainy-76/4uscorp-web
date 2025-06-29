@@ -21,6 +21,7 @@ interface DirectionsProps {
   origin: Coordinate | null
   destination: Coordinate | null
   onRouteClick?: (routeIndex: number) => void
+  truckId: string
 }
 
 export const Directions = ({
@@ -29,6 +30,7 @@ export const Directions = ({
   origin,
   destination,
   onRouteClick,
+  truckId,
 }: DirectionsProps) => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
@@ -170,6 +172,7 @@ export const Directions = ({
 
       // Используем переданную мутацию вместо локальной
       await directionsMutation({
+        TruckId: truckId,
         origin: origin || { latitude: 0, longitude: 0 },
         destination: destination || { latitude: 0, longitude: 0 },
         ViaPoints: transformWayPointsToCoordinates(newMarkers),
@@ -204,6 +207,7 @@ export const Directions = ({
 
       // Используем переданную мутацию вместо локальной
       await directionsMutation({
+        TruckId: truckId,
         origin: origin || { latitude: 0, longitude: 0 },
         destination: destination || { latitude: 0, longitude: 0 },
         ViaPoints: transformWayPointsToCoordinates(updatedWayPoints),

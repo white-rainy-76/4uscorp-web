@@ -6,7 +6,7 @@ import { ClusteredGasStationMarkers } from '@/entities/gas-station/ui/clustered-
 import { FullScreenController } from './controlers/fullscreen'
 import { ZoomControl } from './controlers/zoom'
 import { Coordinate } from '@/shared/types'
-import { Directions } from '@/features/directions/api'
+import { Directions, RouteRequestPayload } from '@/features/directions/api'
 import { DirectionsRoutes } from '@/features/directions'
 import { TrackTruck } from '@/features/truck-track/ui/tracked-truck'
 import { Truck } from '@/entities/truck'
@@ -25,10 +25,7 @@ interface MapWithRouteProps {
   truck: Truck
   selectedRouteId: string | null
   handleRouteClick: (routeIndex: number) => void
-  mutateAsync: (variables: {
-    origin: Coordinate
-    destination: Coordinate
-  }) => Promise<Directions>
+  mutateAsync: (variables: RouteRequestPayload) => Promise<Directions>
   updateGasStations: (
     variables: UpdateGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
@@ -36,6 +33,7 @@ interface MapWithRouteProps {
   selectedProviders: string[]
   setSelectedProviders: (value: string[]) => void
   fuel: string | undefined
+  truckWeight: number | undefined
 }
 
 export const MapWithRoute = ({
@@ -54,6 +52,7 @@ export const MapWithRoute = ({
   setSelectedProviders,
   finishFuel,
   fuel,
+  truckWeight,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -80,6 +79,8 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      ...(truckWeight !== undefined &&
+        truckWeight !== 0 && { Weight: truckWeight }),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
       CurrentFuel: fuel?.toString(),
@@ -97,6 +98,8 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      ...(truckWeight !== undefined &&
+        truckWeight !== 0 && { Weight: truckWeight }),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
       CurrentFuel: fuel?.toString(),
@@ -121,6 +124,8 @@ export const MapWithRoute = ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
       })),
+      ...(truckWeight !== undefined &&
+        truckWeight !== 0 && { Weight: truckWeight }),
       FinishFuel: finishFuel,
       FuelProviderNameList: selectedProviders,
       CurrentFuel: fuel?.toString(),
@@ -148,6 +153,8 @@ export const MapWithRoute = ({
       routeId: routeData.routeId,
       routeSectionIds: routeData.route.map((r) => r.routeSectionId),
       FinishFuel: finishFuel,
+      ...(truckWeight !== undefined &&
+        truckWeight !== 0 && { Weight: truckWeight }),
       FuelProviderNameList: providers,
       CurrentFuel: fuel?.toString(),
     })
@@ -175,6 +182,7 @@ export const MapWithRoute = ({
           data={routeData}
           directionsMutation={mutateAsync}
           onRouteClick={handleRouteClick}
+          truckId={truck.id}
         />
 
         {filteredGasStations.length > 0 && (

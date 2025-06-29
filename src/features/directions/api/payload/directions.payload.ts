@@ -10,6 +10,7 @@ export const PointRequestPayloadSchema = z.object({
 })
 
 export const RouteRequestPayloadSchema = z.object({
+  TruckId: z.string(),
   origin: PointRequestPayloadSchema,
   destination: PointRequestPayloadSchema,
   ViaPoints: z.array(PointRequestPayloadSchema).optional(),
