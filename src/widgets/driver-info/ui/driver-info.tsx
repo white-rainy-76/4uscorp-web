@@ -56,7 +56,7 @@ export const DriverInfo = ({ truck, fuel, isLoadingFuel }: DriverInfoProps) => {
         <DriverProfile
           avatarUrl={undefined}
           name="Алексей Попов"
-          status="AVAILABLE"
+          status="ACTIVE"
           dictionary={dictionary}
         />
 
@@ -111,11 +111,11 @@ const DriverProfile = ({
       <div
         className={cn(
           'text-sm',
-          status === 'AVAILABLE' ? 'text-green-600' : 'text-yellow-600',
+          status === 'ACTIVE' ? 'text-green-600' : 'text-yellow-600',
         )}>
         ●{' '}
-        {status === 'AVAILABLE'
-          ? dictionary.home.status.available
+        {status === 'ACTIVE'
+          ? dictionary.home.status.inactive
           : dictionary.home.status.active}
       </div>
     </div>
