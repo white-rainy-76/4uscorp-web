@@ -9,6 +9,7 @@ export function getAllTrucks(config?: AxiosRequestConfig) {
     .get(`/trucks-api/Trucks/get-truck-list`, config)
     .then(responseContract(z.array(TruckDtoSchema)))
 }
+
 export function getTruckById(id: string, config?: AxiosRequestConfig) {
   return api
     .get(`/trucks-api/Trucks/get-truckBy-id?truckId=${id}`, config)

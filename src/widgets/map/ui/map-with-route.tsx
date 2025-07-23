@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef, useState, useMemo, useEffect } from 'react'
-import { MapBase, Spinner } from '@/shared/ui'
+import { MapBase, Polyline, Spinner } from '@/shared/ui'
 import { ClusteredGasStationMarkers } from '@/entities/gas-station/ui/clustered-gas-station-markers'
 import { FullScreenController } from './controlers/fullscreen'
 import { ZoomControl } from './controlers/zoom'
@@ -14,14 +14,19 @@ import { RoutePanelOnMap } from './route-panel'
 import { useMap } from '@vis.gl/react-google-maps'
 import { GasStation, GetGasStationsResponse } from '@/entities/gas-station'
 import { UpdateGasStationsPayload } from '@/entities/gas-station/api/types/gas-station.payload'
+import { RouteData } from '@/entities/route/api/types/route'
 
 interface MapWithRouteProps {
   origin: Coordinate | null
   destination: Coordinate | null
-  routeData: Directions | undefined
-  getGasStationsResponseData: GetGasStationsResponse | undefined
-  isRoutePending: boolean
+  destinationName: string | undefined
+  originName: string | undefined
+  directionsData: Directions | undefined
+  gasStations: GasStation[] | undefined
+  remainingFuelLiters: number | undefined
+  isDirectionsPending: boolean
   isGasStationsPending: boolean
+  isRoutePending: boolean
   truck: Truck
   selectedRouteId: string | null
   handleRouteClick: (routeIndex: number) => void
@@ -34,13 +39,16 @@ interface MapWithRouteProps {
   setSelectedProviders: (value: string[]) => void
   fuel: string | undefined
   truckWeight: number | undefined
+  routeData: RouteData | undefined
 }
 
 export const MapWithRoute = ({
   origin,
   destination,
-  routeData,
-  getGasStationsResponseData,
+  directionsData,
+  gasStations,
+  remainingFuelLiters,
+  isDirectionsPending,
   isRoutePending,
   isGasStationsPending,
   handleRouteClick,
@@ -53,6 +61,9 @@ export const MapWithRoute = ({
   finishFuel,
   fuel,
   truckWeight,
+  routeData,
+  originName,
+  destinationName,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -62,19 +73,19 @@ export const MapWithRoute = ({
   const map = useMap()
 
   const filteredGasStations = useMemo(() => {
-    if (!getGasStationsResponseData?.fuelStations || !selectedRouteId) return []
-    return getGasStationsResponseData.fuelStations.filter(
+    if (!gasStations || !selectedRouteId) return []
+    return gasStations.filter(
       (station) => station.roadSectionId === selectedRouteId,
     )
-  }, [getGasStationsResponseData?.fuelStations, selectedRouteId])
+  }, [gasStations, selectedRouteId])
 
   const handleAddToCart = async (station: GasStation) => {
     const newCart = [...cart, { ...station, refillLiters: station.refill || 0 }]
     setCart(newCart)
     console.log(newCart)
     await updateGasStations({
-      routeId: routeData?.routeId || '',
-      routeSectionIds: routeData?.route.map((r) => r.routeSectionId) || [],
+      routeId: directionsData?.routeId || '',
+      routeSectionIds: directionsData?.route.map((r) => r.routeSectionId) || [],
       requiredFuelStations: newCart.map((s) => ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
@@ -92,8 +103,8 @@ export const MapWithRoute = ({
     setCart(newCart)
 
     await updateGasStations({
-      routeId: routeData?.routeId || '',
-      routeSectionIds: routeData?.route.map((r) => r.routeSectionId) || [],
+      routeId: directionsData?.routeId || '',
+      routeSectionIds: directionsData?.route.map((r) => r.routeSectionId) || [],
       requiredFuelStations: newCart.map((s) => ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
@@ -118,8 +129,8 @@ export const MapWithRoute = ({
 
     console.log(newCart)
     await updateGasStations({
-      routeId: routeData?.routeId || '',
-      routeSectionIds: routeData?.route.map((r) => r.routeSectionId) || [],
+      routeId: directionsData?.routeId || '',
+      routeSectionIds: directionsData?.route.map((r) => r.routeSectionId) || [],
       requiredFuelStations: newCart.map((s) => ({
         stationId: s.id,
         refillLiters: Number(s.refill || 0),
@@ -133,25 +144,25 @@ export const MapWithRoute = ({
   }
 
   useEffect(() => {
-    if (!getGasStationsResponseData?.fuelStations || !routeData) return
+    if (!gasStations || !routeData) return
 
-    const newCart = getGasStationsResponseData?.fuelStations.filter(
+    const newCart = gasStations.filter(
       (station) =>
         station.isAlgorithm && station.roadSectionId === selectedRouteId,
     )
 
     setCart(newCart)
-  }, [getGasStationsResponseData?.fuelStations, routeData, selectedRouteId])
+  }, [gasStations, routeData, selectedRouteId])
 
   const handleFilterChange = async (providers: string[]) => {
     setSelectedProviders(providers)
     setMarkersKey((prevKey) => prevKey + 1)
 
-    if (!routeData?.routeId || !routeData.route) return
+    if (!directionsData?.routeId || !directionsData.route) return
 
     await updateGasStations({
-      routeId: routeData.routeId,
-      routeSectionIds: routeData.route.map((r) => r.routeSectionId),
+      routeId: directionsData.routeId,
+      routeSectionIds: directionsData.route.map((r) => r.routeSectionId),
       FinishFuel: finishFuel,
       ...(truckWeight !== undefined &&
         truckWeight !== 0 && { Weight: truckWeight }),
@@ -170,7 +181,7 @@ export const MapWithRoute = ({
   return (
     <div ref={mapContainerRef}>
       <MapBase onMapClick={() => setClickedOutside(true)}>
-        {(isRoutePending || isGasStationsPending) && (
+        {(isDirectionsPending || isGasStationsPending || isRoutePending) && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-50 z-[101] pointer-events-auto">
             <Spinner size="lg" />
           </div>
@@ -179,7 +190,9 @@ export const MapWithRoute = ({
         <DirectionsRoutes
           origin={origin}
           destination={destination}
-          data={routeData}
+          originName={originName}
+          destinationName={destinationName}
+          data={directionsData}
           directionsMutation={mutateAsync}
           onRouteClick={handleRouteClick}
           truckId={truck.id}
@@ -195,24 +208,32 @@ export const MapWithRoute = ({
             cart={cart}
           />
         )}
-        <TrackTruck
-          key={truck.id}
-          truckId={truck.id}
-          unitNumber={truck.name}
-          clickedOutside={clickedOutside}
-          resetClick={() => setClickedOutside(false)}
-        />
+        {!directionsData && (
+          <TrackTruck
+            key={truck.id}
+            truckId={truck.id}
+            unitNumber={truck.name}
+            clickedOutside={clickedOutside}
+            resetClick={() => setClickedOutside(false)}
+          />
+        )}
 
+        {routeData && !directionsData && (
+          <Polyline
+            path={routeData.route.mapPoints}
+            strokeColor="#ff2db5"
+            strokeOpacity={0.8}
+            strokeWeight={4}
+          />
+        )}
         <RoutePanelOnMap
           selectedRouteId={selectedRouteId}
           onDeleteGasStation={handleRemoveFromCart}
           onFilterChange={handleFilterChange}
           onGasStationClick={handleGasStationClick}
           selectedProviders={selectedProviders}
-          fuelLeftOver={
-            getGasStationsResponseData?.finishInfo.remainingFuelLiters
-          }
-          directions={routeData}
+          fuelLeftOver={remainingFuelLiters}
+          directions={directionsData}
           cart={cart}
         />
 

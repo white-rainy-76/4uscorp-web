@@ -1,9 +1,13 @@
 import { z } from 'zod'
 
 export const DriverDtoSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
+  truckId: z.string().uuid(),
   fullName: z.string(),
-  status: z.number(),
+  phone: z.string(),
+  email: z.string(),
+  bonus: z.number().int().nonnegative(),
+  telegramLink: z.string(),
 })
 
 export const TruckDtoSchema = z.object({

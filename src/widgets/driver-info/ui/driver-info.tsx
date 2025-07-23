@@ -1,7 +1,7 @@
 import { Truck, TruckStatus } from '@/entities/truck'
 import { useConnection } from '@/shared/lib/context'
-import { useDictionary, useTruckSignalR } from '@/shared/lib/hooks'
-import { TruckFuelUpdate } from '@/shared/types'
+import { useDictionary } from '@/shared/lib/hooks'
+import { TruckStatsUpdate } from '@/shared/types'
 import { Avatar, AvatarImage, AvatarFallback, cn, Spinner } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
@@ -9,45 +9,16 @@ import { useEffect, useState } from 'react'
 
 type DriverInfoProps = {
   truck: Truck
-  fuel: TruckFuelUpdate | null
+  truckInfo: TruckStatsUpdate | null
   isLoadingFuel: boolean
 }
 
-export const DriverInfo = ({ truck, fuel, isLoadingFuel }: DriverInfoProps) => {
+export const DriverInfo = ({
+  truck,
+  truckInfo,
+  isLoadingFuel,
+}: DriverInfoProps) => {
   const { dictionary } = useDictionary()
-  // const { connection, isConnected } = useConnection()
-  // const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
-
-  // const [isLoadingFuel, setIsLoadingFuel] = useState(true)
-
-  // useTruckSignalR({
-  //   connection,
-  //   isConnected,
-  //   truckId: truck.id,
-  //   onFuelUpdate: (data) => {
-  //     setFuel(data)
-  //     setIsLoadingFuel(false)
-  //   },
-  // })
-
-  // useEffect(() => {
-  //   if (!connection || !isConnected) return
-
-  //   setIsLoadingFuel(true)
-
-  //   const handleFuelUpdate = (data: TruckFuelUpdate) => {
-  //     if (data.truckId === truck.id) {
-  //       setFuel(data)
-  //       setIsLoadingFuel(false)
-  //     }
-  //   }
-
-  //   connection.on('ReceiveTruckFuelUpdate', handleFuelUpdate)
-
-  //   return () => {
-  //     connection.off('ReceiveTruckFuelUpdate', handleFuelUpdate)
-  //   }
-  // }, [connection, isConnected, truck.id])
 
   return (
     <>
@@ -62,7 +33,7 @@ export const DriverInfo = ({ truck, fuel, isLoadingFuel }: DriverInfoProps) => {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <FuelIndicator
-            percentage={fuel?.fuelPercentage}
+            percentage={truckInfo?.fuelPercentage}
             label={dictionary.home.driver_info.fuel}
             isLoadingFuel={isLoadingFuel}
           />

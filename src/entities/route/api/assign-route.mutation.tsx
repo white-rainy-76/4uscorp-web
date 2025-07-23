@@ -3,17 +3,16 @@ import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query'
-import { getDirections } from './direction.service'
-import { RouteRequestPayload } from './types/directions.payload'
-import { Directions } from './types/directions'
-import { RouteRequestPayloadSchema } from './payload/directions.payload'
+import { AssignRoutePayload } from './types/route.payload'
+import { AssignRoutePayloadSchema } from './payload/route.payload'
+import { assignRoute } from './route.service'
 
-export function useGetDirectionsMutation(
+export function useAssignRouteMutation(
   options: Pick<
     UseMutationOptions<
-      Directions,
+      void,
       DefaultError,
-      RouteRequestPayload,
+      AssignRoutePayload,
       { abortController: AbortController }
     >,
     'mutationKey' | 'onMutate' | 'onSuccess' | 'onError' | 'onSettled'
@@ -22,12 +21,12 @@ export function useGetDirectionsMutation(
   const { mutationKey = [], onMutate, onSuccess, onError, onSettled } = options
 
   return useMutation({
-    mutationKey: ['directions', 'create', ...mutationKey],
+    mutationKey: ['routes', 'assignRoute', ...mutationKey],
 
-    mutationFn: async (payload: RouteRequestPayload) => {
-      const validatedPayload = RouteRequestPayloadSchema.parse(payload)
+    mutationFn: async (payload: AssignRoutePayload) => {
+      const validatedPayload = AssignRoutePayloadSchema.parse(payload)
       const controller = new AbortController()
-      return getDirections(validatedPayload, controller.signal)
+      return assignRoute(validatedPayload, controller.signal)
     },
 
     onMutate: async (variables) => {
@@ -36,21 +35,16 @@ export function useGetDirectionsMutation(
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
-      await Promise.all([onSuccess?.(data, variables, context)])
-    },
-
     onError: (error, variables, context) => {
       if (context?.abortController) {
         context.abortController.abort('Request cancelled due to error')
       }
       onError?.(error, variables, context)
     },
-
+    onSuccess: (data, variables, context) => {
+      onSuccess?.(data, variables, context)
+    },
     onSettled: (data, error, variables, context) => {
-      if (context?.abortController) {
-        context.abortController.abort('Request settled')
-      }
       onSettled?.(data, error, variables, context)
     },
   })

@@ -7,9 +7,13 @@ export const TruckStatusSchema = z.enum([
 ])
 
 export const DriverSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
+  truckId: z.string().uuid(),
   fullName: z.string(),
-  status: z.number(),
+  phone: z.string(),
+  email: z.string().email(),
+  bonus: z.number().int().nonnegative(),
+  telegramLink: z.string().url(),
 })
 
 export const TruckSchema = z.object({

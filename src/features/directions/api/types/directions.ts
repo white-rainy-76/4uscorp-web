@@ -9,3 +9,5 @@ export type CoordinatePair = z.infer<typeof CoordinatePairSchema>
 
 export type Route = z.infer<typeof RouteSchema>
 export type Directions = z.infer<typeof DirectionsSchema>
+
+export type ActionType = 'create' | 'edit'

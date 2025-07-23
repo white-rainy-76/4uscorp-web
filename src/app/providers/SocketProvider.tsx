@@ -6,6 +6,7 @@ import {
   HubConnection,
   HttpTransportType,
 } from '@microsoft/signalr'
+import signalRService from '@/shared/socket/signalRService'
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [connection, setConnection] = useState<HubConnection | null>(null)
@@ -28,13 +29,27 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       connectionRef.current = newConnection
       setConnection(newConnection)
 
-      newConnection.onclose(() => {
+      signalRService.setConnection(newConnection)
+
+      newConnection.onclose((error) => {
         setIsConnected(false)
+        if (error) {
+          console.error('SignalR connection closed with error:', error)
+        } else {
+          console.log('SignalR connection closed.')
+        }
       })
 
-      newConnection.onreconnecting(() => {
+      newConnection.onreconnecting((error) => {
         setIsConnected(false)
+        console.warn('SignalR connection reconnecting...', error)
       })
+
+      newConnection.onreconnected((connectionId) => {
+        setIsConnected(true)
+        console.log('SignalR reconnected. Connection ID:', connectionId)
+      })
+
       try {
         await newConnection.start()
         setIsConnected(true)

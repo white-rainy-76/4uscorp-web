@@ -11,8 +11,12 @@ export const mapTruck = (rawTruck: TruckDto): Truck => {
   const mappedDriver: Driver | null = rawTruck.driver
     ? {
         id: rawTruck.driver.id,
+        truckId: rawTruck.driver.truckId,
         fullName: rawTruck.driver.fullName,
-        status: rawTruck.driver.status,
+        phone: rawTruck.driver.phone,
+        email: rawTruck.driver.email,
+        bonus: rawTruck.driver.bonus,
+        telegramLink: rawTruck.driver.telegramLink,
       }
     : null
 

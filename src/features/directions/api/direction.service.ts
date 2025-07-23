@@ -2,7 +2,7 @@ import { api } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
 import { DirectionsDtoSchema } from './contracts/direction.contract.dto'
 import { mapDirections } from './mapper/direction.mapper'
-import { Directions } from './types/directions'
+import { ActionType, Directions } from './types/directions'
 import { Coordinate } from '@/shared/types'
 import {
   PointRequestPayload,
@@ -13,20 +13,30 @@ import {
   PointRequestPayloadSchema,
   RouteRequestPayloadSchema,
 } from './payload/directions.payload'
-import { CoordinatesDtoSchema } from './contracts/coordinates.dto'
+import { CoordinatesDtoSchema } from '@/shared/api/contracts/coordinates.dto.contract'
 
-export const getDirections = async (
+export const handleFuelRoute = async (
   payload: RouteRequestPayload,
+  action: ActionType,
   signal?: AbortSignal,
 ): Promise<Directions> => {
   const validatedPayload = RouteRequestPayloadSchema.parse(payload)
   const config: AxiosRequestConfig = { signal }
+
+  let endpoint: string
+  switch (action) {
+    case 'create':
+      endpoint = `/fuelroutes-api/FuelRoute/create-fuel-route`
+      break
+    case 'edit':
+      endpoint = `/fuelroutes-api/FuelRoute/edit-fuel-route`
+      break
+    default:
+      throw new Error(`Unknown action type: ${action}`)
+  }
+
   const response = await api
-    .post(
-      `/fuelroutes-api/FuelRoute/create-fuel-route`,
-      validatedPayload,
-      config,
-    )
+    .post(endpoint, validatedPayload, config)
     .then(responseContract(DirectionsDtoSchema))
 
   return mapDirections(response.data)

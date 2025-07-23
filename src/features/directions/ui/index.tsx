@@ -7,8 +7,6 @@ import { RouteMarkers } from './markers'
 
 import { Coordinate } from '@/shared/types'
 import { useGetNearestDropPointMutation } from '../api/get-nearest-drop-point.mutation'
-import { useCancelDirectionsCreationMutation } from '../api/useCancelDirectionsMutation'
-import { Marker } from '@vis.gl/react-google-maps'
 
 interface DirectionsProps {
   data?: DirectionType | undefined
@@ -22,6 +20,8 @@ interface DirectionsProps {
   destination: Coordinate | null
   onRouteClick?: (routeIndex: number) => void
   truckId: string
+  destinationName: string | undefined
+  originName: string | undefined
 }
 
 export const Directions = ({
@@ -31,6 +31,8 @@ export const Directions = ({
   destination,
   onRouteClick,
   truckId,
+  destinationName,
+  originName,
 }: DirectionsProps) => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
@@ -175,6 +177,8 @@ export const Directions = ({
         TruckId: truckId,
         origin: origin || { latitude: 0, longitude: 0 },
         destination: destination || { latitude: 0, longitude: 0 },
+        destinationName: destinationName || '',
+        originName: originName || '',
         ViaPoints: transformWayPointsToCoordinates(newMarkers),
       })
     } catch (error) {
@@ -210,6 +214,8 @@ export const Directions = ({
         TruckId: truckId,
         origin: origin || { latitude: 0, longitude: 0 },
         destination: destination || { latitude: 0, longitude: 0 },
+        destinationName: destinationName || '',
+        originName: originName || '',
         ViaPoints: transformWayPointsToCoordinates(updatedWayPoints),
       })
     } catch (error) {

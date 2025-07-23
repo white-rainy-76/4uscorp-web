@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navigation2 } from 'lucide-react'
 import { Icon } from '@/shared/ui'
-import { TruckLocationUpdate } from '@/shared/types'
+import { TruckStatsUpdate } from '@/shared/types'
 
 interface TruckMarkerProps {
-  truckInfo: TruckLocationUpdate
+  truckInfo: TruckStatsUpdate
   unitNumber: string
   clickedOutside: boolean
   resetClick: () => void

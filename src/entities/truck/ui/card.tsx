@@ -7,8 +7,8 @@ import { Icon } from '@/shared/ui'
 import { StatusLabel } from '@/shared/ui'
 import { Truck } from '../api/types/truck'
 import { useConnection } from '@/shared/lib/context'
-import { TruckFuelUpdate } from '@/shared/types'
-import { useTruckSignalR } from '@/shared/lib/hooks'
+import { TruckStatsUpdate } from '@/shared/types'
+import signalRService from '@/shared/socket/signalRService'
 
 interface CardProps {
   truck: Truck
@@ -16,9 +16,7 @@ interface CardProps {
 }
 
 export const Card = ({ truck, isActive }: CardProps) => {
-  const [fuel, setFuel] = useState<TruckFuelUpdate | null>(null)
   const router = useRouter()
-  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
 
   const handleClick = () => {
     router.push(`/truck/${truck.id}`)
@@ -28,33 +26,28 @@ export const Card = ({ truck, isActive }: CardProps) => {
     router.prefetch(`/truck/${truck.id}`)
   }
 
+  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
   const { connection, isConnected } = useConnection()
-
-  // const isLoadingFuel = useTruckSignalR({
-  //   connection,
-  //   isConnected,
-  //   truckId: truck.id,
-  //   onFuelUpdate: (data) => {
-  //     setFuel(data)
-  //   },
-  // })
-
+  const [stats, setStats] = useState<TruckStatsUpdate | null>(null)
   useEffect(() => {
-    if (!connection || !isConnected) return
+    if (!isConnected) {
+      setStats(null)
+      return
+    }
 
-    setIsLoadingFuel(true)
+    if (!truck.id) return
 
-    connection
-      .invoke('JoinTruckGroup', truck.id)
-      .catch((err: any) => console.error('Join group error', err))
+    const handleUpdate = (update: TruckStatsUpdate) => {
+      setStats(update)
+      setIsLoadingFuel(false)
+    }
 
-    connection.on('ReceiveTruckFuelUpdate', (data: TruckFuelUpdate) => {
-      if (data.truckId === truck.id) {
-        setFuel(data)
-        setIsLoadingFuel(false)
-      }
-    })
-  }, [connection, isConnected, truck.id])
+    signalRService.subscribe(truck.id, handleUpdate)
+
+    return () => {
+      signalRService.unsubscribe(truck.id, handleUpdate)
+    }
+  }, [truck.id, isConnected])
 
   const driverInitials =
     truck.driver?.fullName
@@ -94,9 +87,9 @@ export const Card = ({ truck, isActive }: CardProps) => {
           {isLoadingFuel ? (
             <Spinner size="sm" color="blue" />
           ) : (
-            fuel && (
+            stats && (
               <span className="text-sm font-extrabold text-text-strong">
-                {fuel.fuelPercentage}%
+                {stats.fuelPercentage}%
               </span>
             )
           )}

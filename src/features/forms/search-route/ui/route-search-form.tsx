@@ -11,18 +11,28 @@ import { Input } from '@/shared/ui'
 import { FuelSlider } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { Coordinate } from '@/shared/types'
+import { RouteRequestPayload } from '@/features/directions/api'
 interface RouteSearchFormProps {
-  setOrigin: (value: Coordinate | null) => void
-  setDestination: (value: Coordinate | null) => void
-  setFinishFuel: (value: number | undefined) => void
-  setTruckWeight: (value: number | undefined) => void
+  destinationName: string | undefined
+  originName: string | undefined
+  truckWeight: number | undefined
+  finishFuel: number | undefined
+  onSubmitForm: (payload: {
+    origin: Coordinate
+    destination: Coordinate
+    originName: string
+    destinationName: string
+    truckWeight?: number
+    finishFuel?: number
+  }) => void
 }
 
 export const RouteSearchForm = ({
-  setOrigin,
-  setDestination,
-  setFinishFuel,
-  setTruckWeight,
+  destinationName,
+  originName,
+  finishFuel,
+  truckWeight,
+  onSubmitForm,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
   const [selectedStartPoint, setSelectedStartPoint] =
@@ -40,10 +50,10 @@ export const RouteSearchForm = ({
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
     defaultValues: {
-      startPoint: '',
-      endPoint: '',
-      weight: '',
-      fuelPercent: 0,
+      startPoint: originName,
+      endPoint: destinationName,
+      weight: truckWeight?.toString() || '',
+      fuelPercent: finishFuel !== undefined ? finishFuel : 0,
     },
   })
 
@@ -57,16 +67,20 @@ export const RouteSearchForm = ({
     }
 
     if (selectedStartPoint?.location && selectedEndPoint?.location) {
-      setOrigin({
-        latitude: selectedStartPoint.location.lat(),
-        longitude: selectedStartPoint.location.lng(),
+      onSubmitForm({
+        origin: {
+          latitude: selectedStartPoint.location.lat(),
+          longitude: selectedStartPoint.location.lng(),
+        },
+        destination: {
+          latitude: selectedEndPoint.location.lat(),
+          longitude: selectedEndPoint.location.lng(),
+        },
+        originName: data.startPoint,
+        destinationName: data.endPoint,
+        truckWeight: Number(data.weight),
+        finishFuel: data.fuelPercent,
       })
-      setDestination({
-        latitude: selectedEndPoint.location.lat(),
-        longitude: selectedEndPoint.location.lng(),
-      })
-      setFinishFuel(data.fuelPercent)
-      setTruckWeight(Number(data.weight))
     }
   }
 

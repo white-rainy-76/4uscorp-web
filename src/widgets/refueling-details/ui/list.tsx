@@ -25,6 +25,7 @@ export const RouteList = ({ gasStations, selectedRouteId }: RouteListProps) => {
       </div>
     )
   }
+
   return (
     <div className="flex gap-6">
       <div className="mt-3">
