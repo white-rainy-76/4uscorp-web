@@ -22,12 +22,12 @@ export const setTruckGroupWeightFuel = async (
   const authConfig = authorizedRequest(getAuthToken, config)
 
   const response = await api
-    .post('/ModelTrcukGroups/set-WeightAndFuelCapacit', payload, authConfig)
+    .post(
+      '/trucks-api/ModelTruckGroups/set-WeightAndFuelCapacit',
+      payload,
+      authConfig,
+    )
     .then((res) => res.data)
 
   return response
 }
-
-
-
-
