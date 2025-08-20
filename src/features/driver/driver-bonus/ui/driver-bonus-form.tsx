@@ -131,7 +131,7 @@ export const DriverBonusForm = ({
         </label>
         <Select onValueChange={(value) => setValue('reason', value)}>
           <SelectTrigger
-            className={`h-10 border-gray-300 ${watchedReason ? 'bg-white' : 'bg-gray-50'}`}>
+            className={`h-10 text-[#000000] border-gray-300 ${watchedReason ? 'bg-white' : 'bg-gray-50'}`}>
             <SelectValue placeholder="Выберите причину" />
           </SelectTrigger>
           <SelectContent>
