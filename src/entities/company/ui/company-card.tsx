@@ -4,8 +4,6 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage, Icon } from '@/shared/ui'
 import { Company } from '../model/types/company'
-import { useSetCompanyUserMutation } from '@/features/company/set-company-user'
-import { useAuthStore } from '@/shared/store/auth-store'
 import { UsersRound } from 'lucide-react'
 
 interface CompanyCardProps {
@@ -15,26 +13,10 @@ interface CompanyCardProps {
 
 export const CompanyCard = ({ company, isActive }: CompanyCardProps) => {
   const router = useRouter()
-  const { mutateAsync: setCompanyUser } = useSetCompanyUserMutation()
-  const { user } = useAuthStore()
 
-  const handleClick = async () => {
-    try {
-      // Выполняем запрос на сервер для установки пользователя компании
-      if (user?.userId) {
-        await setCompanyUser({
-          userId: user.userId,
-          companyId: company.id,
-        })
-      }
-
-      // Переходим на страницу компании
-      router.push(`/companies/company/${company.id}`)
-    } catch (error) {
-      console.error('Failed to set company user:', error)
-      // В случае ошибки все равно переходим на страницу
-      router.push(`/companies/company/${company.id}`)
-    }
+  const handleClick = () => {
+    // Просто переходим на страницу компании
+    router.push(`/companies/company/${company.id}`)
   }
 
   const handleMouseEnter = () => {

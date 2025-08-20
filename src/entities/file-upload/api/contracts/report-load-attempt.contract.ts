@@ -7,7 +7,7 @@ export const FileResultSchema = z.object({
   processedAt: z.string(),
 })
 
-export const PriceLoadAttemptSchema = z.object({
+export const ReportLoadAttemptSchema = z.object({
   id: z.string().uuid(),
   startedAt: z.string(),
   completedAt: z.string(),
@@ -21,10 +21,10 @@ export const PriceLoadAttemptSchema = z.object({
   fileResults: z.array(FileResultSchema),
 })
 
-export const PriceLoadAttemptsResponseSchema = z.array(PriceLoadAttemptSchema)
+export const ReportLoadAttemptsResponseSchema = z.array(ReportLoadAttemptSchema)
 
-export type PriceFileResult = z.infer<typeof FileResultSchema>
-export type PriceLoadAttempt = z.infer<typeof PriceLoadAttemptSchema>
-export type PriceLoadAttemptsResponse = z.infer<
-  typeof PriceLoadAttemptsResponseSchema
+export type ReportFileResult = z.infer<typeof FileResultSchema>
+export type ReportLoadAttempt = z.infer<typeof ReportLoadAttemptSchema>
+export type ReportLoadAttemptsResponse = z.infer<
+  typeof ReportLoadAttemptsResponseSchema
 >

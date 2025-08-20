@@ -2,27 +2,63 @@
 
 import React from 'react'
 import { Calendar, Check } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { reportLoadAttemptQueries } from '@/entities/file-upload'
+import { Spinner } from '@/shared/ui'
+import { ReportLoadAttempt } from '@/entities/file-upload/api/contracts/report-load-attempt.contract'
+import { FileUpload as ReportUpload } from '@/features/file-upload/upload-report'
 
 export const ReportsSection = () => {
-  // TODO: Добавить query для отчётов когда будет готов API
-  const reports: Array<any> = [] // Пока пустой массив
+  const {
+    data: reports = [],
+    isLoading,
+    error,
+  } = useQuery({
+    ...reportLoadAttemptQueries.list(),
+  })
+
+  const typedReports: ReportLoadAttempt[] = reports
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center py-8 gap-4">
+        <Spinner />
+        <span className="text-muted-foreground">Загрузка отчётов...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 py-8">
+        {error instanceof Error
+          ? `Ошибка загрузки отчётов: ${error.message}`
+          : 'Ошибка загрузки отчётов'}
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Left side - Reports Load Attempts List */}
       <div className="space-y-4">
-        {reports.length > 0 ? (
+        {typedReports.length > 0 ? (
           <div className="space-y-3">
-            {reports.slice(0, 5).map((report) => (
+            {typedReports.slice(0, 5).map((report) => (
               <div
                 key={report.id}
                 className="w-full h-11 bg-[#F2F2F2] rounded-[20px] flex items-center justify-between px-5">
                 {/* Left side - Calendar icon and date */}
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-[#A8A8A8]" />
-                  <span className="font-nunito font-normal text-sm leading-[22px] text-[#343434]">
-                    {new Date(report.startedAt).toLocaleDateString('en-CA')}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-nunito font-normal text-sm leading-[22px] text-[#343434]">
+                      {new Date(report.startedAt).toLocaleDateString('en-CA')}
+                    </span>
+                    <span className="text-xs text-[#A8A8A8]">
+                      {report.totalFiles} файлов
+                    </span>
+                  </div>
                 </div>
 
                 {/* Right side - Status indicator */}
@@ -30,15 +66,23 @@ export const ReportsSection = () => {
                   {report.isSuccessful ? (
                     <>
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-green-500 font-medium">
-                        loaded
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm text-green-500 font-medium">
+                          loaded {report.successfullyProcessedFiles}/
+                          {report.totalFiles}
+                        </span>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <span className="text-sm text-red-500 font-medium">
-                        failed
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm text-red-500 font-medium">
+                          failed
+                        </span>
+                        <span className="text-xs text-red-500">
+                          {report.failedFiles}/{report.totalFiles}
+                        </span>
+                      </div>
                     </>
                   )}
                 </div>
@@ -52,11 +96,9 @@ export const ReportsSection = () => {
         )}
       </div>
 
-      {/* Right side - UploadReport */}
+      {/* Right side - ReportUpload */}
       <div>
-        <div className="text-center text-muted-foreground py-8">
-          Компонент загрузки отчётов будет добавлен позже
-        </div>
+        <ReportUpload />
       </div>
     </div>
   )

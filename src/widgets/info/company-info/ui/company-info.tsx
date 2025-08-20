@@ -2,9 +2,17 @@ import { Company } from '@/entities/company'
 import { useDictionary } from '@/shared/lib/hooks'
 import { Avatar, AvatarFallback, AvatarImage, cn } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
-import { Phone, MessageSquare } from 'lucide-react'
+import {
+  Phone,
+  MessageSquare,
+  UsersRound,
+  ChevronRight,
+  Check,
+} from 'lucide-react'
 import { useSetCompanyManagerMutation } from '@/features/company/set-company-manager'
 import { Button } from '@/shared/ui'
+import { useAuthStore } from '@/shared/store/auth-store'
+import { useRouter } from 'next/navigation'
 
 type CompanyInfoProps = {
   company: Company
@@ -14,14 +22,15 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const { dictionary } = useDictionary()
   const { mutateAsync: setCompanyManager, isPending } =
     useSetCompanyManagerMutation()
+  const { user, selectCompany } = useAuthStore()
+  const router = useRouter()
 
-  // Получаем первого менеджера из массива
+  // Первый менеджер из массива
   const manager = company.companyManagers?.[0]
+  const isCurrentCompany = user?.companyId === company.id
 
   const handleAddManager = async () => {
     try {
-      // Здесь нужно передать userId текущего пользователя и companyId
-      // Пока используем заглушку
       await setCompanyManager({
         userId: 'temp-user-id',
         companyId: company.id,
@@ -31,95 +40,100 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
     }
   }
 
+  const handleSelectCompany = async () => {
+    if (!isCurrentCompany) {
+      selectCompany(company.id)
+      // Обновляем URL для отображения выбранной компании
+      router.push(`/companies/company/${company.id}`)
+    }
+  }
+
   return (
-    <>
-      {/* Top section with responsive columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-        {/* Manager Profile */}
-        <div className="flex items-center gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
+      {/* Manager Profile */}
+      <div className="flex items-center gap-4">
+        <Avatar className="w-12 h-12 flex-shrink-0">
+          <AvatarFallback>
+            {manager?.fullName
+              ?.split(' ')
+              .map((n: string) => n[0])
+              .join('') || '?'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
           {manager ? (
-            <>
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>
-                  {manager.fullName
-                    ?.split(' ')
-                    .map((n: string) => n[0])
-                    .join('') || '?'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="font-extrabold text-text-heading">
-                  {manager.fullName}
-                </div>
-                <div className="text-sm text-text-muted">Менеджер</div>
-              </div>
-            </>
+            <div className="font-extrabold text-text-heading">
+              {manager.fullName}
+            </div>
           ) : (
-            <>
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>?</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="text-sm text-text-heading mb-2">
-                  Нет менеджера
-                </div>
-                <Button
-                  onClick={handleAddManager}
-                  disabled={isPending}
-                  size="sm"
-                  className="bg-primary text-white hover:bg-primary/90">
-                  {isPending ? 'Добавление...' : 'Добавить'}
-                </Button>
-              </div>
-            </>
+            <button
+              onClick={handleAddManager}
+              disabled={isPending}
+              className="font-nunito text-[#4964D8] font-extrabold text-base leading-6 hover:underline cursor-pointer">
+              {isPending ? 'Добавление...' : 'Добавить +'}
+            </button>
           )}
-        </div>
-
-        {/* Trucks Count */}
-        <div className="flex items-center gap-2 border border-dashed rounded-xl pl-[14px] pr-14 py-2 border-separator">
-          <Icon
-            name="common/truck-model"
-            width={26}
-            height={31}
-            className="text-text-muted"
-          />
-          <div>
-            <div className="text-sm font-extrabold text-text-strong">
-              {company.trucksCount}
-            </div>
-            <div className="text-sm text-text-muted-alt">Автопарк</div>
-          </div>
-          <Icon
-            name="common/arrow-right"
-            width={20}
-            height={20}
-            className="text-primary ml-auto"
-          />
-        </div>
-
-        {/* Drivers Count */}
-        <div className="flex items-center gap-2">
-          <Icon
-            name="common/users"
-            width={24}
-            height={24}
-            className="text-text-muted"
-          />
-          <div>
-            <div className="text-sm font-extrabold text-text-strong">
-              {company.driversCount}
-            </div>
-            <div className="text-sm text-text-muted-alt">Водители</div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 justify-start sm:justify-end">
-          <ActionButton icon={<Phone className="w-5 h-5" />} />
-          <ActionButton icon={<MessageSquare className="w-5 h-5" />} />
+          <div className="text-sm text-text-muted">Менеджер</div>
         </div>
       </div>
-    </>
+
+      {/* Trucks Count */}
+      <div className="max-w-[174px] flex items-center gap-3 border border-dashed rounded-xl px-4 py-2 border-separator min-w-[180px]">
+        <Icon
+          name="common/truck-model"
+          width={24}
+          height={27}
+          className="text-text-muted flex-shrink-0"
+        />
+        <div className="flex flex-col">
+          <div className="text-sm font-extrabold text-text-strong">
+            {company.trucksCount}
+          </div>
+          <div className="text-sm text-text-muted-alt">Автопарк</div>
+        </div>
+        <ChevronRight className="w-[27px] h-[27px] text-primary ml-auto flex-shrink-0" />
+      </div>
+
+      {/* Company Selection Button */}
+      <div className="max-w-[174px] flex items-center justify-center">
+        <Button
+          onClick={handleSelectCompany}
+          disabled={isCurrentCompany}
+          variant={isCurrentCompany ? 'outline' : 'default'}
+          className={`w-full h-[52px] rounded-xl font-extrabold text-sm ${
+            isCurrentCompany
+              ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300'
+              : 'bg-primary text-white hover:bg-primary/90'
+          }`}>
+          {isCurrentCompany ? (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Выбрана
+            </>
+          ) : (
+            'Выбрать компанию'
+          )}
+        </Button>
+      </div>
+
+      {/* Drivers Count */}
+      <div className="max-w-[174px] flex items-center gap-3 border border-dashed rounded-xl px-4 py-2 border-separator min-w-[160px]">
+        <UsersRound className="w-[27px] h-[27px] text-[#4964D8]" />
+        <div className="flex flex-col">
+          <div className="text-sm font-extrabold text-text-strong">
+            {company.driversCount}
+          </div>
+          <div className="text-sm text-text-muted-alt">Водители</div>
+        </div>
+        <ChevronRight className="w-[27px] h-[27px] text-primary ml-auto flex-shrink-0" />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 justify-start sm:justify-end">
+        <ActionButton icon={<Phone className="w-5 h-5" />} />
+        <ActionButton icon={<MessageSquare className="w-5 h-5" />} />
+      </div>
+    </div>
   )
 }
 

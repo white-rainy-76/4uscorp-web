@@ -23,6 +23,7 @@ export interface AuthActions {
   updateAccessToken: (accessToken: string) => void
   setLoading: (loading: boolean) => void
   initializeAuth: () => void
+  selectCompany: (companyId: string) => void
 }
 
 export type AuthStore = AuthState & AuthActions
@@ -101,6 +102,15 @@ export const useAuthStore = create<AuthStore>()(
 
       setLoading: (loading: boolean) => {
         set({ isLoading: loading })
+      },
+
+      selectCompany: (companyId: string) => {
+        const currentUser = get().user
+        if (currentUser) {
+          const updatedUser = { ...currentUser, companyId }
+          set({ user: updatedUser })
+          storage.set(STORAGE_KEYS.USER_DATA, updatedUser)
+        }
       },
 
       initializeAuth: () => {

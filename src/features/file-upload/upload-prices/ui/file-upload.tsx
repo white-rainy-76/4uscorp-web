@@ -3,6 +3,8 @@ import { Button } from '@/shared/ui'
 import { Upload, FileSpreadsheet, X } from 'lucide-react'
 import { cn } from '@/shared/ui'
 import { useUploadPricesMutation } from '../api'
+import { useQueryClient } from '@tanstack/react-query'
+import { priceLoadAttemptQueries } from '@/entities/file-upload'
 
 interface FileUploadProps {
   className?: string
@@ -18,10 +20,15 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
   const [dragActive, setDragActive] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [dragCounter, setDragCounter] = useState(0)
+  const queryClient = useQueryClient()
 
   const uploadMutation = useUploadPricesMutation({
     onSuccess: () => {
       setSelectedFiles([])
+      // Обновляем кеш для priceLoadAttemptQueries
+      queryClient.invalidateQueries({
+        queryKey: priceLoadAttemptQueries.lists(),
+      })
       onSuccess?.()
     },
     onError: (error) => {

@@ -3,6 +3,8 @@ import { Button } from '@/shared/ui'
 import { Upload, FileSpreadsheet, X } from 'lucide-react'
 import { cn } from '@/shared/ui'
 import { useUploadReportMutation } from '../api'
+import { useQueryClient } from '@tanstack/react-query'
+import { reportLoadAttemptQueries } from '@/entities/file-upload'
 
 interface FileUploadProps {
   className?: string
@@ -18,10 +20,15 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dragCounter, setDragCounter] = useState(0)
+  const queryClient = useQueryClient()
 
   const uploadMutation = useUploadReportMutation({
     onSuccess: () => {
       setSelectedFile(null)
+      // Обновляем кеш для reportLoadAttemptQueries
+      queryClient.invalidateQueries({
+        queryKey: reportLoadAttemptQueries.lists(),
+      })
       onSuccess?.()
     },
     onError: (error) => {

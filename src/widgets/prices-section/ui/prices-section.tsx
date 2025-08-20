@@ -7,9 +7,9 @@ import { PricesUpload } from '@/features/file-upload/upload-prices'
 import { Calendar, Check } from 'lucide-react'
 
 export const PricesSection = () => {
-  const { data: attempts = [], isLoading } = useQuery(
-    priceLoadAttemptQueries.list(),
-  )
+  const { data: attempts = [], isLoading } = useQuery({
+    ...priceLoadAttemptQueries.list(),
+  })
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -33,9 +33,14 @@ export const PricesSection = () => {
                 {/* Left side - Calendar icon and date */}
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-[#A8A8A8]" />
-                  <span className="font-nunito font-normal text-sm leading-[22px] text-[#343434]">
-                    {new Date(attempt.startedAt).toLocaleDateString('en-CA')}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-nunito font-normal text-sm leading-[22px] text-[#343434]">
+                      {new Date(attempt.startedAt).toLocaleDateString('en-CA')}
+                    </span>
+                    <span className="text-xs text-[#A8A8A8]">
+                      {attempt.totalFiles} файлов
+                    </span>
+                  </div>
                 </div>
 
                 {/* Right side - Status indicator */}
@@ -43,15 +48,26 @@ export const PricesSection = () => {
                   {attempt.isSuccessful ? (
                     <>
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-green-500 font-medium">
-                        loaded
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm text-green-500 font-medium">
+                          loaded
+                        </span>
+                        <span className="text-xs text-green-500">
+                          {attempt.successfullyProcessedFiles}/
+                          {attempt.totalFiles}
+                        </span>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <span className="text-sm text-red-500 font-medium">
-                        failed
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm text-red-500 font-medium">
+                          failed
+                        </span>
+                        <span className="text-xs text-red-500">
+                          {attempt.failedFiles}/{attempt.totalFiles}
+                        </span>
+                      </div>
                     </>
                   )}
                 </div>

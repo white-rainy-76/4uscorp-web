@@ -24,7 +24,7 @@ export const uploadFile = async (
   const authConfig = authorizedRequest(getAuthToken, config)
 
   await api.post(
-    'truckstracking-api/Transaction/parse-pdf',
+    'truckstracking-api/Transaction/load-report',
     formData,
     authConfig,
   )
