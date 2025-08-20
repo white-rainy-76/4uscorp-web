@@ -10,6 +10,7 @@ import {
   Check,
 } from 'lucide-react'
 import { useSetCompanyManagerMutation } from '@/features/company/set-company-manager'
+import { useSetCompanyUserMutation } from '@/features/company/set-company-user'
 import { Button } from '@/shared/ui'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { useRouter } from 'next/navigation'
@@ -20,8 +21,10 @@ type CompanyInfoProps = {
 
 export const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const { dictionary } = useDictionary()
-  const { mutateAsync: setCompanyManager, isPending } =
+  const { mutateAsync: setCompanyManager, isPending: isManagerPending } =
     useSetCompanyManagerMutation()
+  const { mutateAsync: setCompanyUser, isPending: isUserPending } =
+    useSetCompanyUserMutation()
   const { user, selectCompany } = useAuthStore()
   const router = useRouter()
 
@@ -31,8 +34,9 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
 
   const handleAddManager = async () => {
     try {
+      if (!user?.userId) return
       await setCompanyManager({
-        userId: 'temp-user-id',
+        userId: user.userId,
         companyId: company.id,
       })
     } catch (error) {
@@ -41,10 +45,17 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
   }
 
   const handleSelectCompany = async () => {
-    if (!isCurrentCompany) {
-      selectCompany(company.id)
-      // Обновляем URL для отображения выбранной компании
-      router.push(`/companies/company/${company.id}`)
+    if (!isCurrentCompany && user?.userId) {
+      try {
+        await setCompanyUser({
+          userId: user.userId,
+          companyId: company.id,
+        })
+
+        selectCompany(company.id)
+      } catch (error) {
+        console.error('Failed to set company user:', error)
+      }
     }
   }
 
@@ -68,9 +79,9 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
           ) : (
             <button
               onClick={handleAddManager}
-              disabled={isPending}
+              disabled={isManagerPending}
               className="font-nunito text-[#4964D8] font-extrabold text-base leading-6 hover:underline cursor-pointer">
-              {isPending ? 'Добавление...' : 'Добавить +'}
+              {isManagerPending ? 'Добавление...' : 'Добавить +'}
             </button>
           )}
           <div className="text-sm text-text-muted">Менеджер</div>
@@ -98,7 +109,7 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
       <div className="max-w-[174px] flex items-center justify-center">
         <Button
           onClick={handleSelectCompany}
-          disabled={isCurrentCompany}
+          disabled={isCurrentCompany || isUserPending}
           variant={isCurrentCompany ? 'outline' : 'default'}
           className={`w-full h-[52px] rounded-xl font-extrabold text-sm ${
             isCurrentCompany
@@ -110,6 +121,8 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
               <Check className="w-4 h-4 mr-2" />
               Выбрана
             </>
+          ) : isUserPending ? (
+            'Выбор...'
           ) : (
             'Выбрать компанию'
           )}
