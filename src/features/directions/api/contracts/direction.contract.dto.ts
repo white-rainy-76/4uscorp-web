@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { CoordinatePairSchema } from './direction.contract'
-import { GasStationDtoSchema } from '@/entities/gas-station/api/contracts/gas-station.contract.dto'
+import { GasStationDtoSchema } from '@/entities/gas-station'
 
 export const RouteInfoDtoSchema = z.object({
   tolls: z.number().min(0),

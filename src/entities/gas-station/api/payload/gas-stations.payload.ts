@@ -5,7 +5,7 @@ const RequiredFuelStationPayloadSchema = z.object({
   refillLiters: z.number().min(0),
 })
 
-export const UpdateGasStationsPayloadSchema = z.object({
+export const GetGasStationsPayloadSchema = z.object({
   routeId: z.string(),
   routeSectionIds: z.array(z.string()),
   requiredFuelStations: z.array(RequiredFuelStationPayloadSchema).optional(),

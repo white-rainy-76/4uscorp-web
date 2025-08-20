@@ -1,5 +1,5 @@
-import { GasStationSchema } from '@/entities/gas-station/api/contracts/gas-station.contract'
-import { CoordinatesDtoSchema } from '@/shared/api/contracts/coordinates.dto.contract'
+import { GasStationSchema } from '@/entities/gas-station/@x/route'
+import { CoordinatesDtoSchema } from '@/shared/api'
 import { z } from 'zod'
 
 // current route

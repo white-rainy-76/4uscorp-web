@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { getLogoUrl } from '../lib/getLogoUrl'
-import { GasStation } from '../api/types/gas-station'
+import { GasStation } from '../model/types/gas-station'
 import { Input } from '@/shared/ui'
 
 interface Props {

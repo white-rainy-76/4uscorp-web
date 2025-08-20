@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { GasStation } from '@/entities/gas-station/api/types/gas-station'
+import { GasStation } from '@/entities/gas-station/model/types/gas-station'
 import { Directions as DirectionsType } from '@/features/directions/api'
 import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'

@@ -1,29 +1,32 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { DriverInfo } from '@/widgets/driver-info'
+
 import { InfoCard } from '@/shared/ui/info-card'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Coordinate, TruckStatsUpdate } from '@/shared/types'
+import { Coordinate } from '@/shared/types'
 import { truckQueries } from '@/entities/truck/api'
-import { DriverInfoSkeleton } from '@/widgets/driver-info/ui/driver-info.skeleton'
+
 import { RouteList } from '@/widgets/refueling-details'
 import { TruckRouteInfo } from '@/widgets/truck-route/ui'
 import { useHandleDirectionsMutation } from '@/features/directions/api/handle-direction.mutation'
 import { MapWithRoute } from '@/widgets/map'
-import { useUpdateGasStationsMutation } from '@/entities/gas-station/api/update-gas-station.mutation'
+import { useGetGasStationsMutation } from '@/entities/gas-station/api/get-gas-station.mutation'
 import { useConnection } from '@/shared/lib/context'
 import { useRoute } from '@/entities/route/lib/hooks/use-route'
-import signalRService from '@/shared/socket/signalRService'
+
 import { Directions, RouteRequestPayload } from '@/features/directions/api'
 import { GasStation } from '@/entities/gas-station'
+import { useTruckStats } from '@/entities/truck/lib'
+import { DriverInfo, DriverInfoSkeleton } from '@/widgets/info/driver-info'
 
 export default function TruckInfo() {
   const { dictionary } = useDictionary()
   const params = useParams()
   const router = useRouter()
+  const { isConnected } = useConnection()
 
   const [editing, setEditing] = useState<boolean>(false)
 
@@ -50,25 +53,7 @@ export default function TruckInfo() {
     enabled: !!truckId,
   })
 
-  const { isConnected } = useConnection()
-  const [stats, setStats] = useState<TruckStatsUpdate | null>(null)
-  useEffect(() => {
-    if (!isConnected) {
-      setStats(null)
-      return
-    }
-    if (!truckId) return
-
-    const handleUpdate = (update: TruckStatsUpdate) => {
-      setStats(update)
-    }
-
-    signalRService.subscribe(truckId, handleUpdate)
-
-    return () => {
-      signalRService.unsubscribe(truckId, handleUpdate)
-    }
-  }, [truckId, isConnected])
+  const { stats, isLoading } = useTruckStats(truckId, isConnected)
 
   const { routeData, isRouteLoading, isRouteByIdLoading, routeByIdData } =
     useRoute({
@@ -86,7 +71,7 @@ export default function TruckInfo() {
     mutateAsync: updateGasStations,
     data: gasStationsData,
     isPending: isGasStationsLoading,
-  } = useUpdateGasStationsMutation({
+  } = useGetGasStationsMutation({
     onError: (error) => {
       console.error('Update gas stations mutation error:', error)
     },

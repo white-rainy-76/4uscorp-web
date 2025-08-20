@@ -8,7 +8,7 @@ import {
   SuperClusterAlgorithm,
 } from '@googlemaps/markerclusterer'
 import { GasStationMarker } from './gas-station-marker'
-import { GasStation } from '../api/types/gas-station'
+import { GasStation } from '../model/types/gas-station'
 
 type Props = {
   gasStations: GasStation[]

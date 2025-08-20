@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage, Spinner } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { StatusLabel } from '@/shared/ui'
-import { Truck } from '../api/types/truck'
+import { Truck } from '../model/types/truck'
 import { useConnection } from '@/shared/lib/context'
-import { TruckStatsUpdate } from '@/shared/types'
-import signalRService from '@/shared/socket/signalRService'
+import { useTruckStats } from '../lib'
 
 interface CardProps {
   truck: Truck
@@ -17,6 +16,7 @@ interface CardProps {
 
 export const Card = ({ truck, isActive }: CardProps) => {
   const router = useRouter()
+  const { isConnected } = useConnection()
 
   const handleClick = () => {
     router.push(`/truck/${truck.id}`)
@@ -26,28 +26,7 @@ export const Card = ({ truck, isActive }: CardProps) => {
     router.prefetch(`/truck/${truck.id}`)
   }
 
-  const [isLoadingFuel, setIsLoadingFuel] = useState(true)
-  const { connection, isConnected } = useConnection()
-  const [stats, setStats] = useState<TruckStatsUpdate | null>(null)
-  useEffect(() => {
-    if (!isConnected) {
-      setStats(null)
-      return
-    }
-
-    if (!truck.id) return
-
-    const handleUpdate = (update: TruckStatsUpdate) => {
-      setStats(update)
-      setIsLoadingFuel(false)
-    }
-
-    signalRService.subscribe(truck.id, handleUpdate)
-
-    return () => {
-      signalRService.unsubscribe(truck.id, handleUpdate)
-    }
-  }, [truck.id, isConnected])
+  const { stats, isLoading } = useTruckStats(truck.id, isConnected)
 
   const driverInitials =
     truck.driver?.fullName
@@ -84,7 +63,7 @@ export const Card = ({ truck, isActive }: CardProps) => {
       <div className="flex items-center">
         <div className="w-[70px] flex items-center justify-end">
           <Icon name="common/fuel" width={14.26} height={17} className="mr-1" />
-          {isLoadingFuel ? (
+          {isLoading ? (
             <Spinner size="sm" color="blue" />
           ) : (
             stats && (

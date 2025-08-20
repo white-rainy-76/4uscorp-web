@@ -1,4 +1,4 @@
-import { GasStationSchema } from '@/entities/gas-station/api/contracts/gas-station.contract'
+import { GasStationSchema } from '@/entities/gas-station'
 import { z } from 'zod'
 
 export const CoordinatePairSchema = z.tuple([z.number(), z.number()])

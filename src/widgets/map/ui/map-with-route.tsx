@@ -8,13 +8,14 @@ import { ZoomControl } from './controlers/zoom'
 import { Coordinate } from '@/shared/types'
 import { Directions, RouteRequestPayload } from '@/features/directions/api'
 import { DirectionsRoutes } from '@/features/directions'
-import { TrackTruck } from '@/features/truck-track/ui/tracked-truck'
+
 import { Truck } from '@/entities/truck'
 import { RoutePanelOnMap } from './route-panel'
 import { useMap } from '@vis.gl/react-google-maps'
 import { GasStation, GetGasStationsResponse } from '@/entities/gas-station'
-import { UpdateGasStationsPayload } from '@/entities/gas-station/api/types/gas-station.payload'
-import { RouteData } from '@/entities/route/api/types/route'
+import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
+import { RouteData } from '@/entities/route'
+import { TrackTruck } from '@/features/truck/track-truck'
 
 interface MapWithRouteProps {
   origin: Coordinate | null
@@ -32,7 +33,7 @@ interface MapWithRouteProps {
   handleRouteClick: (routeIndex: number) => void
   mutateAsync: (variables: RouteRequestPayload) => Promise<Directions>
   updateGasStations: (
-    variables: UpdateGasStationsPayload,
+    variables: GetGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
   finishFuel: number | undefined
   selectedProviders: string[]

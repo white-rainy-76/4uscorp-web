@@ -15,7 +15,6 @@ export const GasStationSchema = z.object({
   }),
   address: z.string().nullable().optional(),
   fuelPrice: FuelPriceSchema.optional(),
-  // New fields from the DTO
   isAlgorithm: z.boolean().nullable().optional(),
   refill: z.string().nullable().optional(),
   stopOrder: z.number().nullable().optional(),

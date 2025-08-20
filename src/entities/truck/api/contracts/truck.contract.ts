@@ -6,14 +6,14 @@ export const TruckStatusSchema = z.enum([
   'IDLE', // 2
 ])
 
-export const DriverSchema = z.object({
+export const DriverForTruckSchema = z.object({
   id: z.string().uuid(),
   truckId: z.string().uuid(),
-  fullName: z.string(),
-  phone: z.string(),
-  email: z.string().email(),
+  fullName: z.string().nullable(),
+  phone: z.string().nullable(),
+  email: z.string().nullable(),
   bonus: z.number().int().nonnegative(),
-  telegramLink: z.string().url(),
+  telegramLink: z.string().nullable(),
 })
 
 export const TruckSchema = z.object({
@@ -28,5 +28,5 @@ export const TruckSchema = z.object({
   make: z.string(),
   model: z.string(),
   year: z.string(),
-  driver: DriverSchema.nullable().optional(),
+  driver: DriverForTruckSchema.nullable().optional(),
 })

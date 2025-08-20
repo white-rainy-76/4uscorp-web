@@ -20,6 +20,9 @@ export interface SpritesMap {
     | 'dollar'
     | 'calendar'
     | 'tag'
+    | 'truck-model'
+    | 'users'
+    | 'arrow-right'
 }
 
 export const SPRITES_META: {
@@ -45,6 +48,9 @@ export const SPRITES_META: {
     | 'dollar'
     | 'calendar'
     | 'tag'
+    | 'truck-model'
+    | 'users'
+    | 'arrow-right'
   >
 } = {
   gasStations: [
@@ -69,5 +75,8 @@ export const SPRITES_META: {
     'dollar',
     'calendar',
     'tag',
+    'truck-model',
+    'users',
+    'arrow-right',
   ],
 }

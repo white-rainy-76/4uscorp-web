@@ -1,6 +1,13 @@
 'use client'
 
-import { Settings, HelpCircle, Truck, FileText, UsersRound } from 'lucide-react'
+import {
+  Settings,
+  HelpCircle,
+  Truck,
+  UsersRound,
+  Building2,
+  Compass,
+} from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -13,14 +20,16 @@ import {
 } from '@/shared/ui/sidebar'
 import { Icon } from '@/shared/ui/Icon'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
-import { useState } from 'react'
 import Link from 'next/link'
+import { useAuthStore } from '@/shared/store/auth-store'
+import { usePathname } from 'next/navigation'
 
 export function AppSidebar() {
-  const [activeItem, setActiveItem] = useState<string | null>('home')
-  const handleItemClick = (itemId: string) => {
-    setActiveItem(itemId)
-  }
+  const pathname = usePathname()
+  const { user } = useAuthStore()
+
+  const canAccessCompanies = user ? user.role : false
+
   return (
     <Sidebar>
       <SidebarHeader className="items-center p-6">
@@ -32,30 +41,31 @@ export function AppSidebar() {
         <SidebarMenu className="items-center">
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => handleItemClick('home')}
-              isActive={activeItem === 'home'}
+              isActive={pathname === '/'}
               tooltip="Dashboard"
               asChild>
               <Link href="/">
-                <Truck className="w-5 h-5" />
+                <Compass className="w-5 h-5" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {canAccessCompanies && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                isActive={pathname?.includes('/companies')}
+                tooltip="Companies"
+                asChild>
+                <Link href="/companies">
+                  <Building2 className="w-5 h-5" />
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => handleItemClick('docs')}
-              isActive={activeItem === 'docs'}
-              tooltip="Documents"
-              asChild>
-              <Link href="/docs">
-                <FileText className="w-5 h-5" />
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => handleItemClick('drivers')}
-              isActive={activeItem === 'drivers'}
+              isActive={pathname?.includes('/drivers')}
               tooltip="Drivers"
               asChild>
               <Link href="/drivers">
@@ -63,8 +73,20 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname?.includes('/truck-models')}
+              tooltip="Truck-models"
+              asChild>
+              <Link href="/truck-models">
+                <Truck className="w-5 h-5" />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarSeparator className="mb-4" />
         <SidebarMenu className="items-center">

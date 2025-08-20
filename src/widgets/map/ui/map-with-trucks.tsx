@@ -1,5 +1,6 @@
 import { truckQueries } from '@/entities/truck/api'
-import { TrackTruckMarkers } from '@/features/truck-track'
+import { TrackTruckMarkers } from '@/features/truck/track-truck'
+
 import { MapBase, Spinner } from '@/shared/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'

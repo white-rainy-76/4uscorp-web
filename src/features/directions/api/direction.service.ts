@@ -1,4 +1,4 @@
-import { api } from '@/shared/api/api.instance'
+import { api, authorizedRequest } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
 import { DirectionsDtoSchema } from './contracts/direction.contract.dto'
 import { mapDirections } from './mapper/direction.mapper'
@@ -14,6 +14,7 @@ import {
   RouteRequestPayloadSchema,
 } from './payload/directions.payload'
 import { CoordinatesDtoSchema } from '@/shared/api/contracts/coordinates.dto.contract'
+import { useAuthStore } from '@/shared/store/auth-store'
 
 export const handleFuelRoute = async (
   payload: RouteRequestPayload,
@@ -22,6 +23,8 @@ export const handleFuelRoute = async (
 ): Promise<Directions> => {
   const validatedPayload = RouteRequestPayloadSchema.parse(payload)
   const config: AxiosRequestConfig = { signal }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
 
   let endpoint: string
   switch (action) {
@@ -36,7 +39,7 @@ export const handleFuelRoute = async (
   }
 
   const response = await api
-    .post(endpoint, validatedPayload, config)
+    .post(endpoint, validatedPayload, authConfig)
     .then(responseContract(DirectionsDtoSchema))
 
   return mapDirections(response.data)
@@ -48,8 +51,15 @@ export const getNearestDropPoint = async (
 ): Promise<Coordinate> => {
   const validatedPayload = PointRequestPayloadSchema.parse(payload)
   const config: AxiosRequestConfig = { signal }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
   const response = await api
-    .post(`/fuelroutes-api/FuelRoute/drop-point-V2`, validatedPayload, config)
+    .post(
+      `/fuelroutes-api/FuelRoute/drop-point-V2`,
+      validatedPayload,
+      authConfig,
+    )
     .then(responseContract(CoordinatesDtoSchema))
 
   return {
@@ -62,9 +72,12 @@ export const cancelDirectionsCreation = async (
   signal?: AbortSignal,
 ): Promise<void> => {
   const config: AxiosRequestConfig = { signal }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
   await api.post(
     `/fuelroutes-api/FuelRoute/canselation-create-fuel-route-canselation`,
     {},
-    config,
+    authConfig,
   )
 }

@@ -3,7 +3,7 @@ import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query'
-import { AssignRoutePayload } from './types/route.payload'
+import { AssignRoutePayload } from '../model'
 import { AssignRoutePayloadSchema } from './payload/route.payload'
 import { assignRoute } from './route.service'
 

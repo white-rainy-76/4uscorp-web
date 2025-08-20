@@ -3,8 +3,8 @@ import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query'
-import { RouteByIdData } from './types/route'
-import { GetRouteByIdPayload } from './types/route.payload'
+import { RouteByIdData } from '../model'
+import { GetRouteByIdPayload } from '../model'
 import { GetRouteByIdPayloadSchema } from './payload/route.payload'
 import { getRouteById } from './route.service'
 

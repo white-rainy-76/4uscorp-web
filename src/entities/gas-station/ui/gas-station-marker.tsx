@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import { CustomPin } from './custom-pin'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import type { Marker } from '@googlemaps/markerclusterer'
-import { GasStation } from '../api/types/gas-station'
+import { GasStation } from '../model/types/gas-station'
 
 interface Props {
   gasStation: GasStation

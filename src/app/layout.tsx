@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   SocketProvider,
   GoogleMapApiProvider,
+  AuthProvider,
 } from './providers'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/shared/api/query-client'
@@ -42,12 +43,14 @@ export default function RootLayout({
           fontSans.variable,
         )}>
         <QueryClientProvider client={queryClient}>
-          <SocketProvider>
-            <GoogleMapApiProvider>
-              <ThemeProvider>{children}</ThemeProvider>
-            </GoogleMapApiProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </SocketProvider>
+          <AuthProvider>
+            <SocketProvider>
+              <GoogleMapApiProvider>
+                <ThemeProvider>{children}</ThemeProvider>
+              </GoogleMapApiProvider>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </SocketProvider>
+          </AuthProvider>
         </QueryClientProvider>
       </body>
     </html>
