@@ -100,7 +100,7 @@ export default function SignInScreen() {
           <button
             type="submit"
             disabled={signInMutation.isPending}
-            className="w-full h-11 bg-[#F2F2F2] text-[#A8A8A8] font-nunito font-medium rounded-full hover:opacity-90 transition">
+            className="w-full h-11 bg-[#4964D8] text-[#A8A8A8] font-nunito font-medium rounded-full hover:opacity-90 transition">
             Continue
           </button>
         </form>
