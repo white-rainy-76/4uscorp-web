@@ -4,7 +4,7 @@ import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { priceLoadAttemptQueries } from '@/entities/file-upload'
 import { PricesUpload } from '@/features/file-upload/upload-prices'
-import { Calendar, Check } from 'lucide-react'
+import { Calendar, Check, X } from 'lucide-react'
 
 export const PricesSection = () => {
   const { data: attempts = [], isLoading } = useQuery({
@@ -50,22 +50,17 @@ export const PricesSection = () => {
                       <Check className="w-4 h-4 text-green-500" />
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-green-500 font-medium">
-                          loaded
-                        </span>
-                        <span className="text-xs text-green-500">
-                          {attempt.successfullyProcessedFiles}/
+                          loaded {attempt.successfullyProcessedFiles}/
                           {attempt.totalFiles}
                         </span>
                       </div>
                     </>
                   ) : (
                     <>
+                      <X className="w-4 h-4 text-red-500 " />
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-red-500 font-medium">
-                          failed
-                        </span>
-                        <span className="text-xs text-red-500">
-                          {attempt.failedFiles}/{attempt.totalFiles}
+                          failed {attempt.failedFiles}/{attempt.totalFiles}
                         </span>
                       </div>
                     </>

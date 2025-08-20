@@ -121,6 +121,7 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
             <Button
               variant="outline"
               size="sm"
+              className="text-gray-600"
               onClick={() => document.getElementById('file-input')?.click()}
               disabled={isUploading}>
               Выберите файл

@@ -122,7 +122,7 @@ export const TruckMarker = ({
   }
 
   const handleMenuClick = () => {
-    router.push(`/truck/${unitNumber}`)
+    router.push(`/truck/${truckInfo.truckId}`)
   }
 
   return (
@@ -142,9 +142,6 @@ export const TruckMarker = ({
             onClick={handleMenuClick}>
             <div className="font-bold text-lg text-[hsl(210,36%,18%)]">
               {unitNumber}
-            </div>
-            <div className="mt-2 text-sm text-[hsl(210,11%,60%)] whitespace-nowrap overflow-hidden text-ellipsis">
-              [some address]
             </div>
             <div className="mt-2 flex items-center text-sm text-[hsl(210,11%,60%)]">
               <Icon name="common/fuel" width={17} height={17} />

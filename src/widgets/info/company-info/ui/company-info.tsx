@@ -102,9 +102,18 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
           </div>
           <div className="text-sm text-text-muted-alt">Автопарк</div>
         </div>
-        <ChevronRight className="w-[27px] h-[27px] text-primary ml-auto flex-shrink-0" />
       </div>
 
+      {/* Drivers Count */}
+      <div className="max-w-[174px] flex items-center gap-3 border border-dashed rounded-xl px-4 py-2 border-separator min-w-[160px]">
+        <UsersRound className="w-[27px] h-[27px] text-[#4964D8]" />
+        <div className="flex flex-col">
+          <div className="text-sm font-extrabold text-text-strong">
+            {company.driversCount}
+          </div>
+          <div className="text-sm text-text-muted-alt">Водители</div>
+        </div>
+      </div>
       {/* Company Selection Button */}
       <div className="max-w-[174px] flex items-center justify-center">
         <Button
@@ -128,19 +137,6 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
           )}
         </Button>
       </div>
-
-      {/* Drivers Count */}
-      <div className="max-w-[174px] flex items-center gap-3 border border-dashed rounded-xl px-4 py-2 border-separator min-w-[160px]">
-        <UsersRound className="w-[27px] h-[27px] text-[#4964D8]" />
-        <div className="flex flex-col">
-          <div className="text-sm font-extrabold text-text-strong">
-            {company.driversCount}
-          </div>
-          <div className="text-sm text-text-muted-alt">Водители</div>
-        </div>
-        <ChevronRight className="w-[27px] h-[27px] text-primary ml-auto flex-shrink-0" />
-      </div>
-
       {/* Action Buttons */}
       <div className="flex gap-3 justify-start sm:justify-end">
         <ActionButton icon={<Phone className="w-5 h-5" />} />
