@@ -61,6 +61,10 @@ export default function TruckModelPage() {
               <span className="font-nunito text-base font-extrabold leading-6 tracking-[-0.04em] text-[#000000]">
                 {truckGroup.fuelCapacity} л
               </span>
+              <SetTruckGroupWeightFuelButton
+                truckGroup={truckGroup}
+                buttonText="изменить"
+              />
             </div>
           </div>
           <div className="mt-1">
