@@ -9,6 +9,6 @@ export function getReportLoadAttempts(config?: AxiosRequestConfig) {
   const authConfig = authorizedRequest(getAuthToken, config)
 
   return api
-    .get(`/truckstracking-api/Transaction/report-load-attempts`, authConfig)
+    .get(`/trucks-api/Report/report-load-attempts`, authConfig)
     .then(responseContract(ReportLoadAttemptsResponseSchema))
 }

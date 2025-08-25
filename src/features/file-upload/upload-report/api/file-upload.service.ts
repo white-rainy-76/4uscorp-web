@@ -23,9 +23,5 @@ export const uploadFile = async (
   const getAuthToken = () => useAuthStore.getState().accessToken
   const authConfig = authorizedRequest(getAuthToken, config)
 
-  await api.post(
-    'truckstracking-api/Transaction/load-report',
-    formData,
-    authConfig,
-  )
+  await api.post('/trucks-api/Report/load-report', formData, authConfig)
 }
