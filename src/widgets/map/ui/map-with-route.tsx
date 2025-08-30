@@ -11,6 +11,7 @@ import { DirectionsRoutes } from '@/features/directions'
 import {
   useChangeFuelPlanMutation,
   FuelPlanOperation,
+  FuelPlanChangeResponse,
 } from '@/features/directions/api'
 
 import { Truck } from '@/entities/truck'
@@ -20,6 +21,50 @@ import { GasStation, GetGasStationsResponse } from '@/entities/gas-station'
 import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
 import { RouteData } from '@/entities/route'
 import { TrackTruck } from '@/features/truck/track-truck'
+
+// Компонент для отображения ошибок поверх карты
+const MapErrorsOverlay: React.FC<{
+  errors: Array<{ stationId: string; message: string }>
+}> = ({ errors }) => {
+  if (errors.length === 0) return null
+
+  // Разделяем ошибки на общие и связанные с конкретными заправками
+  const generalErrors = errors.filter((error) => error.stationId === 'general')
+  const stationErrors = errors.filter((error) => error.stationId !== 'general')
+
+  return (
+    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] pointer-events-none">
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg max-w-md">
+        <div className="flex items-center">
+          <div className="text-red-500 mr-2">⚠️</div>
+          <div>
+            <h4 className="font-bold text-sm mb-2">Ошибки топливного плана:</h4>
+            <div className="space-y-1">
+              {/* Общие ошибки */}
+              {generalErrors.map((error, index) => (
+                <div key={`general-${index}`} className="text-xs">
+                  <span className="font-semibold text-red-800">
+                    Общая ошибка:
+                  </span>
+                  <span className="ml-2">{error.message}</span>
+                </div>
+              ))}
+              {/* Ошибки конкретных заправок */}
+              {stationErrors.map((error, index) => (
+                <div key={`station-${index}`} className="text-xs">
+                  <span className="font-semibold">
+                    Заправка {error.stationId.slice(0, 8)}...
+                  </span>
+                  <span className="ml-2">{error.message}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 interface MapWithRouteProps {
   origin: Coordinate | null
@@ -84,23 +129,71 @@ export const MapWithRoute = ({
     [stationId: string]: string
   }>({})
 
+  // Состояние изменений - хранит новые значения fuelLeftBeforeRefill для каждой заправки
+  const [stationChanges, setStationChanges] = useState<{
+    [stationId: string]: number
+  }>({})
+
+  // Состояние ошибок для отображения поверх карты
+  const [mapErrors, setMapErrors] = useState<
+    Array<{ stationId: string; message: string }>
+  >([])
+
   const map = useMap()
 
   // Новая мутация для изменения топливного плана
   const { mutateAsync: changeFuelPlan } = useChangeFuelPlanMutation({
-    onSuccess: (data: any) => {
+    onSuccess: (data: FuelPlanChangeResponse) => {
+      console.log('Fuel plan change response:', data)
+
       if (!data.isValid && data.stepResults) {
         // Обрабатываем ошибки и создаем объект ошибок для маркеров
         const errors: { [stationId: string]: string } = {}
-        data.stepResults.forEach((result: any) => {
+        const mapErrorMessages: Array<{ stationId: string; message: string }> =
+          []
+
+        data.stepResults.forEach((result) => {
           if (!result.isValid && result.notes) {
-            errors[result.stationId] = result.notes
+            // Игнорируем ошибки с stationId равным "00000000-0000-0000-0000-000000000000"
+            if (result.stationId !== '00000000-0000-0000-0000-000000000000') {
+              errors[result.stationId] = result.notes
+              mapErrorMessages.push({
+                stationId: result.stationId,
+                message: result.notes,
+              })
+            } else {
+              // Для общих ошибок добавляем их в mapErrors без привязки к конкретной заправке
+              mapErrorMessages.push({
+                stationId: 'general',
+                message: result.notes,
+              })
+            }
           }
         })
+
         setStationErrors(errors)
+        setMapErrors(mapErrorMessages)
       } else {
         // Очищаем ошибки если все валидно
         setStationErrors({})
+        setMapErrors([])
+      }
+
+      // Обрабатываем изменения для обновления fuelLeftBeforeRefill
+      if (data.changes && data.changes.length > 0) {
+        console.log('Processing changes:', data.changes)
+        const changes: { [stationId: string]: number } = {}
+
+        data.changes.forEach((change) => {
+          if (change.fuelStationId !== '00000000-0000-0000-0000-000000000000') {
+            changes[change.fuelStationId] = change.newCurrentFuel
+            console.log(
+              `Updated fuel for station ${change.fuelStationId}: ${change.newCurrentFuel}`,
+            )
+          }
+        })
+
+        setStationChanges(changes)
       }
     },
     onError: (error: any) => {
@@ -133,6 +226,17 @@ export const MapWithRoute = ({
       return parseFloat(station.refill || '0')
     },
     [cart, isStationInCart],
+  )
+
+  // Получаем обновленный fuelLeftBeforeRefill для заправки (из изменений или из исходных данных)
+  const getStationFuelLeftBeforeRefill = useCallback(
+    (station: GasStation) => {
+      if (stationChanges[station.id] !== undefined) {
+        return stationChanges[station.id]
+      }
+      return station.fuelLeftBeforeRefill || 0
+    },
+    [stationChanges],
   )
 
   // Добавление заправки в корзину
@@ -229,6 +333,8 @@ export const MapWithRoute = ({
 
     setCart(algorithmStations)
     setStationErrors({})
+    setStationChanges({})
+    setMapErrors([])
   }, [gasStations, selectedRouteId])
 
   // Очистка корзины и ошибок при изменении фильтров
@@ -238,6 +344,8 @@ export const MapWithRoute = ({
     // Очищаем корзину и ошибки при изменении фильтров
     setCart({})
     setStationErrors({})
+    setStationChanges({})
+    setMapErrors([])
 
     if (!directionsData?.routeId || !directionsData.route) return
 
@@ -268,6 +376,9 @@ export const MapWithRoute = ({
           </div>
         )}
 
+        {/* Отображение ошибок поверх карты */}
+        <MapErrorsOverlay errors={mapErrors} />
+
         <DirectionsRoutes
           origin={origin}
           destination={destination}
@@ -290,6 +401,7 @@ export const MapWithRoute = ({
             stationErrors={stationErrors}
             isStationInCart={isStationInCart}
             getStationRefillLiters={getStationRefillLiters}
+            getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
           />
         )}
         {!directionsData && (

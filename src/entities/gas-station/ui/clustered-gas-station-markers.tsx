@@ -19,6 +19,7 @@ type Props = {
   stationErrors?: { [stationId: string]: string }
   isStationInCart: (stationId: string) => boolean
   getStationRefillLiters: (station: GasStation) => number
+  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const ClusteredGasStationMarkers: React.FC<Props> = ({
@@ -30,6 +31,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
   stationErrors,
   isStationInCart,
   getStationRefillLiters,
+  getStationFuelLeftBeforeRefill,
 }) => {
   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
   const map = useMap()
@@ -95,6 +97,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
           isInCart={isStationInCart(station.id)}
           stationErrors={stationErrors}
           getStationRefillLiters={getStationRefillLiters}
+          getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
         />
       ))}
     </>

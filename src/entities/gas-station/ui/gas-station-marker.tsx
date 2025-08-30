@@ -16,6 +16,7 @@ interface Props {
   isInCart: boolean
   stationErrors?: { [stationId: string]: string }
   getStationRefillLiters: (station: GasStation) => number
+  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const GasStationMarker: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const GasStationMarker: React.FC<Props> = ({
   isInCart,
   stationErrors,
   getStationRefillLiters,
+  getStationFuelLeftBeforeRefill,
 }) => {
   const [clicked, setClicked] = useState(false)
   const [hovered, setHovered] = useState(false)
@@ -58,6 +60,7 @@ export const GasStationMarker: React.FC<Props> = ({
           onUpdateRefillLiters={onUpdateRefillLiters}
           errorMessage={errorMessage}
           getStationRefillLiters={getStationRefillLiters}
+          getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
         />
       ) : (
         <div

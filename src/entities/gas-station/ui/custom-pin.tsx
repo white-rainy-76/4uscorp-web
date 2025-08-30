@@ -15,6 +15,7 @@ interface Props {
   onUpdateRefillLiters: (stationId: string, liters: number) => void
   errorMessage?: string
   getStationRefillLiters: (station: GasStation) => number
+  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const CustomPin: React.FC<Props> = ({
@@ -26,6 +27,7 @@ export const CustomPin: React.FC<Props> = ({
   onUpdateRefillLiters,
   errorMessage,
   getStationRefillLiters,
+  getStationFuelLeftBeforeRefill,
 }) => {
   // Инициализируем refillLiters из корзины или из исходных данных
   const [refillLiters, setRefillLiters] = useState<string>(
@@ -55,6 +57,9 @@ export const CustomPin: React.FC<Props> = ({
       onUpdateRefillLiters(gasStation.id, refillNum)
     }
   }
+
+  // Получаем обновленный fuelLeftBeforeRefill
+  const updatedFuelLeftBeforeRefill = getStationFuelLeftBeforeRefill(gasStation)
 
   return (
     <div className="custom-pin bg-white rounded-md p-2 border border-gray-300 relative shadow-md w-56">
@@ -101,7 +106,7 @@ export const CustomPin: React.FC<Props> = ({
           <p className="text-gray-600">
             Fuel before gas station:{' '}
             <span className="font-bold text-green-600">
-              {gasStation.fuelLeftBeforeRefill}
+              {updatedFuelLeftBeforeRefill.toFixed(2)}
             </span>
           </p>
         </div>
