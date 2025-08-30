@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import { GasStation } from '../model/types/gas-station'
 import { Input } from '@/shared/ui'
@@ -10,9 +10,11 @@ interface Props {
   setClicked: (value: boolean) => void
   gasStation: GasStation
   isInCart: boolean
-  onAddToCart: (station: GasStation) => void
+  onAddToCart: (station: GasStation, refillLiters: number) => void
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
+  errorMessage?: string
+  getStationRefillLiters: (station: GasStation) => number
 }
 
 export const CustomPin: React.FC<Props> = ({
@@ -22,21 +24,29 @@ export const CustomPin: React.FC<Props> = ({
   onAddToCart,
   onRemoveFromCart,
   onUpdateRefillLiters,
+  errorMessage,
+  getStationRefillLiters,
 }) => {
+  // Инициализируем refillLiters из корзины или из исходных данных
   const [refillLiters, setRefillLiters] = useState<string>(
-    gasStation.refill ?? '',
+    getStationRefillLiters(gasStation).toString(),
   )
+
+  // Синхронизируем refillLiters при изменении isInCart
+  useEffect(() => {
+    setRefillLiters(getStationRefillLiters(gasStation).toString())
+  }, [isInCart, getStationRefillLiters, gasStation])
 
   const handleCartClick = () => {
     const refillNum = parseFloat(refillLiters)
     console.log('Refill number ' + refillNum)
     console.log('Is in cart ' + isInCart)
 
-    const updatedStation: GasStation = {
-      ...gasStation,
-      refill: refillLiters,
+    if (isInCart) {
+      onRemoveFromCart(gasStation.id)
+    } else {
+      onAddToCart(gasStation, refillNum)
     }
-    isInCart ? onRemoveFromCart(gasStation.id) : onAddToCart(updatedStation)
   }
 
   const handleSaveClick = () => {
@@ -96,6 +106,15 @@ export const CustomPin: React.FC<Props> = ({
           </p>
         </div>
 
+        {/* Error message */}
+        {errorMessage && (
+          <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded-md text-xs">
+            <p className="text-red-700 font-semibold">
+              ⚠️ Ошибка: {errorMessage}
+            </p>
+          </div>
+        )}
+
         {/* Ввод и кнопки */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <input
@@ -108,11 +127,14 @@ export const CustomPin: React.FC<Props> = ({
             onClick={(e) => e.stopPropagation()}
             placeholder="Литры"
           />
-          <button
-            onClick={handleSaveClick}
-            className="px-2 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
-            💾
-          </button>
+          {/* Кнопка обновления показывается только если заправка в корзине */}
+          {isInCart && (
+            <button
+              onClick={handleSaveClick}
+              className="px-2 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
+              💾
+            </button>
+          )}
         </div>
 
         <button

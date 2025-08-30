@@ -12,10 +12,13 @@ import { GasStation } from '../model/types/gas-station'
 
 type Props = {
   gasStations: GasStation[]
-  onAddToCart: (station: GasStation) => void
+  onAddToCart: (station: GasStation, refillLiters: number) => void
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
-  cart: GasStation[]
+  cart: { [stationId: string]: { refillLiters: number } }
+  stationErrors?: { [stationId: string]: string }
+  isStationInCart: (stationId: string) => boolean
+  getStationRefillLiters: (station: GasStation) => number
 }
 
 export const ClusteredGasStationMarkers: React.FC<Props> = ({
@@ -24,6 +27,9 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
   onRemoveFromCart,
   onUpdateRefillLiters,
   cart,
+  stationErrors,
+  isStationInCart,
+  getStationRefillLiters,
 }) => {
   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
   const map = useMap()
@@ -86,7 +92,9 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
           onAddToCart={onAddToCart}
           onRemoveFromCart={onRemoveFromCart}
           onUpdateRefillLiters={onUpdateRefillLiters}
-          isInCart={cart.some((s) => s.id === station.id)}
+          isInCart={isStationInCart(station.id)}
+          stationErrors={stationErrors}
+          getStationRefillLiters={getStationRefillLiters}
         />
       ))}
     </>

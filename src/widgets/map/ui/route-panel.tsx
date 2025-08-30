@@ -14,7 +14,8 @@ interface Props {
   onGasStationClick: (lat: number, lng: number) => void
   directions?: DirectionsType
   selectedProviders: string[]
-  cart: GasStation[]
+  cart: { [stationId: string]: { refillLiters: number } }
+  gasStations?: GasStation[] // Добавляем gasStations для получения информации о заправках
   fuelLeftOver: number | undefined
 }
 
@@ -35,6 +36,7 @@ export const RoutePanelOnMap = ({
   directions,
   selectedProviders,
   cart,
+  gasStations,
   fuelLeftOver,
 }: Props) => {
   const route = directions?.route.find(
@@ -124,43 +126,65 @@ export const RoutePanelOnMap = ({
 
         {/* Gas Stations Section */}
         <div className="space-y-2">
-          <h3 className="font-extrabold text-xl mb-2 text-[#192A3E]">
-            Список заправок
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="font-extrabold text-xl text-[#192A3E]">
+              Список заправок
+            </h3>
+            <span className="text-sm text-[#9BA9BB] font-medium">
+              {Object.keys(cart).length} шт.
+            </span>
+          </div>
           <ScrollArea className="h-40">
             <div className="space-y-4 pr-2">
-              {cart.length > 0 ? (
-                cart.map((station) => (
-                  <div
-                    key={station.id}
-                    className="flex justify-between items-start text-sm">
-                    <div
-                      className="text-[#192A3E] hover:underline cursor-pointer flex-grow pr-2" // Added flex-grow and padding-right
-                      onClick={() =>
-                        onGasStationClick(
-                          station.position.lat,
-                          station.position.lng,
-                        )
-                      }>
-                      <span className="text-[#9BA9BB] font-normal block text-xs">
-                        Адрес
-                      </span>
-                      <span className="font-bold text-xs leading-4">
-                        {station.address}
-                      </span>
-                    </div>
+              {Object.keys(cart).length > 0 && gasStations ? (
+                Object.entries(cart).map(([stationId, cartItem]) => {
+                  // Находим информацию о заправке по ID
+                  const station = gasStations.find((s) => s.id === stationId)
+                  if (!station) return null
 
-                    <button
-                      className="text-[#D84949] font-bold text-sm underline whitespace-nowrap ml-auto" // Adjusted styling for delete
-                      onClick={() => onDeleteGasStation(station.id)}>
-                      delete
-                    </button>
-                  </div>
-                ))
+                  return (
+                    <div
+                      key={stationId}
+                      className="flex justify-between items-start text-sm p-2 bg-gray-50 rounded-md border border-gray-200">
+                      <div
+                        className="text-[#192A3E] hover:underline cursor-pointer flex-grow pr-2"
+                        onClick={() =>
+                          onGasStationClick(
+                            station.position.lat,
+                            station.position.lng,
+                          )
+                        }>
+                        <span className="text-[#9BA9BB] font-normal block text-xs">
+                          Адрес
+                        </span>
+                        <span className="font-bold text-xs leading-4">
+                          {station.address}
+                        </span>
+                        <span className="text-[#9BA9BB] font-normal block text-xs mt-1">
+                          Заправка: {cartItem.refillLiters} л
+                        </span>
+                        {station.isAlgorithm && (
+                          <span className="text-[#F59E0B] font-normal block text-xs mt-1">
+                            ⭐ Алгоритмическая
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        className="text-[#D84949] font-bold text-sm underline whitespace-nowrap ml-auto hover:text-red-700"
+                        onClick={() => onDeleteGasStation(stationId)}>
+                        delete
+                      </button>
+                    </div>
+                  )
+                })
               ) : (
-                <p className="text-sm text-gray-500">
-                  No gas stations available
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-500">Заправки не выбраны</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Добавьте заправки в корзину для планирования маршрута
+                  </p>
+                </div>
               )}
             </div>
           </ScrollArea>
