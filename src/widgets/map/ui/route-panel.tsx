@@ -17,6 +17,7 @@ interface Props {
   cart: { [stationId: string]: { refillLiters: number } }
   gasStations?: GasStation[] // Добавляем gasStations для получения информации о заправках
   fuelLeftOver: number | undefined
+  finalFuelAmount: number | undefined
 }
 
 const FUEL_PROVIDERS = [
@@ -38,11 +39,16 @@ export const RoutePanelOnMap = ({
   cart,
   gasStations,
   fuelLeftOver,
+  finalFuelAmount,
 }: Props) => {
   const route = directions?.route.find(
     (r) => r.routeSectionId === selectedRouteId,
   )
   const routeInfo = route?.routeInfo
+
+  // Определяем какое значение топлива показывать
+  const displayFuelAmount =
+    finalFuelAmount !== undefined ? finalFuelAmount : fuelLeftOver
 
   const displayDriveTime = useMemo(() => {
     if (
@@ -106,7 +112,7 @@ export const RoutePanelOnMap = ({
           <div className="flex flex-col items-start">
             <span className="font-normal ">Fuel Left</span>
             <span className=" font-bold whitespace-nowrap">
-              {fuelLeftOver?.toFixed(2) ?? '-'}
+              {displayFuelAmount?.toFixed(2) ?? '-'}
             </span>
           </div>
         </div>

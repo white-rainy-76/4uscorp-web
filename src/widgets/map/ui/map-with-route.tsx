@@ -139,6 +139,11 @@ export const MapWithRoute = ({
     Array<{ stationId: string; message: string }>
   >([])
 
+  // Состояние finalFuelAmount - хранит количество топлива после заправки
+  const [finalFuelAmount, setFinalFuelAmount] = useState<number | undefined>(
+    undefined,
+  )
+
   const map = useMap()
 
   // Новая мутация для изменения топливного плана
@@ -194,6 +199,11 @@ export const MapWithRoute = ({
         })
 
         setStationChanges(changes)
+      }
+
+      // Сохраняем finalFuelAmount из ответа API
+      if (data.finalFuelAmount !== undefined) {
+        setFinalFuelAmount(data.finalFuelAmount)
       }
     },
     onError: (error: any) => {
@@ -335,6 +345,8 @@ export const MapWithRoute = ({
     setStationErrors({})
     setStationChanges({})
     setMapErrors([])
+    // Сбрасываем finalFuelAmount, чтобы снова показывать fuelLeftOver
+    setFinalFuelAmount(undefined)
   }, [gasStations, selectedRouteId])
 
   // Очистка корзины и ошибок при изменении фильтров
@@ -346,6 +358,8 @@ export const MapWithRoute = ({
     setStationErrors({})
     setStationChanges({})
     setMapErrors([])
+    // Сбрасываем finalFuelAmount, чтобы снова показывать fuelLeftOver
+    setFinalFuelAmount(undefined)
 
     if (!directionsData?.routeId || !directionsData.route) return
 
@@ -429,6 +443,7 @@ export const MapWithRoute = ({
           onGasStationClick={handleGasStationClick}
           selectedProviders={selectedProviders}
           fuelLeftOver={remainingFuelLiters}
+          finalFuelAmount={finalFuelAmount}
           directions={directionsData}
           cart={cart}
           gasStations={filteredGasStations}
