@@ -155,6 +155,12 @@ export const Directions = ({
 
       return newMapping
     })
+
+    // Немедленно уведомляем родительский компонент о переключении маршрута
+    if (onRouteClick) {
+      const selectedRouteOriginalIndex = routeIndexMapping[index + 1]
+      onRouteClick(selectedRouteOriginalIndex)
+    }
   }
 
   interface Coordinate {
