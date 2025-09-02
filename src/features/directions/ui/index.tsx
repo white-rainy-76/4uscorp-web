@@ -27,6 +27,7 @@ interface DirectionsProps {
   truckId: string
   destinationName: string | undefined
   originName: string | undefined
+  onClearAlternativeRoutes?: (clearFn: () => void) => void
 }
 
 export const Directions = ({
@@ -38,6 +39,7 @@ export const Directions = ({
   truckId,
   destinationName,
   originName,
+  onClearAlternativeRoutes,
 }: DirectionsProps) => {
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
@@ -89,6 +91,13 @@ export const Directions = ({
   useEffect(() => {
     setWayPoints([])
   }, [origin, destination])
+
+  // Передаем функцию очистки в родительский компонент
+  useEffect(() => {
+    if (onClearAlternativeRoutes) {
+      onClearAlternativeRoutes(() => setAlternativeRoutes([]))
+    }
+  }, [onClearAlternativeRoutes])
 
   // Обработка данных маршрута
   useEffect(() => {

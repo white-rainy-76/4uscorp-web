@@ -163,6 +163,9 @@ export const MapWithRoute = ({
   >(undefined)
 
   const map = useMap()
+  const [clearAlternativeRoutes, setClearAlternativeRoutes] = useState<
+    (() => void) | null
+  >(null)
 
   // Новая мутация для изменения топливного плана
   const { mutateAsync: changeFuelPlan } = useChangeFuelPlanMutation({
@@ -294,6 +297,9 @@ export const MapWithRoute = ({
         ...prev,
         [station.id]: { refillLiters },
       }))
+
+      // Очищаем альтернативные маршруты
+      clearAlternativeRoutes?.()
     } catch (error) {
       console.error('Failed to add to cart:', error)
     }
@@ -319,6 +325,9 @@ export const MapWithRoute = ({
         delete newCart[stationId]
         return newCart
       })
+
+      // Очищаем альтернативные маршруты
+      clearAlternativeRoutes?.()
     } catch (error) {
       console.error('Failed to remove from cart:', error)
     }
@@ -346,6 +355,9 @@ export const MapWithRoute = ({
         ...prev,
         [stationId]: { refillLiters: liters },
       }))
+
+      // Очищаем альтернативные маршруты
+      clearAlternativeRoutes?.()
     } catch (error) {
       console.error('Failed to update refill liters:', error)
     }
@@ -407,6 +419,11 @@ export const MapWithRoute = ({
     }
   }
 
+  // Функция для получения функции очистки альтернативных маршрутов
+  const handleGetClearAlternativeRoutes = useCallback((clearFn: () => void) => {
+    setClearAlternativeRoutes(() => clearFn)
+  }, [])
+
   return (
     <div ref={mapContainerRef}>
       <MapBase onMapClick={() => setClickedOutside(true)}>
@@ -428,6 +445,7 @@ export const MapWithRoute = ({
           directionsMutation={mutateAsync}
           onRouteClick={handleRouteClick}
           truckId={truck.id}
+          onClearAlternativeRoutes={handleGetClearAlternativeRoutes}
         />
 
         {filteredGasStations.length > 0 && (
