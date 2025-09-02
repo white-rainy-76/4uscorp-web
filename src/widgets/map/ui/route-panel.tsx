@@ -123,8 +123,8 @@ export const RoutePanelOnMap = ({
             <span className="font-bold whitespace-nowrap">
               {(
                 updatedFuelAmount ??
-                routeByIdTotalFuelAmount ??
-                currentFuelRouteInfo?.totalFuelAmmount
+                currentFuelRouteInfo?.totalFuelAmmount ??
+                routeByIdTotalFuelAmount
               )?.toFixed(2) ?? '-'}
             </span>
           </div>
@@ -146,8 +146,8 @@ export const RoutePanelOnMap = ({
               $
               {(
                 updatedPriceAmount ??
-                routeByIdTotalPriceAmount ??
-                currentFuelRouteInfo?.totalPriceAmmount
+                currentFuelRouteInfo?.totalPriceAmmount ??
+                routeByIdTotalPriceAmount
               )?.toFixed(2) ?? '-'}
             </span>
           </div>
