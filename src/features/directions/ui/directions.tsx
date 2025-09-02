@@ -5,7 +5,11 @@ interface RoutePolylinesProps {
   mainRoute: google.maps.LatLngLiteral[]
   alternativeRoutes: google.maps.LatLngLiteral[][]
   routeSectionIds: string[]
-  onHover: (e: google.maps.MapMouseEvent, routeSectionId: string) => void
+  onHover: (
+    e: google.maps.MapMouseEvent,
+    routeSectionId: string,
+    routeIndex: number,
+  ) => void
   onHoverOut: () => void
   onAltRouteClick: (index: number) => void
 }
@@ -26,7 +30,7 @@ export const RoutePolylines = ({
           strokeColor="#0000FF"
           strokeOpacity={0.8}
           strokeWeight={10}
-          onMouseMove={(e) => onHover(e, routeSectionIds[0] || '')}
+          onMouseMove={(e) => onHover(e, routeSectionIds[0] || '', 0)}
           onMouseOut={onHoverOut}
         />
       )}
@@ -37,7 +41,9 @@ export const RoutePolylines = ({
           strokeColor="#141414"
           strokeOpacity={0.5}
           strokeWeight={3}
-          onMouseMove={(e) => onHover(e, routeSectionIds[index + 1] || '')}
+          onMouseMove={(e) =>
+            onHover(e, routeSectionIds[index + 1] || '', index + 1)
+          }
           onMouseOut={onHoverOut}
           onClick={() => onAltRouteClick(index)}
         />

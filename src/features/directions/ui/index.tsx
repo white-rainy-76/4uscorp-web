@@ -56,6 +56,9 @@ export const Directions = ({
   const [hoveredRouteSectionId, setHoveredRouteSectionId] = useState<
     string | null
   >(null)
+  const [hoveredRouteIndex, setHoveredRouteIndex] = useState<number | null>(
+    null,
+  )
   const [hoverCoordinates, setHoverCoordinates] = useState<{
     lat: number
     lng: number
@@ -129,7 +132,21 @@ export const Directions = ({
     }
   }, [routeIndexMapping, onRouteClick])
 
+  const handleHoverMarkerClick = (e: google.maps.MapMouseEvent) => {
+    // Если hover marker находится на альтернативном маршруте, переключаемся на него
+    if (hoveredRouteIndex !== null && hoveredRouteIndex > 0) {
+      const altRouteIndex = hoveredRouteIndex - 1 // -1 потому что альтернативные маршруты начинаются с индекса 0
+      handleAltRouteClick(altRouteIndex)
+    }
+  }
+
   const handleAltRouteClick = (index: number) => {
+    // Очищаем состояние hover при переключении маршрутов
+    setHoverMarker(null)
+    setHoverCoordinates(null)
+    setHoveredRouteSectionId(null)
+    setHoveredRouteIndex(null)
+
     // Сохраняем текущий главный маршрут
     const currentMainRoute = [...mainRoute]
     const currentMainRouteIndex = routeIndexMapping[0]
@@ -262,7 +279,7 @@ export const Directions = ({
         mainRoute={mainRoute}
         alternativeRoutes={alternativeRoutes}
         routeSectionIds={routeSectionIds}
-        onHover={(e, routeSectionId) => {
+        onHover={(e, routeSectionId, routeIndex) => {
           if (e.latLng) {
             const coordinates = {
               lat: e.latLng.lat(),
@@ -271,12 +288,14 @@ export const Directions = ({
             setHoverMarker(coordinates)
             setHoverCoordinates(coordinates)
             setHoveredRouteSectionId(routeSectionId)
+            setHoveredRouteIndex(routeIndex)
           }
         }}
         onHoverOut={() => {
           setHoverMarker(null)
           setHoverCoordinates(null)
           setHoveredRouteSectionId(null)
+          setHoveredRouteIndex(null)
         }}
         onAltRouteClick={handleAltRouteClick}
       />
@@ -290,6 +309,7 @@ export const Directions = ({
         onMarkerDragStart={() => setAlternativeRoutes([])}
         onMarkerDragEnd={handleMarkerOnDragEnd}
         onExistingMarkerDragEnd={handleExistingMarkerOnDragEnd}
+        onHoverMarkerClick={handleHoverMarkerClick}
       />
     </>
   )

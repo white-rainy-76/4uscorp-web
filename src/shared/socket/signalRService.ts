@@ -22,7 +22,6 @@ class SignalRService {
         (update: TruckStatsUpdate) => {
           const subs = this.listeners[update.truckId]
           if (subs) {
-            console.log('Oh no!')
             subs.forEach((cb) => cb(update))
           }
         },

@@ -14,6 +14,7 @@ interface RouteMarkersProps {
   onMarkerDragStart: () => void
   onMarkerDragEnd: (e: google.maps.MapMouseEvent) => void
   onExistingMarkerDragEnd: (index: number, e: google.maps.MapMouseEvent) => void
+  onHoverMarkerClick?: (e: google.maps.MapMouseEvent) => void
 }
 
 export const RouteMarkers = ({
@@ -26,6 +27,7 @@ export const RouteMarkers = ({
   onMarkerDragStart,
   onMarkerDragEnd,
   onExistingMarkerDragEnd,
+  onHoverMarkerClick,
 }: RouteMarkersProps) => {
   return (
     <>
@@ -36,6 +38,7 @@ export const RouteMarkers = ({
             draggable
             onDragStart={onMarkerDragStart}
             onDragEnd={onMarkerDragEnd}
+            onClick={onHoverMarkerClick}
             icon={{
               path: google.maps.SymbolPath.CIRCLE,
               scale: 6,
