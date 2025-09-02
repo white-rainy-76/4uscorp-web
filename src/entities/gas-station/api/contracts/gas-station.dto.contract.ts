@@ -17,6 +17,12 @@ export const GasStationDtoSchema = z.object({
   currentFuel: z.number().nullable().optional(), // currentFuel: 0
 })
 
+export const FuelRouteInfoDtoSchema = z.object({
+  roadSectionId: z.string(),
+  totalPriceAmmount: z.number(),
+  totalFuelAmmount: z.number(),
+})
+
 export const FinishInfoDtoSchema = z.object({
   remainingFuelLiters: z.number(), // remainingFuelLiters: 59.99
 })
@@ -24,4 +30,5 @@ export const FinishInfoDtoSchema = z.object({
 export const GetGasStationsResponseDtoSchema = z.object({
   fuelStations: z.array(GasStationDtoSchema),
   finishInfo: FinishInfoDtoSchema,
+  fuelRouteInfoDtos: z.array(FuelRouteInfoDtoSchema),
 })
