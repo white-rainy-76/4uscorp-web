@@ -124,7 +124,9 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
               variant="outline"
               size="sm"
               className="text-gray-600"
-              onClick={() => document.getElementById('file-input')?.click()}
+              onClick={() =>
+                document.getElementById('prices-file-input')?.click()
+              }
               disabled={isUploading}>
               Выберите файлы
             </Button>
@@ -162,7 +164,7 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
       </div>
 
       <input
-        id="file-input"
+        id="prices-file-input"
         type="file"
         accept=".xls,.xlsx"
         multiple

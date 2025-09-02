@@ -122,7 +122,7 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
               variant="outline"
               size="sm"
               className="text-gray-600"
-              onClick={() => document.getElementById('file-input')?.click()}
+              onClick={() => document.getElementById('report-file-input')?.click()}
               disabled={isUploading}>
               Выберите файл
             </Button>
@@ -155,9 +155,9 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
 
       {/* Hidden file input */}
       <input
-        id="file-input"
+        id="report-file-input"
         type="file"
-        accept=".xls,.xlsx"
+        accept=".pdf"
         onChange={handleFileSelect}
         className="hidden"
       />
