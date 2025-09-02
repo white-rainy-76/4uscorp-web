@@ -11,7 +11,6 @@ type useRouteProps = {
   setTruckWeight: (value: number | undefined) => void
   setOriginName: (value: string | undefined) => void
   setDestinationName: (value: string | undefined) => void
-  editing: boolean
 }
 
 export function useRoute({
@@ -22,7 +21,6 @@ export function useRoute({
   setTruckWeight,
   setOriginName,
   setDestinationName,
-  editing,
 }: useRouteProps) {
   const {
     mutateAsync: getRouteById,
@@ -32,15 +30,8 @@ export function useRoute({
     onError: (error) => {
       console.error('Route details fetch error:', error)
     },
-    onSuccess: (data) => {
-      setOrigin(data.origin)
-      setDestination(data.destination)
-      setFinishFuel(data.remainingFuel)
-      setTruckWeight(data.weight)
-      setOriginName(data.originName)
-      setDestinationName(data.destinationName)
-    },
   })
+
   const {
     mutateAsync: getRoute,
     data: routeData,
@@ -49,28 +40,55 @@ export function useRoute({
     onError: (error) => {
       console.error('Route mutation error:', error)
     },
+    onSuccess: (data) => {
+      // Обновляем состояние данными о маршруте
+      setOrigin(data.origin)
+      setDestination(data.destination)
+      setFinishFuel(data.remainingFuel)
+      setTruckWeight(data.weight)
+
+      // Если маршрут есть - используем originName/destinationName
+      // Если маршрута нет - используем formattedLocation
+      if (data.route.isRoute) {
+        setOriginName(data.originName || undefined)
+        setDestinationName(data.destinationName || undefined)
+      } else {
+        // Когда маршрута нет, показываем formattedLocation как originName
+        setOriginName(data.route.formattedLocation || undefined)
+        setDestinationName(undefined)
+      }
+    },
   })
+
+  // Получаем информацию о маршруте при загрузке страницы
   useEffect(() => {
     if (truckId) {
       getRoute({ truckId })
     }
   }, [truckId, getRoute])
 
+  // Автоматически получаем детали маршрута, если маршрут существует
   useEffect(() => {
-    if (
-      editing &&
-      truckId &&
-      routeData?.route?.isRoute &&
-      routeData?.route?.routeId
-    ) {
+    if (truckId && routeData?.route?.isRoute && routeData?.route?.routeId) {
       getRouteById({ routeId: routeData.route.routeId })
     }
-  }, [editing, truckId, routeData, getRouteById])
+  }, [truckId, routeData, getRouteById])
 
   return {
     routeData,
     isRouteLoading,
     routeByIdData,
     isRouteByIdLoading,
+    // Возвращаем координаты напрямую из API
+    // Если маршрута нет - используем currentLocation как origin
+    apiOrigin:
+      routeData?.origin ||
+      (routeData?.route?.currentLocation
+        ? {
+            latitude: routeData.route.currentLocation.latitude,
+            longitude: routeData.route.currentLocation.longitude,
+          }
+        : null),
+    apiDestination: routeData?.destination,
   }
 }

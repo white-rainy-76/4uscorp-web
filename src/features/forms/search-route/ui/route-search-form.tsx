@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from '@/shared/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,6 +17,8 @@ interface RouteSearchFormProps {
   originName: string | undefined
   truckWeight: number | undefined
   finishFuel: number | undefined
+  origin?: Coordinate | null
+  destination?: Coordinate | null
   onSubmitForm: (payload: {
     origin: Coordinate
     destination: Coordinate
@@ -32,6 +34,8 @@ export const RouteSearchForm = ({
   originName,
   finishFuel,
   truckWeight,
+  origin,
+  destination,
   onSubmitForm,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
@@ -58,24 +62,38 @@ export const RouteSearchForm = ({
   })
 
   const onSubmit = (data: RouteSearchFormValues) => {
-    if (!selectedStartPoint) {
+    // Проверяем, есть ли координаты (либо из API, либо выбранные пользователем)
+
+    const hasStartCoordinates = selectedStartPoint?.location || origin
+    const hasEndCoordinates = selectedEndPoint?.location || destination
+
+    if (!hasStartCoordinates) {
       setError('startPoint', { type: 'manual', message: 'valid' })
     }
 
-    if (!selectedEndPoint) {
+    if (!hasEndCoordinates) {
       setError('endPoint', { type: 'manual', message: 'valid' })
     }
 
-    if (selectedStartPoint?.location && selectedEndPoint?.location) {
+    if (hasStartCoordinates && hasEndCoordinates) {
+      // Используем координаты из выбранных мест или из API напрямую
+      const startCoords = selectedStartPoint?.location
+        ? {
+            latitude: selectedStartPoint.location.lat(),
+            longitude: selectedStartPoint.location.lng(),
+          }
+        : origin!
+
+      const endCoords = selectedEndPoint?.location
+        ? {
+            latitude: selectedEndPoint.location.lat(),
+            longitude: selectedEndPoint.location.lng(),
+          }
+        : destination!
+
       onSubmitForm({
-        origin: {
-          latitude: selectedStartPoint.location.lat(),
-          longitude: selectedStartPoint.location.lng(),
-        },
-        destination: {
-          latitude: selectedEndPoint.location.lat(),
-          longitude: selectedEndPoint.location.lng(),
-        },
+        origin: startCoords,
+        destination: endCoords,
         originName: data.startPoint,
         destinationName: data.endPoint,
         truckWeight: Number(data.weight),

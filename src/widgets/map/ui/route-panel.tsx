@@ -1,7 +1,10 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { GasStation } from '@/entities/gas-station/model/types/gas-station'
+import {
+  GasStation,
+  FuelRouteInfo,
+} from '@/entities/gas-station/model/types/gas-station'
 import { Directions as DirectionsType } from '@/features/directions/api'
 import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'
@@ -18,6 +21,11 @@ interface Props {
   gasStations?: GasStation[] // Добавляем gasStations для получения информации о заправках
   fuelLeftOver: number | undefined
   finalFuelAmount: number | undefined
+  fuelRouteInfoDtos?: FuelRouteInfo[] // Добавляем fuelRouteInfoDtos для получения информации о топливе по секциям
+  updatedFuelAmount?: number // Новые значения из change-fuel-plan API
+  updatedPriceAmount?: number // Новые значения из change-fuel-plan API
+  routeByIdTotalFuelAmount?: number // Новые значения из route by id API
+  routeByIdTotalPriceAmount?: number // Новые значения из route by id API
 }
 
 const FUEL_PROVIDERS = [
@@ -40,11 +48,24 @@ export const RoutePanelOnMap = ({
   gasStations,
   fuelLeftOver,
   finalFuelAmount,
+  fuelRouteInfoDtos,
+  updatedFuelAmount,
+  updatedPriceAmount,
+  routeByIdTotalFuelAmount,
+  routeByIdTotalPriceAmount,
 }: Props) => {
   const route = directions?.route.find(
     (r) => r.routeSectionId === selectedRouteId,
   )
   const routeInfo = route?.routeInfo
+
+  // Находим информацию о топливе для текущей секции маршрута
+  const currentFuelRouteInfo = useMemo(() => {
+    if (!selectedRouteId || !fuelRouteInfoDtos) return null
+    return fuelRouteInfoDtos.find(
+      (info) => info.roadSectionId === selectedRouteId,
+    )
+  }, [selectedRouteId, fuelRouteInfoDtos])
 
   // Определяем какое значение топлива показывать
   const displayFuelAmount =
@@ -100,7 +121,11 @@ export const RoutePanelOnMap = ({
           <div className="flex flex-col items-start">
             <span className="font-normal ">Gallons:</span>
             <span className="font-bold whitespace-nowrap">
-              {routeInfo?.gallons ?? '-'}
+              {(
+                updatedFuelAmount ??
+                routeByIdTotalFuelAmount ??
+                currentFuelRouteInfo?.totalFuelAmmount
+              )?.toFixed(2) ?? '-'}
             </span>
           </div>
           <div className="flex flex-col items-start">
@@ -113,6 +138,17 @@ export const RoutePanelOnMap = ({
             <span className="font-normal ">Fuel Left</span>
             <span className=" font-bold whitespace-nowrap">
               {displayFuelAmount?.toFixed(2) ?? '-'}
+            </span>
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-normal ">Total Price:</span>
+            <span className=" font-bold whitespace-nowrap">
+              $
+              {(
+                updatedPriceAmount ??
+                routeByIdTotalPriceAmount ??
+                currentFuelRouteInfo?.totalPriceAmmount
+              )?.toFixed(2) ?? '-'}
             </span>
           </div>
         </div>

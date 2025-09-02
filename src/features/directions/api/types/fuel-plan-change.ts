@@ -63,6 +63,8 @@ export const FuelPlanChangeResponseSchema = z.object({
   ),
   stepResults: z.array(StepResultSchema),
   finalFuelAmount: z.number(),
+  totalFuelAmmount: z.number(),
+  totalPriceAmmount: z.number(),
 })
 
 export type FuelPlanChangePayload = z.infer<typeof FuelPlanChangePayloadSchema>

@@ -13,3 +13,9 @@ export const AssignRoutePayloadSchema = z.object({
   routeSectionId: z.string(),
   truckId: z.string(),
 })
+
+export const GetDistancePayloadSchema = z.object({
+  routeSectionId: z.string().uuid(),
+  latitude: z.number(),
+  longitude: z.number(),
+})

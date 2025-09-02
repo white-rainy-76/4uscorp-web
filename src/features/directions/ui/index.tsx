@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { convertToLatLngLiteral } from '../lib'
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query'
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query'
 import { Directions as DirectionType, RouteRequestPayload } from '../api'
 import { RoutePolylines } from './directions'
 import { RouteMarkers } from './markers'
 
 import { Coordinate } from '@/shared/types'
 import { useGetNearestDropPointMutation } from '../api/get-nearest-drop-point.mutation'
+import { routeQueries } from '@/entities/route'
 
 interface DirectionsProps {
   data?: DirectionType | undefined
@@ -47,6 +52,14 @@ export const Directions = ({
   const [endMarker, setEndMarker] = useState<google.maps.LatLngLiteral | null>(
     null,
   )
+  const [routeSectionIds, setRouteSectionIds] = useState<string[]>([])
+  const [hoveredRouteSectionId, setHoveredRouteSectionId] = useState<
+    string | null
+  >(null)
+  const [hoverCoordinates, setHoverCoordinates] = useState<{
+    lat: number
+    lng: number
+  } | null>(null)
 
   const dropPointMutation = useGetNearestDropPointMutation({
     onError: (error, variables, context) => {
@@ -57,6 +70,16 @@ export const Directions = ({
         )
       }
     },
+  })
+
+  // Query для получения расстояния при наведении на полилайн
+  const { data: distanceData, isLoading: isDistanceLoading } = useQuery({
+    ...routeQueries.distance({
+      routeSectionId: hoveredRouteSectionId || '',
+      latitude: hoverCoordinates?.lat || 0,
+      longitude: hoverCoordinates?.lng || 0,
+    }),
+    enabled: !!hoveredRouteSectionId && !!hoverCoordinates,
   })
 
   // Сбрасываем wayPoints при изменении origin или destination
@@ -79,6 +102,10 @@ export const Directions = ({
         setAlternativeRoutes(
           allShapes.length > 1 ? [...allShapes.slice(1)] : [],
         )
+
+        // Сохраняем routeSectionIds для всех маршрутов
+        const sectionIds = data.route.map((route) => route.routeSectionId)
+        setRouteSectionIds(sectionIds)
 
         // Инициализируем маппинг индексов маршрутов
         const initialMapping = allShapes.map((_, index) => index)
@@ -228,15 +255,23 @@ export const Directions = ({
       <RoutePolylines
         mainRoute={mainRoute}
         alternativeRoutes={alternativeRoutes}
-        onHover={(e) => {
+        routeSectionIds={routeSectionIds}
+        onHover={(e, routeSectionId) => {
           if (e.latLng) {
-            setHoverMarker({
+            const coordinates = {
               lat: e.latLng.lat(),
               lng: e.latLng.lng(),
-            })
+            }
+            setHoverMarker(coordinates)
+            setHoverCoordinates(coordinates)
+            setHoveredRouteSectionId(routeSectionId)
           }
         }}
-        onHoverOut={() => setHoverMarker(null)}
+        onHoverOut={() => {
+          setHoverMarker(null)
+          setHoverCoordinates(null)
+          setHoveredRouteSectionId(null)
+        }}
         onAltRouteClick={handleAltRouteClick}
       />
       <RouteMarkers
@@ -244,6 +279,8 @@ export const Directions = ({
         wayPoints={wayPoints}
         startMarker={startMarker}
         endMarker={endMarker}
+        distanceData={distanceData}
+        isDistanceLoading={isDistanceLoading}
         onMarkerDragStart={() => setAlternativeRoutes([])}
         onMarkerDragEnd={handleMarkerOnDragEnd}
         onExistingMarkerDragEnd={handleExistingMarkerOnDragEnd}

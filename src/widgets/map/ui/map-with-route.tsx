@@ -17,7 +17,11 @@ import {
 import { Truck } from '@/entities/truck'
 import { RoutePanelOnMap } from './route-panel'
 import { useMap } from '@vis.gl/react-google-maps'
-import { GasStation, GetGasStationsResponse } from '@/entities/gas-station'
+import {
+  GasStation,
+  GetGasStationsResponse,
+  FuelRouteInfo,
+} from '@/entities/gas-station'
 import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
 import { RouteData } from '@/entities/route'
 import { TrackTruck } from '@/features/truck/track-truck'
@@ -90,6 +94,9 @@ interface MapWithRouteProps {
   fuel: string | undefined
   truckWeight: number | undefined
   routeData: RouteData | undefined
+  fuelRouteInfoDtos?: FuelRouteInfo[]
+  routeByIdTotalFuelAmount?: number
+  routeByIdTotalPriceAmount?: number
 }
 
 export const MapWithRoute = ({
@@ -114,6 +121,9 @@ export const MapWithRoute = ({
   routeData,
   originName,
   destinationName,
+  fuelRouteInfoDtos,
+  routeByIdTotalFuelAmount,
+  routeByIdTotalPriceAmount,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -143,6 +153,14 @@ export const MapWithRoute = ({
   const [finalFuelAmount, setFinalFuelAmount] = useState<number | undefined>(
     undefined,
   )
+
+  // Состояние для хранения новых значений totalFuelAmmount и totalPriceAmmount
+  const [updatedFuelAmount, setUpdatedFuelAmount] = useState<
+    number | undefined
+  >(undefined)
+  const [updatedPriceAmount, setUpdatedPriceAmount] = useState<
+    number | undefined
+  >(undefined)
 
   const map = useMap()
 
@@ -204,6 +222,14 @@ export const MapWithRoute = ({
       // Сохраняем finalFuelAmount из ответа API
       if (data.finalFuelAmount !== undefined) {
         setFinalFuelAmount(data.finalFuelAmount)
+      }
+
+      // Сохраняем новые значения totalFuelAmmount и totalPriceAmmount из ответа API
+      if (data.totalFuelAmmount !== undefined) {
+        setUpdatedFuelAmount(data.totalFuelAmmount)
+      }
+      if (data.totalPriceAmmount !== undefined) {
+        setUpdatedPriceAmount(data.totalPriceAmmount)
       }
     },
     onError: (error: any) => {
@@ -447,6 +473,11 @@ export const MapWithRoute = ({
           directions={directionsData}
           cart={cart}
           gasStations={filteredGasStations}
+          fuelRouteInfoDtos={fuelRouteInfoDtos}
+          updatedFuelAmount={updatedFuelAmount}
+          updatedPriceAmount={updatedPriceAmount}
+          routeByIdTotalFuelAmount={routeByIdTotalFuelAmount}
+          routeByIdTotalPriceAmount={routeByIdTotalPriceAmount}
         />
 
         <FullScreenController mapRef={mapContainerRef} />

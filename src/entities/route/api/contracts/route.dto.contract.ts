@@ -33,6 +33,7 @@ export const RouteDataDtoSchema = z.object({
   origin: CoordinatesDtoSchema.nullable(),
   destination: CoordinatesDtoSchema.nullable(),
   weight: z.number(),
+  remainingFuel: z.number().optional(),
   routeDto: RouteDtoSchema,
 })
 
@@ -56,4 +57,11 @@ export const RouteByIdDtoSchema = z.object({
   sectionId: z.string(),
   mapPoints: z.array(z.array(z.number())),
   fuelStationDtos: z.array(GasStationDtoSchema),
+  totalFuelAmmount: z.number(),
+  totalPriceAmmount: z.number(),
+})
+
+// get distance
+export const GetDistanceDtoSchema = z.object({
+  distance: z.number(),
 })

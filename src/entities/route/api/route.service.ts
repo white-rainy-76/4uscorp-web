@@ -5,16 +5,19 @@ import {
   AssignRoutePayload,
   GetRouteByIdPayload,
   GetRoutePayload,
+  GetDistancePayload,
 } from '../model'
 import {
   AssignRoutePayloadSchema,
   GetRouteByIdPayloadSchema,
   GetRoutePayloadSchema,
+  GetDistancePayloadSchema,
 } from './payload/route.payload'
-import { RouteByIdData, RouteData } from '../model'
+import { RouteByIdData, RouteData, GetDistanceData } from '../model'
 import {
   RouteByIdDtoSchema,
   RouteDataDtoSchema,
+  GetDistanceDtoSchema,
 } from './contracts/route.dto.contract'
 import { mapRouteDataDtoToRouteData } from './mapper/route.mapper'
 import { mapRouteByIdDtoToRouteById } from './mapper/route-by-id.mapper'
@@ -74,4 +77,23 @@ export const assignRoute = async (
     validatedPayload,
     authConfig,
   )
+}
+
+export const getDistance = async (
+  payload: GetDistancePayload,
+  signal?: AbortSignal,
+): Promise<GetDistanceData> => {
+  const validatedPayload = GetDistancePayloadSchema.parse(payload)
+  const config: AxiosRequestConfig = {
+    signal,
+    params: validatedPayload,
+  }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  const response = await api
+    .get(`/fuelroutes-api/FuelRoute/get-distance`, authConfig)
+    .then(responseContract(GetDistanceDtoSchema))
+
+  return response.data
 }

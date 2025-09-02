@@ -29,5 +29,7 @@ export const mapRouteByIdDtoToRouteById = (
     remainingFuel: dto.remainingFuel,
     mapPoints: mappedMapPoints,
     fuelStations: mappedFuelStations,
+    totalFuelAmmount: dto.totalFuelAmmount,
+    totalPriceAmmount: dto.totalPriceAmmount,
   }
 }

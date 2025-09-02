@@ -10,6 +10,7 @@ import { AttachDetachDriverResponse } from '../model'
 import { queryClient } from '@/shared/api/query-client'
 import { driverQueries } from '@/entities/driver'
 import { Driver } from '@/entities/driver'
+import { truckUnitQueries } from '@/entities/truck'
 
 export function useAttachDriverMutation(
   options: Pick<
@@ -71,6 +72,11 @@ export function useAttachDriverMutation(
 
       queryClient.invalidateQueries({
         queryKey: driverQueries.lists(),
+      })
+
+      // Инвалидируем truckUnitQueries после прикрепления драйвера
+      queryClient.invalidateQueries({
+        queryKey: truckUnitQueries.lists(),
       })
 
       await Promise.all([onSuccess?.(data, variables, context)])
@@ -144,6 +150,11 @@ export function useDetachDriverMutation(
 
       queryClient.invalidateQueries({
         queryKey: driverQueries.lists(),
+      })
+
+      // Инвалидируем truckUnitQueries после открепления драйвера
+      queryClient.invalidateQueries({
+        queryKey: truckUnitQueries.lists(),
       })
 
       await Promise.all([onSuccess?.(data, variables, context)])

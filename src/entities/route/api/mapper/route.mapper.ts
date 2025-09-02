@@ -9,6 +9,7 @@ export const mapRouteDataDtoToRouteData = (raw: RouteDataDto): RouteData => {
     origin: raw.origin,
     destination: raw.destination,
     weight: raw.weight,
+    remainingFuel: raw.remainingFuel,
     route: raw.routeDto.isRoute
       ? {
           isRoute: true,

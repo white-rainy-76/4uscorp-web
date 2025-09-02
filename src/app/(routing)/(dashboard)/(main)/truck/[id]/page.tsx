@@ -28,8 +28,6 @@ export default function TruckInfo() {
   const router = useRouter()
   const { isConnected } = useConnection()
 
-  const [editing, setEditing] = useState<boolean>(false)
-
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
   const [origin, setOrigin] = useState<Coordinate | null>(null)
   const [destination, setDestination] = useState<Coordinate | null>(null)
@@ -55,17 +53,22 @@ export default function TruckInfo() {
 
   const { stats, isLoading } = useTruckStats(truckId, isConnected)
 
-  const { routeData, isRouteLoading, isRouteByIdLoading, routeByIdData } =
-    useRoute({
-      truckId: truckData?.id,
-      setOrigin,
-      setDestination,
-      setFinishFuel,
-      setTruckWeight,
-      setOriginName,
-      setDestinationName,
-      editing,
-    })
+  const {
+    routeData,
+    isRouteLoading,
+    isRouteByIdLoading,
+    routeByIdData,
+    apiOrigin,
+    apiDestination,
+  } = useRoute({
+    truckId: truckData?.id,
+    setOrigin,
+    setDestination,
+    setFinishFuel,
+    setTruckWeight,
+    setOriginName,
+    setDestinationName,
+  })
 
   const {
     mutateAsync: updateGasStations,
@@ -232,8 +235,8 @@ export default function TruckInfo() {
               {routeData && (
                 <TruckRouteInfo
                   truck={truckData}
-                  origin={origin}
-                  destination={destination}
+                  origin={apiOrigin || null}
+                  destination={apiDestination || null}
                   originName={originName}
                   destinationName={destinationName}
                   truckWeight={truckWeight}
@@ -246,8 +249,6 @@ export default function TruckInfo() {
                       : currentDirectionsData?.routeId
                   }
                   selectedRouteId={selectedRouteId}
-                  editing={editing}
-                  setEditing={setEditing}
                 />
               )}
             </InfoCard>
@@ -272,11 +273,14 @@ export default function TruckInfo() {
               updateGasStations={updateGasStations}
               selectedRouteId={selectedRouteId}
               handleRouteClick={handleRouteClick}
+              fuelRouteInfoDtos={gasStationsData?.fuelRouteInfoDtos}
               finishFuel={finishFuel}
               selectedProviders={selectedProviders}
               setSelectedProviders={setSelectedProviders}
               fuel={stats?.fuelPercentage}
               routeData={routeData}
+              routeByIdTotalFuelAmount={routeByIdData?.totalFuelAmmount}
+              routeByIdTotalPriceAmount={routeByIdData?.totalPriceAmmount}
             />
           </>
         )}
