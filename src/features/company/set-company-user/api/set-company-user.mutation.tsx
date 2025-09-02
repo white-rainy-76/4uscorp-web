@@ -7,6 +7,7 @@ import { setCompanyUser } from './set-company-user.service'
 import { SetCompanyUserPayload } from './payload/set-company-user.payload'
 import { SetCompanyUserResponse } from '../model'
 import { useAuthStore } from '@/shared/store/auth-store'
+import { queryClient } from '@/shared/api/query-client'
 
 export function useSetCompanyUserMutation(
   options: Pick<
@@ -40,6 +41,9 @@ export function useSetCompanyUserMutation(
       if (data) {
         useAuthStore.getState().updateAccessToken(data)
       }
+
+      // Инвалидируем все запросы после смены компании
+      queryClient.invalidateQueries()
 
       await Promise.all([onSuccess?.(data, variables, context)])
     },
