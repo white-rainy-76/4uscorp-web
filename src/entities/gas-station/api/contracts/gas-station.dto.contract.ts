@@ -15,6 +15,7 @@ export const GasStationDtoSchema = z.object({
   nextDistanceKm: z.string().optional().nullable(), // nextDistanceKm: null
   roadSectionId: z.string(), // roadSectionId: "d3a9ca2f-27d2-47e8-a534-f6062d96c7a2"
   currentFuel: z.number().nullable().optional(), // currentFuel: 0
+  fuelStationProviderId: z.string().optional().nullable(), // fuelStationProviderId: "276"
 })
 
 export const FuelRouteInfoDtoSchema = z.object({

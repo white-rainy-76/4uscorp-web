@@ -49,6 +49,7 @@ export const mapGasStation = (dto: GasStationDto): GasStation => {
     nextDistanceKm: dto.nextDistanceKm ? parseFloat(dto.nextDistanceKm) : null,
     roadSectionId: dto.roadSectionId,
     fuelLeftBeforeRefill: dto.currentFuel,
+    fuelStationProviderId: dto.fuelStationProviderId,
     state: null, // Or undefined
     distanceToLocation: null, // Or undefined
     route: null, // Or undefined

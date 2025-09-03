@@ -87,6 +87,14 @@ export const GasStationMarker: React.FC<Props> = ({
             })}>
             {gasStation.fuelPrice?.finalPrice}
           </span>
+          {gasStation.fuelStationProviderId && (
+            <p className="text-gray-600">
+              Id:{' '}
+              <span className="font-bold text-blue-600">
+                {gasStation.fuelStationProviderId}
+              </span>
+            </p>
+          )}
         </div>
       )}
     </AdvancedMarker>

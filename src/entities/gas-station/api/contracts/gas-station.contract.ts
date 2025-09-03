@@ -21,6 +21,7 @@ export const GasStationSchema = z.object({
   nextDistanceKm: z.number().nullable().optional(),
   roadSectionId: z.string(),
   fuelLeftBeforeRefill: z.number().nullable().optional(),
+  fuelStationProviderId: z.string().nullable().optional(),
   // Fields from old contract that might still be relevant
   state: z.string().nullable().optional(),
   distanceToLocation: z.number().nullable().optional(),
