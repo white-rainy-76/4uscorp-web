@@ -66,6 +66,8 @@ export const mapFuelRouteInfo = (dto: FuelRouteInfoDto): FuelRouteInfo => {
     roadSectionId: dto.roadSectionId,
     totalPriceAmmount: dto.totalPriceAmmount,
     totalFuelAmmount: dto.totalFuelAmmount,
+    finishInfo: dto.finishInfo,
+    validationError: dto.validationError,
   }
 }
 
@@ -80,9 +82,6 @@ export const mapGetGasStations = (
 ): GetGasStationsResponse => {
   return {
     fuelStations: dto.fuelStations.map(mapGasStation),
-    finishInfo: {
-      remainingFuelLiters: dto.finishInfo.remainingFuelLiters,
-    },
     fuelRouteInfoDtos: dto.fuelRouteInfoDtos.map(mapFuelRouteInfo),
   }
 }

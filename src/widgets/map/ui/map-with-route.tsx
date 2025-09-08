@@ -32,9 +32,15 @@ const MapErrorsOverlay: React.FC<{
 }> = ({ errors }) => {
   if (errors.length === 0) return null
 
-  // Разделяем ошибки на общие и связанные с конкретными заправками
+  // Разделяем ошибки на общие, связанные с конкретными заправками и ошибки валидации маршрута
   const generalErrors = errors.filter((error) => error.stationId === 'general')
-  const stationErrors = errors.filter((error) => error.stationId !== 'general')
+  const stationErrors = errors.filter(
+    (error) =>
+      error.stationId !== 'general' && error.stationId !== 'route-validation',
+  )
+  const routeValidationErrors = errors.filter(
+    (error) => error.stationId === 'route-validation',
+  )
 
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] pointer-events-none">
@@ -44,6 +50,15 @@ const MapErrorsOverlay: React.FC<{
           <div>
             <h4 className="font-bold text-sm mb-2">Ошибки топливного плана:</h4>
             <div className="space-y-1">
+              {/* Ошибки валидации маршрута */}
+              {routeValidationErrors.map((error, index) => (
+                <div key={`route-validation-${index}`} className="text-xs">
+                  <span className="font-semibold text-red-800">
+                    Ошибка маршрута:
+                  </span>
+                  <span className="ml-2">{error.message}</span>
+                </div>
+              ))}
               {/* Общие ошибки */}
               {generalErrors.map((error, index) => (
                 <div key={`general-${index}`} className="text-xs">
@@ -382,10 +397,33 @@ export const MapWithRoute = ({
     setCart(algorithmStations)
     setStationErrors({})
     setStationChanges({})
-    setMapErrors([])
+
+    // Проверяем validationError для выбранного маршрута
+    if (fuelRouteInfoDtos && selectedRouteId) {
+      const selectedRouteInfo = fuelRouteInfoDtos.find(
+        (info) => info.roadSectionId === selectedRouteId,
+      )
+
+      if (selectedRouteInfo?.validationError) {
+        // Создаем массив ошибок с validationError
+        const mapErrorMessages: Array<{ stationId: string; message: string }> =
+          [
+            {
+              stationId: 'route-validation',
+              message: selectedRouteInfo.validationError.message,
+            },
+          ]
+        setMapErrors(mapErrorMessages)
+      } else {
+        setMapErrors([])
+      }
+    } else {
+      setMapErrors([])
+    }
+
     // Сбрасываем finalFuelAmount, чтобы снова показывать fuelLeftOver
     setFinalFuelAmount(undefined)
-  }, [gasStations, selectedRouteId])
+  }, [gasStations, selectedRouteId, fuelRouteInfoDtos])
 
   // Очистка корзины и ошибок при изменении фильтров
   const handleFilterChange = async (providers: string[]) => {

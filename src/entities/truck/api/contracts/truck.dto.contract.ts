@@ -26,4 +26,7 @@ export const TruckDtoSchema = z.object({
   year: z.string(),
   createdAtTime: z.string(),
   updatedAtTime: z.string(),
+  tankCapacityG: z.number(),
+  overWeight: z.number(),
+  poundPerGallon: z.number(),
 })

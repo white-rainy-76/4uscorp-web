@@ -18,18 +18,21 @@ export const GasStationDtoSchema = z.object({
   fuelStationProviderId: z.string().optional().nullable(), // fuelStationProviderId: "276"
 })
 
+export const ValidationErrorDtoSchema = z.object({
+  message: z.string(),
+})
+
 export const FuelRouteInfoDtoSchema = z.object({
   roadSectionId: z.string(),
   totalPriceAmmount: z.number(),
   totalFuelAmmount: z.number(),
-})
-
-export const FinishInfoDtoSchema = z.object({
-  remainingFuelLiters: z.number(), // remainingFuelLiters: 59.99
+  finishInfo: z.object({
+    remainingFuelLiters: z.number(),
+  }),
+  validationError: ValidationErrorDtoSchema.nullable(),
 })
 
 export const GetGasStationsResponseDtoSchema = z.object({
   fuelStations: z.array(GasStationDtoSchema),
-  finishInfo: FinishInfoDtoSchema,
   fuelRouteInfoDtos: z.array(FuelRouteInfoDtoSchema),
 })

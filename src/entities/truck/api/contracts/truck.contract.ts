@@ -29,4 +29,7 @@ export const TruckSchema = z.object({
   model: z.string(),
   year: z.string(),
   driver: DriverForTruckSchema.nullable().optional(),
+  tankCapacityG: z.number(),
+  overWeight: z.number(),
+  poundPerGallon: z.number(),
 })

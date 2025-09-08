@@ -19,6 +19,7 @@ interface TruckRouteInfoProps {
   truckWeight?: number
   finishFuel?: number
   isRoute: boolean
+  currentFuelPercent?: number
   onSubmitForm: (payload: {
     origin: Coordinate
     destination: Coordinate
@@ -39,6 +40,7 @@ export const TruckRouteInfo = ({
   finishFuel,
   truckWeight,
   isRoute = false,
+  currentFuelPercent,
   onSubmitForm,
   routeId,
   truck,
@@ -61,6 +63,8 @@ export const TruckRouteInfo = ({
           finishFuel={finishFuel}
           origin={origin}
           destination={destination}
+          truck={truck}
+          currentFuelPercent={currentFuelPercent}
           onSubmitForm={onSubmitForm}
         />
         <Button

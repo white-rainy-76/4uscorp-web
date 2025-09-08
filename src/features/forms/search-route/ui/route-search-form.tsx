@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from '@/shared/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,6 +12,8 @@ import { FuelSlider } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { Coordinate } from '@/shared/types'
 import { RouteRequestPayload } from '@/features/directions/api'
+import { Truck } from '@/entities/truck'
+
 interface RouteSearchFormProps {
   destinationName: string | undefined
   originName: string | undefined
@@ -19,6 +21,8 @@ interface RouteSearchFormProps {
   finishFuel: number | undefined
   origin?: Coordinate | null
   destination?: Coordinate | null
+  truck?: Truck
+  currentFuelPercent?: number
   onSubmitForm: (payload: {
     origin: Coordinate
     destination: Coordinate
@@ -36,6 +40,8 @@ export const RouteSearchForm = ({
   truckWeight,
   origin,
   destination,
+  truck,
+  currentFuelPercent,
   onSubmitForm,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
@@ -51,6 +57,7 @@ export const RouteSearchForm = ({
     formState: { errors },
     setError,
     reset,
+    watch,
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
     defaultValues: {
@@ -60,6 +67,29 @@ export const RouteSearchForm = ({
       fuelPercent: finishFuel !== undefined ? finishFuel : 0,
     },
   })
+
+  // Watch the weight field to recalculate max fuel slider value
+  const watchedWeight = watch('weight')
+  const currentWeight = watchedWeight ? parseFloat(watchedWeight) : 0
+
+  // Recalculate max fuel slider value when weight changes
+  const dynamicMaxFuelSliderValue = useMemo(() => {
+    if (!truck || currentFuelPercent === undefined) {
+      return 100 // Default fallback
+    }
+
+    const { tankCapacityG, overWeight, poundPerGallon } = truck
+
+    // Formula: Math.Min(((OverWeight - TruckWeight) / PoundPerGalon) + (CurrentFuelPercent * (TankCapacityG / 100.0), TankCapacityG)
+    const calculatedMax = Math.min(
+      (overWeight - currentWeight) / poundPerGallon +
+        currentFuelPercent * (tankCapacityG / 100.0),
+      tankCapacityG,
+    )
+    console.log('calculatedMax', calculatedMax)
+    // Convert to percentage (0-100)
+    return calculatedMax
+  }, [truck, currentFuelPercent, currentWeight])
 
   const onSubmit = (data: RouteSearchFormValues) => {
     // Проверяем, есть ли координаты (либо из API, либо выбранные пользователем)
@@ -192,7 +222,7 @@ export const RouteSearchForm = ({
                 <FuelSlider
                   defaultValue={[field.value as number]}
                   onChange={field.onChange}
-                  max={100}
+                  max={dynamicMaxFuelSliderValue}
                   step={1}
                 />
               )}

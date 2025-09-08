@@ -45,6 +45,9 @@ export const mapTruck = (rawTruck: TruckDto): Truck => {
     model: rawTruck.model,
     year: rawTruck.year,
     driver: mappedDriver,
+    tankCapacityG: rawTruck.tankCapacityG,
+    overWeight: rawTruck.overWeight,
+    poundPerGallon: rawTruck.poundPerGallon,
   }
 }
 

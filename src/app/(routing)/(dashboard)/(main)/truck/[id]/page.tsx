@@ -241,6 +241,11 @@ export default function TruckInfo() {
                   destinationName={destinationName}
                   truckWeight={truckWeight}
                   finishFuel={finishFuel}
+                  currentFuelPercent={
+                    stats?.fuelPercentage
+                      ? parseFloat(stats.fuelPercentage)
+                      : undefined
+                  }
                   onSubmitForm={handleSubmitRoute}
                   isRoute={routeData.route.isRoute}
                   routeId={
@@ -260,8 +265,10 @@ export default function TruckInfo() {
               directionsData={currentDirectionsData}
               gasStations={combinedGasStations}
               remainingFuelLiters={
-                gasStationsData?.finishInfo.remainingFuelLiters
-                  ? gasStationsData?.finishInfo.remainingFuelLiters
+                gasStationsData?.fuelRouteInfoDtos?.[0]?.finishInfo
+                  ?.remainingFuelLiters
+                  ? gasStationsData?.fuelRouteInfoDtos[0].finishInfo
+                      .remainingFuelLiters
                   : routeByIdData?.remainingFuel
               }
               isDirectionsPending={isLoadingRouteRelated}
