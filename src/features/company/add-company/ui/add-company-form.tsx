@@ -9,12 +9,14 @@ import {
   AddCompanyPayload,
   AddCompanyPayloadSchema,
 } from '../api/payload/add-company.payload'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface AddCompanyFormProps {
   onClose: () => void
 }
 
 export const AddCompanyForm = ({ onClose }: AddCompanyFormProps) => {
+  const { dictionary } = useDictionary()
   const {
     register,
     handleSubmit,
@@ -45,11 +47,11 @@ export const AddCompanyForm = ({ onClose }: AddCompanyFormProps) => {
       {/* Company Name Field */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Название компании
+          {dictionary.home.input_fields.company_name}
         </label>
         <Input
           {...register('name')}
-          placeholder="Введите название компании"
+          placeholder={dictionary.home.input_fields.company_name_placeholder}
           variant="gray"
           className={errors.name ? 'border-red-500' : ''}
         />
@@ -61,11 +63,11 @@ export const AddCompanyForm = ({ onClose }: AddCompanyFormProps) => {
       {/* Samsara Token Field */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Samsara токен
+          {dictionary.home.input_fields.samsara_token}
         </label>
         <Input
           {...register('samsaraToken')}
-          placeholder="Введите Samsara токен"
+          placeholder={dictionary.home.input_fields.samsara_token_placeholder}
           variant="gray"
           className={errors.samsaraToken ? 'border-red-500' : ''}
         />
@@ -79,7 +81,9 @@ export const AddCompanyForm = ({ onClose }: AddCompanyFormProps) => {
         type="submit"
         disabled={isPending}
         className="w-full rounded-[22px]">
-        {isPending ? 'Загрузка...' : 'Добавить компанию'}
+        {isPending
+          ? dictionary.home.buttons.loading
+          : dictionary.home.buttons.add_company}
       </Button>
     </form>
   )

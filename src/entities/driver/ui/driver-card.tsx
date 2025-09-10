@@ -4,6 +4,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
 import { Driver } from '../model/types/driver'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface DriverCardProps {
   driver: Driver
@@ -12,13 +13,14 @@ interface DriverCardProps {
 
 export const DriverCard = ({ driver, isActive }: DriverCardProps) => {
   const router = useRouter()
+  const { lang, dictionary } = useDictionary()
 
   const handleClick = () => {
-    router.push(`/drivers/driver/${driver.id}`)
+    router.push(`/${lang}/drivers/driver/${driver.id}`)
   }
 
   const handleMouseEnter = () => {
-    router.prefetch(`/drivers/driver/${driver.id}`)
+    router.prefetch(`/${lang}/drivers/driver/${driver.id}`)
   }
 
   const driverInitials =
@@ -56,7 +58,7 @@ export const DriverCard = ({ driver, isActive }: DriverCardProps) => {
       <div className="flex items-center">
         <div className="text-right">
           <p className="text-sm font-semibold text-[#FFAF2A]">
-            Bonus: {driver.bonus}
+            {dictionary.home.drivers.bonuses}: {driver.bonus}
           </p>
         </div>
       </div>

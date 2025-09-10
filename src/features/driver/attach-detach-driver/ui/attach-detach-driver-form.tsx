@@ -26,6 +26,7 @@ import {
 import { Driver } from '@/entities/driver'
 import { truckUnitQueries } from '@/entities/truck'
 import { useQuery } from '@tanstack/react-query'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface AttachDetachDriverFormProps {
   onClose: () => void
@@ -36,6 +37,7 @@ export const AttachDetachDriverForm = ({
   onClose,
   driver,
 }: AttachDetachDriverFormProps) => {
+  const { dictionary } = useDictionary()
   const [open, setOpen] = useState(false)
   const [selectedTruckId, setSelectedTruckId] = useState<string>('')
   const [selectedTruckUnit, setSelectedTruckUnit] = useState<string>('')
@@ -104,7 +106,7 @@ export const AttachDetachDriverForm = ({
       {!isAttached && (
         <div className="space-y-3">
           <label className="block text-sm font-extrabold text-[#A8A8A8]">
-            Выберите трак
+            {dictionary.home.truck.select_truck}
           </label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -113,15 +115,21 @@ export const AttachDetachDriverForm = ({
                 role="combobox"
                 aria-expanded={open}
                 className="w-full justify-between h-10 border-gray-300 bg-gray-50 text-black">
-                {selectedTruckUnit ? selectedTruckUnit : 'Выберите трак...'}
+                {selectedTruckUnit
+                  ? selectedTruckUnit
+                  : dictionary.home.truck.select_truck_placeholder}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[450px] p-0">
               <Command>
-                <CommandInput placeholder="Поиск по номеру трака..." />
+                <CommandInput
+                  placeholder={dictionary.home.truck.search_truck}
+                />
                 <CommandList>
-                  <CommandEmpty>Трак не найден.</CommandEmpty>
+                  <CommandEmpty>
+                    {dictionary.home.truck.truck_not_found}
+                  </CommandEmpty>
                   <CommandGroup>
                     {selectedTruckId && (
                       <CommandItem
@@ -132,7 +140,7 @@ export const AttachDetachDriverForm = ({
                           setValue('truckId', '')
                           setOpen(false)
                         }}>
-                        Отвязать от трака
+                        {dictionary.home.truck.detach_from_truck}
                       </CommandItem>
                     )}
                     {truckUnits?.map((truckUnit) => (
@@ -171,13 +179,13 @@ export const AttachDetachDriverForm = ({
       {isAttached && (
         <div className="space-y-3">
           <label className="block text-sm font-extrabold text-[#A8A8A8]">
-            Текущий трак
+            {dictionary.home.truck.current_truck}
           </label>
           <div className="p-3 bg-gray-50 border border-gray-300 rounded-md">
             <span className="text-sm text-gray-700">
               {driver.truck?.unitNumber
                 ? `#${driver.truck.unitNumber}`
-                : 'Номер не указан'}
+                : dictionary.home.truck.unit_not_specified}
             </span>
           </div>
         </div>
@@ -189,10 +197,10 @@ export const AttachDetachDriverForm = ({
         disabled={isSubmitDisabled}
         className="w-full rounded-[22px]">
         {isAttaching || isDetaching
-          ? 'Загрузка...'
+          ? dictionary.home.buttons.loading
           : isAttached
-            ? 'Открепить от трака'
-            : 'Прикрепить к траку'}
+            ? dictionary.home.truck.detach_from_truck_btn
+            : dictionary.home.truck.attach_to_truck}
       </Button>
     </form>
   )

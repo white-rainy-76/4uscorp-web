@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react'
 import { useAuthStore } from '@/shared/store/auth-store'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -11,6 +11,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { initializeAuth, isAuthenticated, isLoading } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     // Initialize authentication state on app load
@@ -21,11 +22,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Redirect to login if not authenticated and not loading
     if (!isLoading && !isAuthenticated) {
       const currentPath = window.location.pathname
-      if (currentPath !== '/auth/sign-in' && currentPath !== '/auth/sign-up') {
-        router.push('/auth/sign-in')
+
+      // Check if we're already on an auth page with locale
+      const isOnAuthPage =
+        currentPath.includes('/auth/sign-in') ||
+        currentPath.includes('/auth/sign-up')
+
+      if (!isOnAuthPage) {
+        // Extract locale from current pathname
+        const segments = pathname?.split('/') || []
+        const locale =
+          segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
+
+        router.push(`/${locale}/auth/sign-in`)
       }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router, pathname])
 
   // Show loading state while initializing
   if (isLoading) {

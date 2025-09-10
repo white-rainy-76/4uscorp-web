@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage, Icon } from '@/shared/ui'
 import { Company } from '../model/types/company'
 import { UsersRound } from 'lucide-react'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface CompanyCardProps {
   company: Company
@@ -13,14 +14,15 @@ interface CompanyCardProps {
 
 export const CompanyCard = ({ company, isActive }: CompanyCardProps) => {
   const router = useRouter()
+  const { lang } = useDictionary()
 
   const handleClick = () => {
     // Просто переходим на страницу компании
-    router.push(`/companies/company/${company.id}`)
+    router.push(`/${lang}/companies/company/${company.id}`)
   }
 
   const handleMouseEnter = () => {
-    router.prefetch(`/companies/company/${company.id}`)
+    router.prefetch(`/${lang}/companies/company/${company.id}`)
   }
 
   const companyInitials =

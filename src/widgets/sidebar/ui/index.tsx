@@ -23,17 +23,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import Link from 'next/link'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { usePathname } from 'next/navigation'
+import { useDictionary } from '@/shared/lib/hooks'
+import { LanguageSwitcher } from '@/shared/ui/language-switcher'
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { user } = useAuthStore()
+  const { dictionary, lang } = useDictionary()
 
   const canAccessCompanies = user ? user.role : false
 
   return (
     <Sidebar>
       <SidebarHeader className="items-center p-6">
-        <Link href="/">
+        <Link href={`/${lang}`}>
           <Icon name="common/logo" width={32} height={32} />
         </Link>
       </SidebarHeader>
@@ -41,10 +44,12 @@ export function AppSidebar() {
         <SidebarMenu className="items-center">
           <SidebarMenuItem>
             <SidebarMenuButton
-              isActive={pathname === '/'}
-              tooltip="Dashboard"
+              isActive={
+                pathname === `/${lang}` || pathname === `/${lang}/dashboard`
+              }
+              tooltip={dictionary.home.navigation.dashboard}
               asChild>
-              <Link href="/">
+              <Link href={`/${lang}`}>
                 <Compass className="w-5 h-5" />
               </Link>
             </SidebarMenuButton>
@@ -54,9 +59,9 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 isActive={pathname?.includes('/companies')}
-                tooltip="Companies"
+                tooltip={dictionary.home.navigation.companies}
                 asChild>
-                <Link href="/companies">
+                <Link href={`/${lang}/companies`}>
                   <Building2 className="w-5 h-5" />
                 </Link>
               </SidebarMenuButton>
@@ -66,9 +71,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname?.includes('/drivers')}
-              tooltip="Drivers"
+              tooltip={dictionary.home.navigation.drivers}
               asChild>
-              <Link href="/drivers">
+              <Link href={`/${lang}/drivers`}>
                 <UsersRound className="w-5 h-5" />
               </Link>
             </SidebarMenuButton>
@@ -77,9 +82,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname?.includes('/truck-models')}
-              tooltip="Truck-models"
+              tooltip={dictionary.home.navigation.truck_models}
               asChild>
-              <Link href="/truck-models">
+              <Link href={`/${lang}/truck-models`}>
                 <Truck className="w-5 h-5" />
               </Link>
             </SidebarMenuButton>
@@ -99,6 +104,9 @@ export function AppSidebar() {
             <SidebarMenuButton>
               <HelpCircle className="w-5 h-5" />
             </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <LanguageSwitcher />
           </SidebarMenuItem>
 
           <Avatar>

@@ -16,7 +16,7 @@ export const TruckModelList = () => {
   const { user } = useAuthStore()
   const activeTruckGroupId = typeof params?.id === 'string' ? params.id : null
 
-  const { dictionary } = useDictionary()
+  const { dictionary, lang } = useDictionary()
   const { data: truckGroups = [], isLoading } = useQuery(
     truckGroupQueries.list(),
   )
@@ -41,11 +41,11 @@ export const TruckModelList = () => {
         (group) => group.id === user.companyId,
       )
       if (userCompany) {
-        router.push(`/truck-models/truck-model/${userCompany.id}`)
+        router.push(`/${lang}/truck-models/truck-model/${userCompany.id}`)
       } else {
         // Если компания не найдена, выбираем первую
         const firstTruckGroup = filteredTruckGroups[0]
-        router.push(`/truck-models/truck-model/${firstTruckGroup.id}`)
+        router.push(`/${lang}/truck-models/truck-model/${firstTruckGroup.id}`)
       }
     }
   }, [
@@ -54,6 +54,7 @@ export const TruckModelList = () => {
     isLoading,
     router,
     user?.companyId,
+    lang,
   ])
 
   const handleFilterChange = useCallback((filters: { search?: string }) => {
@@ -65,7 +66,7 @@ export const TruckModelList = () => {
       <ListFilters
         onChange={handleFilterChange}
         initialSearch={filterText}
-        placeholder="Search truck models..."
+        placeholder={dictionary.home.truck_models.search_truck_models}
       />
 
       <GenericList
@@ -74,7 +75,7 @@ export const TruckModelList = () => {
         skeleton={Array.from({ length: 12 }).map((_, i) => (
           <CardSkeleton key={i} />
         ))}
-        emptyMessage="No truck models found"
+        emptyMessage={dictionary.home.truck_models.no_truck_models_found}
         renderItem={(truckGroup) => (
           <TruckGroupCard
             key={truckGroup.id}

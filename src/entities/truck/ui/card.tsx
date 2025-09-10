@@ -8,6 +8,7 @@ import { StatusLabel } from '@/shared/ui'
 import { Truck } from '../model/types/truck'
 import { useConnection } from '@/shared/lib/context'
 import { useTruckStats } from '../lib'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface CardProps {
   truck: Truck
@@ -17,13 +18,14 @@ interface CardProps {
 export const Card = ({ truck, isActive }: CardProps) => {
   const router = useRouter()
   const { isConnected } = useConnection()
+  const { lang } = useDictionary()
 
   const handleClick = () => {
-    router.push(`/truck/${truck.id}`)
+    router.push(`/${lang}/truck/${truck.id}`)
   }
 
   const handleMouseEnter = () => {
-    router.prefetch(`/truck/${truck.id}`)
+    router.prefetch(`/${lang}/truck/${truck.id}`)
   }
 
   const { stats, isLoading } = useTruckStats(truck.id, isConnected)

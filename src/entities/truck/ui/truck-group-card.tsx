@@ -4,6 +4,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@/shared/ui'
 import { TruckGroup } from '../model'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface TruckGroupCardProps {
   truckGroup: TruckGroup
@@ -15,13 +16,14 @@ export const TruckGroupCard = ({
   isActive,
 }: TruckGroupCardProps) => {
   const router = useRouter()
+  const { lang } = useDictionary()
 
   const handleClick = () => {
-    router.push(`/truck-models/truck-model/${truckGroup.id}`)
+    router.push(`/${lang}/truck-models/truck-model/${truckGroup.id}`)
   }
 
   const handleMouseEnter = () => {
-    router.prefetch(`/truck-models/truck-model/${truckGroup.id}`)
+    router.prefetch(`/${lang}/truck-models/truck-model/${truckGroup.id}`)
   }
 
   return (

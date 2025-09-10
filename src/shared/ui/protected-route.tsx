@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react'
 import { useAuthStore } from '@/shared/store/auth-store'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -12,12 +12,18 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, fallback }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/auth/sign-in')
+      // Extract locale from current pathname
+      const segments = pathname?.split('/') || []
+      const locale =
+        segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
+
+      router.push(`/${locale}/auth/sign-in`)
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router, pathname])
 
   if (isLoading) {
     return (

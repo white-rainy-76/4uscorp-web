@@ -170,7 +170,11 @@ export default function TruckInfo() {
 
   useEffect(() => {
     if (!truckId || (isTruckError && !isTruckLoading)) {
-      router.replace('/404')
+      // Extract locale from current pathname and redirect to 404 with locale
+      const segments = window.location.pathname.split('/')
+      const locale =
+        segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
+      router.replace(`/${locale}/404`)
     }
   }, [truckId, isTruckError, isTruckLoading, router])
 

@@ -5,7 +5,13 @@
       "send_route": "Отправить маршрут",
       "create": "Создать маршрут",
       "adjust": "Изменить маршрут",
-      "loading": "Пожалуйста, подождите"
+      "loading": "Пожалуйста, подождите",
+      "submit": "Отправить",
+      "save": "Сохранить",
+      "save_changes": "Сохранить изменения",
+      "add_company": "Добавить компанию",
+      "add_driver": "Добавить водителя",
+      "update_driver": "Обновить водителя"
     },
     "errors": {
       "departure_required_error": "Выберите точку отправления",
@@ -13,14 +19,83 @@
       "different_points": "Точки отправления и назначения должны быть разными",
       "invalid_weight": "Пожалуйста, введите корректный вес",
       "invalid_fuel": "Пожалуйста, введите корректный объем топлива",
-      "valid": "Введите корректный адрес"
+      "min_fuel": "Объем топлива должен быть не менее 0",
+      "max_fuel": "Объем топлива не может превышать 200",
+      "valid": "Введите корректный адрес",
+      "error": "Ошибка"
     },
     "input_fields": {
       "find_unit_placeholder": "Поиск по номеру юнита",
       "departure_placeholder": "Место отправления",
       "destination_placeholder": "Пункт назначения",
       "weight": "Вес",
-      "weight_placeholder": "Введите вес"
+      "weight_placeholder": "Введите вес",
+      "company_name": "Название компании",
+      "company_name_placeholder": "Введите название компании",
+      "samsara_token": "Samsara токен",
+      "samsara_token_placeholder": "Введите Samsara токен",
+      "full_name": "Полное имя",
+      "full_name_placeholder": "Введите полное имя",
+      "phone": "Телефон",
+      "phone_placeholder": "Введите номер телефона",
+      "email": "Email",
+      "email_placeholder": "Введите email адрес",
+      "telegram_link": "Telegram ссылка",
+      "telegram_link_placeholder": "Введите Telegram ссылку",
+      "fuel_capacity": "Бак (л)",
+      "fuel_capacity_placeholder": "Введите объем бака",
+      "weight_kg": "Вес (кг)",
+      "weight_kg_placeholder": "Введите вес",
+      "liters": "Литры",
+      "search_companies": "Поиск компаний...",
+      "search_drivers": "Поиск водителей..."
+    },
+    "bonus": {
+      "amount": "Сумма бонуса",
+      "amount_placeholder": "Введите сумму бонуса",
+      "reason": "Причина",
+      "reason_placeholder": "Выберите причину",
+      "add_bonus": "Добавить бонус",
+      "remove_bonus": "Убрать бонус",
+      "reasons": {
+        "birthday": "День рождения",
+        "good_work": "Хорошая работа",
+        "overtime": "Сверхурочные",
+        "bonus": "Бонус",
+        "achievement": "Достижение",
+        "holiday": "Праздник"
+      }
+    },
+    "truck": {
+      "select_truck": "Выберите трак",
+      "select_truck_placeholder": "Выберите трак...",
+      "search_truck": "Поиск траков...",
+      "truck_not_found": "Траки не найдены",
+      "detach_from_truck": "Открепить от трака",
+      "current_truck": "Текущий трак",
+      "unit_not_specified": "Юнит не указан",
+      "detach_from_truck_btn": "Открепить от трака",
+      "attach_to_truck": "Прикрепить к траку"
+    },
+    "modals": {
+      "detach_driver_from_truck": "Открепить драйвера от трака",
+      "attach_driver_to_truck": "Прикрепить драйвера к траку",
+      "add_bonuses": "Добавить бонусы",
+      "remove_bonuses": "Убавить бонусы"
+    },
+    "validation": {
+      "min_bonus": "Минимальная сумма бонуса 1",
+      "min_fuel_capacity": "Минимальная емкость бака 0",
+      "min_weight": "Минимальный вес 0",
+      "name_required": "Имя обязательно",
+      "phone_required": "Телефон обязателен",
+      "invalid_email": "Некорректный email",
+      "invalid_telegram_url": "Некорректная ссылка на Telegram",
+      "company_name_required": "Название компании обязательно",
+      "invalid_user_id": "Некорректный ID пользователя",
+      "invalid_company_id": "Некорректный ID компании",
+      "driver_id_required": "ID водителя обязателен",
+      "samsara_token_required": "Samsara токен обязателен"
     },
     "headings": {
       "driver_info": "Информация о водителе",
@@ -30,7 +105,7 @@
     "status": {
       "active": "В дороге",
       "inactive": "Неактивен",
-      "idle": "Холостой ход"
+      "idle": "Дрейф"
     },
     "driver_info": {
       "fuel": "Топливо",
@@ -45,10 +120,95 @@
       "miles_next": "миль до следующей",
       "stop_order": "Порядок остановки",
       "price": "Цена",
-      "save": "Сохранить"
+      "save": "Сохранить",
+      "discount": "Скидка",
+      "total": "Итог",
+      "fuel_before_station": "Топливо до заправки"
     },
     "trucks": {
       "no_trucks_found": "По вашему запросу траки не найдены"
+    },
+    "route": {
+      "departure_city": "Город отправки",
+      "destination_city": "Город назначения",
+      "adjust_route": "Корректировать маршрут",
+      "create_route": "Создать маршрут"
+    },
+    "gas_station": {
+      "add_to_cart": "Добавить в корзину",
+      "remove_from_cart": "Удалить из корзины",
+      "price": "Цена",
+      "discount": "Скидка",
+      "total": "Итог",
+      "fuel_before_station": "Топливо до заправки"
+    },
+    "navigation": {
+      "dashboard": "Панель управления",
+      "companies": "Компании",
+      "drivers": "Водители",
+      "truck_models": "Модели грузовиков"
+    },
+    "lists": {
+      "no_companies_found": "Компании не найдены",
+      "no_drivers_found": "Водители не найдены",
+      "no_trucks_found": "Грузовики не найдены"
+    },
+    "auth": {
+      "sign_in": "Войти",
+      "login": "Логин",
+      "login_placeholder": "Введите логин",
+      "password": "Пароль",
+      "password_placeholder": "Введите пароль",
+      "continue": "Продолжить",
+      "info_text": "Введите данные, отправленные вам вашим менеджером",
+      "username_required": "Логин обязателен"
+    },
+    "route_panel": {
+      "drive_time": "Время в пути:",
+      "miles": "Мили:",
+      "gallons": "Галлоны:",
+      "tolls": "Платные дороги:",
+      "fuel_left": "Остаток топлива",
+      "total_price": "Общая цена:",
+      "filter": "Фильтр",
+      "fuel_providers": "Поставщики топлива",
+      "gas_stations_list": "Список заправок",
+      "items_count": "шт.",
+      "address": "Адрес",
+      "refuel": "Заправка:",
+      "algorithmic": "⭐ Алгоритмическая",
+      "delete": "удалить",
+      "no_stations_selected": "Заправки не выбраны",
+      "add_stations_message": "Добавьте заправки в корзину для планирования маршрута"
+    },
+    "drivers": {
+      "select_driver": "Выберите водителя",
+      "choose_driver_message": "Выберите водителя из списка для просмотра деталей",
+      "drivers": "Водители",
+      "loading_driver": "Загрузка водителя...",
+      "driver_not_found": "Водитель не найден",
+      "full_name": "Полное имя",
+      "phone": "Телефон",
+      "email": "Email",
+      "telegram": "Telegram",
+      "unit_number": "Номер единицы",
+      "bonuses": "Бонусы",
+      "change": "изменить",
+      "add": "Добавить +",
+      "add_bonus": "Добавить",
+      "decrease_bonus": "Убавить"
+    },
+    "truck_models": {
+      "select_truck_model": "Выберите модель трака",
+      "choose_truck_model_message": "Выберите модель трака из списка для просмотра деталей",
+      "truck_fleet": "Автопарк",
+      "loading_truck_model": "Загрузка модели трака...",
+      "truck_model_not_found": "Модель трака не найдена",
+      "truck_model_info": "Информация о модели трака",
+      "weight": "Вес",
+      "fuel_capacity": "Объем бака",
+      "search_truck_models": "Поиск моделей траков...",
+      "no_truck_models_found": "Модели траков не найдены"
     }
   }
 }

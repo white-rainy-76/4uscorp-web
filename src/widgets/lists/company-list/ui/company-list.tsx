@@ -14,7 +14,7 @@ export const CompanyList = () => {
   const router = useRouter()
   const activeCompanyId = typeof params?.id === 'string' ? params.id : null
 
-  const { dictionary } = useDictionary()
+  const { dictionary, lang } = useDictionary()
   const { data: companies = [], isLoading } = useQuery(companyQueries.list())
 
   const filteredCompanies = useMemo(() => {
@@ -28,9 +28,9 @@ export const CompanyList = () => {
   useEffect(() => {
     if (filteredCompanies.length > 0 && !activeCompanyId && !isLoading) {
       const firstCompany = filteredCompanies[0]
-      router.push(`/companies/company/${firstCompany.id}`)
+      router.push(`/${lang}/companies/company/${firstCompany.id}`)
     }
-  }, [filteredCompanies, activeCompanyId, isLoading, router])
+  }, [filteredCompanies, activeCompanyId, isLoading, router, lang])
 
   const handleFilterChange = useCallback((filters: { search?: string }) => {
     setFilterText(filters.search ?? '')
@@ -41,7 +41,7 @@ export const CompanyList = () => {
       <ListFilters
         onChange={handleFilterChange}
         initialSearch={filterText}
-        placeholder="Search companies..."
+        placeholder={dictionary.home.input_fields.search_companies}
       />
 
       <GenericList
@@ -50,7 +50,7 @@ export const CompanyList = () => {
         skeleton={Array.from({ length: 12 }).map((_, i) => (
           <CompanyCardSkeleton key={i} />
         ))}
-        emptyMessage="No companies found"
+        emptyMessage={dictionary.home.lists.no_companies_found}
         renderItem={(company) => (
           <CompanyCard
             key={company.id}

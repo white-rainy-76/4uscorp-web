@@ -14,7 +14,7 @@ export const DriverList = () => {
   const router = useRouter()
   const activeDriverId = typeof params?.id === 'string' ? params.id : null
 
-  const { dictionary } = useDictionary()
+  const { dictionary, lang } = useDictionary()
   const { data: drivers = [], isLoading } = useQuery(driverQueries.list())
 
   const filteredDrivers = useMemo(() => {
@@ -28,9 +28,9 @@ export const DriverList = () => {
   useEffect(() => {
     if (filteredDrivers.length > 0 && !activeDriverId && !isLoading) {
       const firstDriver = filteredDrivers[0]
-      router.push(`/drivers/driver/${firstDriver.id}`)
+      router.push(`/${lang}/drivers/driver/${firstDriver.id}`)
     }
-  }, [filteredDrivers, activeDriverId, isLoading, router])
+  }, [filteredDrivers, activeDriverId, isLoading, router, lang])
 
   const handleFilterChange = useCallback((filters: { search?: string }) => {
     setFilterText(filters.search ?? '')
@@ -41,7 +41,7 @@ export const DriverList = () => {
       <ListFilters
         onChange={handleFilterChange}
         initialSearch={filterText}
-        placeholder="Search drivers..."
+        placeholder={dictionary.home.input_fields.search_drivers}
       />
 
       <GenericList
@@ -50,7 +50,7 @@ export const DriverList = () => {
         skeleton={Array.from({ length: 12 }).map((_, i) => (
           <DriverCardSkeleton key={i} />
         ))}
-        emptyMessage="No drivers found"
+        emptyMessage={dictionary.home.lists.no_drivers_found}
         renderItem={(driver) => (
           <DriverCard
             key={driver.id}

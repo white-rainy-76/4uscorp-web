@@ -9,6 +9,7 @@ import { Coordinate } from '@/shared/types'
 import { useAssignRouteMutation } from '@/entities/route/api/assign-route.mutation'
 import { useState } from 'react'
 import { Icon } from '@/shared/ui'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface TruckRouteInfoProps {
   truck: Truck
@@ -46,9 +47,11 @@ export const TruckRouteInfo = ({
   truck,
   selectedRouteId,
 }: TruckRouteInfoProps) => {
+  const { dictionary } = useDictionary()
   const [isEditing, setIsEditing] = useState(false)
-  const displayOrigin = originName || 'Город отправки'
-  const displayDestination = destinationName || 'Город назначения'
+  const displayOrigin = originName || dictionary.home.route.departure_city
+  const displayDestination =
+    destinationName || dictionary.home.route.destination_city
 
   const { mutateAsync: AssignRoute, isPending: isAssignLoading } =
     useAssignRouteMutation({})
@@ -77,7 +80,7 @@ export const TruckRouteInfo = ({
               routeSectionId: selectedRouteId ? selectedRouteId : '',
             })
           }>
-          Submit
+          {dictionary.home.buttons.submit}
         </Button>
       </div>
     )
@@ -121,7 +124,9 @@ export const TruckRouteInfo = ({
       </div>
 
       <Button onClick={() => setIsEditing(true)} className="rounded-full">
-        {isRoute ? 'Корректировать маршрут' : 'Создать маршрут'}
+        {isRoute
+          ? dictionary.home.route.adjust_route
+          : dictionary.home.route.create_route}
       </Button>
     </div>
   )

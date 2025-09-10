@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Navigation2 } from 'lucide-react'
 import { Icon } from '@/shared/ui'
 import { TruckStatsUpdate } from '@/shared/types'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface TruckMarkerProps {
   truckInfo: TruckStatsUpdate
@@ -27,6 +28,7 @@ export const TruckMarker = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const router = useRouter()
+  const { lang } = useDictionary()
 
   const pointQueue = useRef<
     { lat: number; lng: number; headingDegrees: number }[]
@@ -122,7 +124,7 @@ export const TruckMarker = ({
   }
 
   const handleMenuClick = () => {
-    router.push(`/truck/${truckInfo.truckId}`)
+    router.push(`/${lang}/truck/${truckInfo.truckId}`)
   }
 
   return (

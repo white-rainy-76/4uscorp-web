@@ -10,6 +10,7 @@ import {
   SetTruckGroupWeightFuelPayloadSchema,
 } from '../api/payload/set-truck-group-weight-fuel.payload'
 import { TruckGroup } from '@/entities/truck'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface SetTruckGroupWeightFuelFormProps {
   onClose: () => void
@@ -20,6 +21,7 @@ export const SetTruckGroupWeightFuelForm = ({
   onClose,
   truckGroup,
 }: SetTruckGroupWeightFuelFormProps) => {
+  const { dictionary } = useDictionary()
   const {
     register,
     handleSubmit,
@@ -60,15 +62,18 @@ export const SetTruckGroupWeightFuelForm = ({
       {/* Fuel Capacity Field */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Бак (л)
+          {dictionary.home.input_fields.fuel_capacity}
         </label>
         <Input
           {...register('fuelCapacity', {
             valueAsNumber: true,
-            min: { value: 0, message: 'Минимум 0 литров' },
+            min: {
+              value: 0,
+              message: dictionary.home.validation.min_fuel_capacity,
+            },
           })}
           type="number"
-          placeholder="Введите объем бака"
+          placeholder={dictionary.home.input_fields.fuel_capacity_placeholder}
           variant="gray"
           className={errors.fuelCapacity ? 'border-red-500' : ''}
         />
@@ -80,15 +85,15 @@ export const SetTruckGroupWeightFuelForm = ({
       {/* Weight Field */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Вес (кг)
+          {dictionary.home.input_fields.weight_kg}
         </label>
         <Input
           {...register('weight', {
             valueAsNumber: true,
-            min: { value: 0, message: 'Минимум 0 кг' },
+            min: { value: 0, message: dictionary.home.validation.min_weight },
           })}
           type="number"
-          placeholder="Введите вес"
+          placeholder={dictionary.home.input_fields.weight_kg_placeholder}
           variant="gray"
           className={errors.weight ? 'border-red-500' : ''}
         />
@@ -102,7 +107,9 @@ export const SetTruckGroupWeightFuelForm = ({
         type="submit"
         disabled={isPending}
         className="w-full rounded-[22px]">
-        {isPending ? 'Загрузка...' : 'Сохранить изменения'}
+        {isPending
+          ? dictionary.home.buttons.loading
+          : dictionary.home.buttons.save_changes}
       </Button>
     </form>
   )

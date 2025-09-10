@@ -15,6 +15,10 @@ export const getLocalizedErrorMessage = (
       return dictionary.home.errors.invalid_weight
     case 'invalidFuel':
       return dictionary.home.errors.invalid_fuel
+    case 'minFuel':
+      return dictionary.home.errors.min_fuel
+    case 'maxFuel':
+      return dictionary.home.errors.max_fuel
     case 'valid':
       return dictionary.home.errors.valid
     default:

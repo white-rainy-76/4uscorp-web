@@ -10,6 +10,7 @@ import {
   UpdateDriverPayloadSchema,
 } from '../api/payload/update-driver.payload'
 import { Driver } from '@/entities/driver'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface UpdateDriverFormProps {
   onClose: () => void
@@ -20,6 +21,7 @@ export const UpdateDriverForm = ({
   onClose,
   driver,
 }: UpdateDriverFormProps) => {
+  const { dictionary } = useDictionary()
   const {
     register,
     handleSubmit,
@@ -67,11 +69,11 @@ export const UpdateDriverForm = ({
       {/* Full Name */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Full Name
+          {dictionary.home.input_fields.full_name}
         </label>
         <Input
           {...register('fullName')}
-          placeholder="Enter full name"
+          placeholder={dictionary.home.input_fields.full_name_placeholder}
           variant="gray"
           className={errors.fullName ? 'border-red-500' : ''}
         />
@@ -83,12 +85,12 @@ export const UpdateDriverForm = ({
       {/* Phone */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Phone
+          {dictionary.home.input_fields.phone}
         </label>
         <Input
           {...register('phone')}
           variant="gray"
-          placeholder="Enter phone number"
+          placeholder={dictionary.home.input_fields.phone_placeholder}
           className={errors.phone ? 'border-red-500' : ''}
         />
         {errors.phone && (
@@ -99,13 +101,13 @@ export const UpdateDriverForm = ({
       {/* Email */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Email
+          {dictionary.home.input_fields.email}
         </label>
         <Input
           {...register('email')}
           variant="gray"
           type="email"
-          placeholder="Enter email address"
+          placeholder={dictionary.home.input_fields.email_placeholder}
           className={errors.email ? 'border-red-500' : ''}
         />
         {errors.email && (
@@ -116,12 +118,12 @@ export const UpdateDriverForm = ({
       {/* Telegram Link */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Telegram Link
+          {dictionary.home.input_fields.telegram_link}
         </label>
         <Input
           {...register('telegramLink')}
           variant="gray"
-          placeholder="Enter Telegram link"
+          placeholder={dictionary.home.input_fields.telegram_link_placeholder}
           className={errors.telegramLink ? 'border-red-500' : ''}
         />
         {errors.telegramLink && (
@@ -134,7 +136,9 @@ export const UpdateDriverForm = ({
         type="submit"
         disabled={isPending}
         className="w-full rounded-[22px]">
-        {isPending ? 'Loading...' : 'Update Driver'}
+        {isPending
+          ? dictionary.home.buttons.loading
+          : dictionary.home.buttons.update_driver}
       </Button>
     </form>
   )

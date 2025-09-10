@@ -9,6 +9,7 @@ import { Directions as DirectionsType } from '@/features/directions/api'
 import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'
 import { MapControl, ControlPosition } from '@vis.gl/react-google-maps'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface Props {
   selectedRouteId: string | null
@@ -54,6 +55,7 @@ export const RoutePanelOnMap = ({
   routeByIdTotalFuelAmount,
   routeByIdTotalPriceAmount,
 }: Props) => {
+  const { dictionary } = useDictionary()
   const route = directions?.route.find(
     (r) => r.routeSectionId === selectedRouteId,
   )
@@ -107,19 +109,25 @@ export const RoutePanelOnMap = ({
       <div className="w-[341px] p-4 bg-white rounded-xl shadow-lg space-y-5 border border-[#E1E5EA] z-[100] pointer-events-auto font-nunito">
         <div className="grid grid-cols-4 gap-x-2 text-sm text-text-neutral font-semibold">
           <div className="flex flex-col items-start">
-            <span className="font-normal">Drive time:</span>
+            <span className="font-normal">
+              {dictionary.home.route_panel.drive_time}
+            </span>
             <span className=" font-bold whitespace-nowrap">
               {displayDriveTime}
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal">Miles:</span>
+            <span className="font-normal">
+              {dictionary.home.route_panel.miles}
+            </span>
             <span className=" font-bold whitespace-nowrap">
               {displayMiles}mi
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal ">Gallons:</span>
+            <span className="font-normal ">
+              {dictionary.home.route_panel.gallons}
+            </span>
             <span className="font-bold whitespace-nowrap">
               {(
                 updatedFuelAmount ??
@@ -129,19 +137,25 @@ export const RoutePanelOnMap = ({
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal ">Tolls:</span>
+            <span className="font-normal ">
+              {dictionary.home.route_panel.tolls}
+            </span>
             <span className=" font-bold whitespace-nowrap">
               ${routeInfo?.tolls ?? '-'}
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal ">Fuel Left</span>
+            <span className="font-normal ">
+              {dictionary.home.route_panel.fuel_left}
+            </span>
             <span className=" font-bold whitespace-nowrap">
               {displayFuelAmount?.toFixed(2) ?? '-'}
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal ">Total Price:</span>
+            <span className="font-normal ">
+              {dictionary.home.route_panel.total_price}
+            </span>
             <span className=" font-bold whitespace-nowrap">
               $
               {(
@@ -155,12 +169,14 @@ export const RoutePanelOnMap = ({
 
         {/* Filter Section */}
         <div className="space-y-2">
-          <h3 className="font-black text-xl mb-2 text-text-heading">Фильтр</h3>
+          <h3 className="font-black text-xl mb-2 text-text-heading">
+            {dictionary.home.route_panel.filter}
+          </h3>
           <MultiSelect
             options={FUEL_PROVIDERS}
             value={selectedProviders}
             onValueChange={onFilterChange}
-            placeholder="Fuel Providers"
+            placeholder={dictionary.home.route_panel.fuel_providers}
             modalPopover={true}
             className="w-full"
           />
@@ -170,10 +186,11 @@ export const RoutePanelOnMap = ({
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <h3 className="font-extrabold text-xl text-[#192A3E]">
-              Список заправок
+              {dictionary.home.route_panel.gas_stations_list}
             </h3>
             <span className="text-sm text-[#9BA9BB] font-medium">
-              {Object.keys(cart).length} шт.
+              {Object.keys(cart).length}{' '}
+              {dictionary.home.route_panel.items_count}
             </span>
           </div>
           <ScrollArea className="h-40">
@@ -197,17 +214,18 @@ export const RoutePanelOnMap = ({
                           )
                         }>
                         <span className="text-[#9BA9BB] font-normal block text-xs">
-                          Адрес
+                          {dictionary.home.route_panel.address}
                         </span>
                         <span className="font-bold text-xs leading-4">
                           {station.address}
                         </span>
                         <span className="text-[#9BA9BB] font-normal block text-xs mt-1">
-                          Заправка: {cartItem.refillLiters} л
+                          {dictionary.home.route_panel.refuel}{' '}
+                          {cartItem.refillLiters} л
                         </span>
                         {station.isAlgorithm && (
                           <span className="text-[#F59E0B] font-normal block text-xs mt-1">
-                            ⭐ Алгоритмическая
+                            {dictionary.home.route_panel.algorithmic}
                           </span>
                         )}
                       </div>
@@ -215,16 +233,18 @@ export const RoutePanelOnMap = ({
                       <button
                         className="text-[#D84949] font-bold text-sm underline whitespace-nowrap ml-auto hover:text-red-700"
                         onClick={() => onDeleteGasStation(stationId)}>
-                        delete
+                        {dictionary.home.route_panel.delete}
                       </button>
                     </div>
                   )
                 })
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-500">Заправки не выбраны</p>
+                  <p className="text-sm text-gray-500">
+                    {dictionary.home.route_panel.no_stations_selected}
+                  </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Добавьте заправки в корзину для планирования маршрута
+                    {dictionary.home.route_panel.add_stations_message}
                   </p>
                 </div>
               )}

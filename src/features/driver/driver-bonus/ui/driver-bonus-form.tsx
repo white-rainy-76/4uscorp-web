@@ -21,6 +21,7 @@ import {
   DriverBonusPayloadSchema,
 } from '../api/payload/driver-bonus.payload'
 import { Driver } from '@/entities/driver'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface DriverBonusFormProps {
   onClose: () => void
@@ -28,20 +29,22 @@ interface DriverBonusFormProps {
   actionType: 'increase' | 'decrease'
 }
 
-const BONUS_REASONS = [
-  { value: 'birthday', label: 'День рождения' },
-  { value: 'good_work', label: 'Хорошая работа' },
-  { value: 'overtime', label: 'Сверхурочная работа' },
-  { value: 'bonus', label: 'Просто так' },
-  { value: 'achievement', label: 'Достижение' },
-  { value: 'holiday', label: 'Праздник' },
-]
-
 export const DriverBonusForm = ({
   onClose,
   driver,
   actionType,
 }: DriverBonusFormProps) => {
+  const { dictionary } = useDictionary()
+
+  const BONUS_REASONS = [
+    { value: 'birthday', label: dictionary.home.bonus.reasons.birthday },
+    { value: 'good_work', label: dictionary.home.bonus.reasons.good_work },
+    { value: 'overtime', label: dictionary.home.bonus.reasons.overtime },
+    { value: 'bonus', label: dictionary.home.bonus.reasons.bonus },
+    { value: 'achievement', label: dictionary.home.bonus.reasons.achievement },
+    { value: 'holiday', label: dictionary.home.bonus.reasons.holiday },
+  ]
+
   const {
     register,
     handleSubmit,
@@ -107,15 +110,15 @@ export const DriverBonusForm = ({
       {/* Bonus Amount Field */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Количество бонусов
+          {dictionary.home.bonus.amount}
         </label>
         <Input
           {...register('bonus', {
             valueAsNumber: true,
-            min: { value: 1, message: 'Минимум 1 бонус' },
+            min: { value: 1, message: dictionary.home.validation.min_bonus },
           })}
           type="number"
-          placeholder="Введите количество"
+          placeholder={dictionary.home.bonus.amount_placeholder}
           variant="gray"
           className={errors.bonus ? 'border-red-500' : ''}
         />
@@ -127,12 +130,14 @@ export const DriverBonusForm = ({
       {/* Reason Select */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Причина
+          {dictionary.home.bonus.reason}
         </label>
         <Select onValueChange={(value) => setValue('reason', value)}>
           <SelectTrigger
             className={`h-10 text-[#000000] border-gray-300 ${watchedReason ? 'bg-white' : 'bg-gray-50'}`}>
-            <SelectValue placeholder="Выберите причину" />
+            <SelectValue
+              placeholder={dictionary.home.bonus.reason_placeholder}
+            />
           </SelectTrigger>
           <SelectContent>
             {BONUS_REASONS.map((reason) => (
@@ -153,8 +158,10 @@ export const DriverBonusForm = ({
         disabled={isSubmitDisabled}
         className="w-full rounded-[22px]">
         {isIncreasing || isPending
-          ? 'Загрузка...'
-          : `${actionType === 'increase' ? 'Добавить' : 'Убавить'} бонусы`}
+          ? dictionary.home.buttons.loading
+          : actionType === 'increase'
+            ? dictionary.home.bonus.add_bonus
+            : dictionary.home.bonus.remove_bonus}
       </Button>
     </form>
   )

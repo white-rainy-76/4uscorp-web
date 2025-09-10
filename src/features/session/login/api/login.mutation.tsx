@@ -7,7 +7,7 @@ import { signIn } from './auth.service'
 import { signInPayloadSchema } from './payload/auth.payload'
 import { AuthResponse, SignInPayload } from '../model'
 import { useAuthStore } from '@/shared/store/auth-store'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 export function useSignInMutation(
   options: Pick<
@@ -23,6 +23,7 @@ export function useSignInMutation(
   const { mutationKey = [], onMutate, onError, onSettled } = options
   const { login } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
 
   return useMutation({
     mutationKey: ['auth', 'signIn', ...mutationKey],
@@ -43,8 +44,12 @@ export function useSignInMutation(
       // Login with the access token (refresh token is handled via httpOnly cookies)
       login(data.token)
 
-      // Redirect to dashboard
-      router.push('/')
+      // Extract locale from current pathname and redirect to main page
+      const segments = pathname?.split('/') || []
+      const locale =
+        segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
+
+      router.push(`/${locale}`)
     },
 
     onError: (error, variables, context) => {

@@ -10,6 +10,7 @@ import {
 
 import { Driver } from '@/entities/driver'
 import { DriverBonusForm } from './driver-bonus-form'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface DriverBonusModalProps {
   isOpen: boolean
@@ -24,12 +25,16 @@ export const DriverBonusModal = ({
   driver,
   actionType,
 }: DriverBonusModalProps) => {
+  const { dictionary } = useDictionary()
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-text-heading">
-            {actionType === 'increase' ? 'Добавить бонусы' : 'Убавить бонусы'}
+            {actionType === 'increase'
+              ? dictionary.home.modals.add_bonuses
+              : dictionary.home.modals.remove_bonuses}
           </DialogTitle>
         </DialogHeader>
 

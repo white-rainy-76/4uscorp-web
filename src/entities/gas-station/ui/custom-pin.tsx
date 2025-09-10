@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import { GasStation } from '../model/types/gas-station'
 import { Input } from '@/shared/ui'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface Props {
   setClicked: (value: boolean) => void
@@ -29,6 +30,7 @@ export const CustomPin: React.FC<Props> = ({
   getStationRefillLiters,
   getStationFuelLeftBeforeRefill,
 }) => {
+  const { dictionary } = useDictionary()
   // Инициализируем refillLiters из корзины или из исходных данных
   const [refillLiters, setRefillLiters] = useState<string>(
     getStationRefillLiters(gasStation).toString(),
@@ -86,25 +88,25 @@ export const CustomPin: React.FC<Props> = ({
 
         <div className="mt-2 p-2 bg-gray-100 rounded-md text-xs">
           <p className="text-gray-600">
-            Цена:{' '}
+            {dictionary.home.gas_station.price}:{' '}
             <span className="font-bold">
               {gasStation.fuelPrice?.price ?? 'N/A'}₴
             </span>
           </p>
           <p className="text-gray-600">
-            Скидка:{' '}
+            {dictionary.home.gas_station.discount}:{' '}
             <span className="font-bold text-orange-600">
               {gasStation.fuelPrice?.discount ?? 'N/A'}₴
             </span>
           </p>
           <p className="text-gray-600">
-            Итог:{' '}
+            {dictionary.home.gas_station.total}:{' '}
             <span className="font-bold text-green-600">
               {gasStation.fuelPrice?.finalPrice ?? 'N/A'}₴
             </span>
           </p>
           <p className="text-gray-600">
-            Fuel before gas station:{' '}
+            {dictionary.home.gas_station.fuel_before_station}:{' '}
             <span className="font-bold text-green-600">
               {updatedFuelLeftBeforeRefill.toFixed(2)}
             </span>
@@ -115,7 +117,7 @@ export const CustomPin: React.FC<Props> = ({
         {errorMessage && (
           <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded-md text-xs">
             <p className="text-red-700 font-semibold">
-              ⚠️ Ошибка: {errorMessage}
+              ⚠️ {dictionary.home.errors.error}: {errorMessage}
             </p>
           </div>
         )}
@@ -130,7 +132,7 @@ export const CustomPin: React.FC<Props> = ({
             onChange={(e) => setRefillLiters(e.target.value)}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
-            placeholder="Литры"
+            placeholder={dictionary.home.input_fields.liters}
           />
           {/* Кнопка обновления показывается только если заправка в корзине */}
           {isInCart && (
@@ -145,7 +147,9 @@ export const CustomPin: React.FC<Props> = ({
         <button
           className="mt-2 w-full px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
           onClick={handleCartClick}>
-          {isInCart ? 'Удалить из корзины' : 'Добавить в корзину'}
+          {isInCart
+            ? dictionary.home.gas_station.remove_from_cart
+            : dictionary.home.gas_station.add_to_cart}
         </button>
       </div>
 

@@ -9,12 +9,14 @@ import {
   AddDriverPayload,
   AddDriverPayloadSchema,
 } from '../api/payload/add-driver.payload'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface AddDriverFormProps {
   onClose: () => void
 }
 
 export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
+  const { dictionary } = useDictionary()
   const {
     register,
     handleSubmit,
@@ -50,11 +52,11 @@ export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
       {/* Full Name */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Full Name
+          {dictionary.home.input_fields.full_name}
         </label>
         <Input
           {...register('name')}
-          placeholder="Enter full name"
+          placeholder={dictionary.home.input_fields.full_name_placeholder}
           variant="gray"
           className={errors.name ? 'border-red-500' : ''}
         />
@@ -66,12 +68,12 @@ export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
       {/* Phone */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Phone
+          {dictionary.home.input_fields.phone}
         </label>
         <Input
           {...register('phone')}
           variant="gray"
-          placeholder="Enter phone number"
+          placeholder={dictionary.home.input_fields.phone_placeholder}
           className={errors.phone ? 'border-red-500' : ''}
         />
         {errors.phone && (
@@ -82,13 +84,13 @@ export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
       {/* Email */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Email
+          {dictionary.home.input_fields.email}
         </label>
         <Input
           {...register('email')}
           variant="gray"
           type="email"
-          placeholder="Enter email address"
+          placeholder={dictionary.home.input_fields.email_placeholder}
           className={errors.email ? 'border-red-500' : ''}
         />
         {errors.email && (
@@ -99,12 +101,12 @@ export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
       {/* Telegram Link */}
       <div className="space-y-3">
         <label className="block text-sm font-extrabold text-[#A8A8A8]">
-          Telegram Link
+          {dictionary.home.input_fields.telegram_link}
         </label>
         <Input
           {...register('telegramLink')}
           variant="gray"
-          placeholder="Enter Telegram link"
+          placeholder={dictionary.home.input_fields.telegram_link_placeholder}
           className={errors.telegramLink ? 'border-red-500' : ''}
         />
         {errors.telegramLink && (
@@ -117,7 +119,9 @@ export const AddDriverForm = ({ onClose }: AddDriverFormProps) => {
         type="submit"
         disabled={isPending}
         className="w-full rounded-[22px]">
-        {isPending ? 'Loading...' : 'Add Driver'}
+        {isPending
+          ? dictionary.home.buttons.loading
+          : dictionary.home.buttons.add_driver}
       </Button>
     </form>
   )
