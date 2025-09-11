@@ -153,38 +153,6 @@
       "no_drivers_found": "No drivers found",
       "no_trucks_found": "No trucks found"
     },
-    "validation": {
-      "min_fuel_capacity": "Minimum 0 liters",
-      "min_weight": "Minimum 0 kg",
-      "min_bonus": "Minimum 1 bonus"
-    },
-    "bonus": {
-      "amount": "Bonus amount",
-      "amount_placeholder": "Enter amount",
-      "reason": "Reason",
-      "reason_placeholder": "Select reason",
-      "add_bonus": "Add bonus",
-      "remove_bonus": "Remove bonus",
-      "reasons": {
-        "birthday": "Birthday",
-        "good_work": "Good work",
-        "overtime": "Overtime",
-        "bonus": "Just because",
-        "achievement": "Achievement",
-        "holiday": "Holiday"
-      }
-    },
-    "truck": {
-      "select_truck": "Select truck",
-      "select_truck_placeholder": "Select truck...",
-      "search_truck": "Search by truck number...",
-      "truck_not_found": "Truck not found",
-      "detach_from_truck": "Detach from truck",
-      "current_truck": "Current truck",
-      "unit_not_specified": "Unit not specified",
-      "attach_to_truck": "Attach to truck",
-      "detach_from_truck_btn": "Detach from truck"
-    },
     "auth": {
       "sign_in": "Sign in",
       "login": "Login",
