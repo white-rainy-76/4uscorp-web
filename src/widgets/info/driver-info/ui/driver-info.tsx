@@ -80,12 +80,18 @@ const DriverProfile = ({
       <div
         className={cn(
           'text-sm',
-          status === 'ACTIVE' ? 'text-green-600' : 'text-yellow-600',
+          status === 'ACTIVE'
+            ? 'text-green-500'
+            : status === 'INACTIVE'
+              ? 'text-red-500'
+              : 'text-gray-500',
         )}>
         ●{' '}
         {status === 'ACTIVE'
-          ? dictionary.home.status.inactive
-          : dictionary.home.status.active}
+          ? dictionary.home.status.active
+          : status === 'INACTIVE'
+            ? dictionary.home.status.inactive
+            : dictionary.home.status.idle}
       </div>
     </div>
   </div>
