@@ -12,6 +12,7 @@ interface Props {
   unitNumber: string
   clickedOutside: boolean
   resetClick: () => void
+  showPolyline?: boolean
 }
 
 export const TrackTruck = ({
@@ -19,6 +20,7 @@ export const TrackTruck = ({
   unitNumber,
   clickedOutside,
   resetClick,
+  showPolyline = true,
 }: Props) => {
   const { connection, isConnected } = useConnection()
   const [truckPath, setTruckPath] = useState<google.maps.LatLngLiteral[]>([])
@@ -61,7 +63,7 @@ export const TrackTruck = ({
         resetClick={resetClick}
       />
 
-      {truckPath.length > 1 && (
+      {showPolyline && truckPath.length > 1 && (
         <Polyline
           path={truckPath}
           strokeColor="#2D8CFF"

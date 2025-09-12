@@ -21,6 +21,7 @@ export const TrackTruckMarkers = ({
           unitNumber={truck.name}
           clickedOutside={clickedOutside}
           resetClick={resetClick}
+          showPolyline={false}
         />
       ))}
     </>
