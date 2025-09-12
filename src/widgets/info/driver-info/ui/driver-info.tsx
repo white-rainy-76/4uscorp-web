@@ -24,8 +24,8 @@ export const DriverInfo = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <DriverProfile
           avatarUrl={undefined}
-          name="Алексей Попов"
-          status="ACTIVE"
+          name={truck.driver?.fullName || 'N/A'}
+          status={truck.status}
           dictionary={dictionary}
         />
 
@@ -36,7 +36,7 @@ export const DriverInfo = ({
             isLoadingFuel={isLoadingFuel}
           />
           <BonusPoints
-            points={5000}
+            points={truck.driver?.bonus || 0}
             label={dictionary.home.driver_info.bonus}
           />
         </div>
