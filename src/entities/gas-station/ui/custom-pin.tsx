@@ -90,19 +90,19 @@ export const CustomPin: React.FC<Props> = ({
           <p className="text-gray-600">
             {dictionary.home.gas_station.price}:{' '}
             <span className="font-bold">
-              {gasStation.fuelPrice?.price ?? 'N/A'}₴
+              ${gasStation.fuelPrice?.price ?? 'N/A'}
             </span>
           </p>
           <p className="text-gray-600">
             {dictionary.home.gas_station.discount}:{' '}
             <span className="font-bold text-orange-600">
-              {gasStation.fuelPrice?.discount ?? 'N/A'}₴
+              ${gasStation.fuelPrice?.discount ?? 'N/A'}
             </span>
           </p>
           <p className="text-gray-600">
             {dictionary.home.gas_station.total}:{' '}
             <span className="font-bold text-green-600">
-              {gasStation.fuelPrice?.finalPrice ?? 'N/A'}₴
+              ${gasStation.fuelPrice?.finalPrice ?? 'N/A'}
             </span>
           </p>
           <p className="text-gray-600">

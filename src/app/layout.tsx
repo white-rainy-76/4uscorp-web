@@ -2,12 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Nunito as FontSans } from 'next/font/google'
 import { cn } from '@/shared/ui/utils'
-import {
-  ThemeProvider,
-  SocketProvider,
-  GoogleMapApiProvider,
-  AuthProvider,
-} from './providers'
+import { ThemeProvider, SocketProvider, AuthProvider } from './providers'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/shared/api/query-client'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -45,9 +40,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <SocketProvider>
-              <GoogleMapApiProvider>
-                <ThemeProvider>{children}</ThemeProvider>
-              </GoogleMapApiProvider>
+              <ThemeProvider>{children}</ThemeProvider>
               <ReactQueryDevtools initialIsOpen={false} />
             </SocketProvider>
           </AuthProvider>

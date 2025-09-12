@@ -7,8 +7,10 @@ import { reportLoadAttemptQueries } from '@/entities/file-upload'
 import { Spinner } from '@/shared/ui'
 import { ReportLoadAttempt } from '@/entities/file-upload/api/contracts/report-load-attempt.contract'
 import { FileUpload as ReportUpload } from '@/features/file-upload/upload-report'
+import { useDictionary } from '@/shared/lib/hooks'
 
 export const ReportsSection = () => {
+  const { dictionary } = useDictionary()
   const {
     data: reports = [],
     isLoading,
@@ -23,7 +25,9 @@ export const ReportsSection = () => {
     return (
       <div className="flex flex-col justify-center items-center py-8 gap-4">
         <Spinner />
-        <span className="text-muted-foreground">Загрузка отчётов...</span>
+        <span className="text-muted-foreground">
+          {dictionary.home.file_upload.loading_reports}
+        </span>
       </div>
     )
   }
@@ -32,8 +36,11 @@ export const ReportsSection = () => {
     return (
       <div className="text-center text-red-500 py-8">
         {error instanceof Error
-          ? `Ошибка загрузки отчётов: ${error.message}`
-          : 'Ошибка загрузки отчётов'}
+          ? dictionary.home.file_upload.loading_reports_error_with_message.replace(
+              '{{message}}',
+              error.message,
+            )
+          : dictionary.home.file_upload.loading_reports_error}
       </div>
     )
   }
@@ -56,7 +63,7 @@ export const ReportsSection = () => {
                       {new Date(report.startedAt).toLocaleDateString('en-CA')}
                     </span>
                     <span className="text-xs text-[#A8A8A8]">
-                      {report.totalFiles} файлов
+                      {report.totalFiles} {dictionary.home.file_upload.files}
                     </span>
                   </div>
                 </div>
@@ -68,7 +75,8 @@ export const ReportsSection = () => {
                       <Check className="w-4 h-4 text-green-500" />
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-green-500 font-medium">
-                          loaded {report.successfullyProcessedFiles}/
+                          {dictionary.home.file_upload.loaded}{' '}
+                          {report.successfullyProcessedFiles}/
                           {report.totalFiles}
                         </span>
                       </div>
@@ -77,7 +85,7 @@ export const ReportsSection = () => {
                     <>
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-red-500 font-medium">
-                          failed
+                          {dictionary.home.file_upload.failed}
                         </span>
                         <span className="text-xs text-red-500">
                           {report.failedFiles}/{report.totalFiles}
@@ -91,7 +99,7 @@ export const ReportsSection = () => {
           </div>
         ) : (
           <div className="text-center text-muted-foreground py-8">
-            Нет попыток загрузки отчётов
+            {dictionary.home.file_upload.no_report_attempts}
           </div>
         )}
       </div>

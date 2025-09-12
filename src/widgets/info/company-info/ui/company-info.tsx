@@ -60,7 +60,7 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
       {/* Manager Profile */}
       <div className="flex items-center gap-4">
         <Avatar className="w-12 h-12 flex-shrink-0">
@@ -81,10 +81,14 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
               onClick={handleAddManager}
               disabled={isManagerPending}
               className="font-nunito text-[#4964D8] font-extrabold text-base leading-6 hover:underline cursor-pointer">
-              {isManagerPending ? 'Добавление...' : 'Добавить +'}
+              {isManagerPending
+                ? dictionary.home.companies.adding
+                : dictionary.home.companies.add}
             </button>
           )}
-          <div className="text-sm text-text-muted">Менеджер</div>
+          <div className="text-sm text-text-muted">
+            {dictionary.home.companies.manager}
+          </div>
         </div>
       </div>
 
@@ -100,7 +104,9 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
           <div className="text-sm font-extrabold text-text-strong">
             {company.trucksCount}
           </div>
-          <div className="text-sm text-text-muted-alt">Автопарк</div>
+          <div className="text-sm text-text-muted-alt">
+            {dictionary.home.companies.truck_fleet}
+          </div>
         </div>
       </div>
 
@@ -118,17 +124,17 @@ export const CompanyInfo = ({ company }: CompanyInfoProps) => {
           {isCurrentCompany ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              Выбрана
+              {dictionary.home.companies.selected}
             </>
           ) : isUserPending ? (
-            'Выбор...'
+            dictionary.home.companies.selecting
           ) : (
-            'Выбрать компанию'
+            dictionary.home.companies.select_company_btn
           )}
         </Button>
       </div>
       {/* Action Buttons */}
-      <div className="flex gap-3 justify-start sm:justify-end">
+      <div className="flex gap-3 justify-center items-center">
         <ActionButton icon={<Phone className="w-5 h-5" />} />
         <ActionButton icon={<MessageSquare className="w-5 h-5" />} />
       </div>

@@ -5,6 +5,7 @@ import { cn } from '@/shared/ui'
 import { useUploadReportMutation } from '../api'
 import { useQueryClient } from '@tanstack/react-query'
 import { reportLoadAttemptQueries } from '@/entities/file-upload'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface FileUploadProps {
   className?: string
@@ -21,6 +22,7 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dragCounter, setDragCounter] = useState(0)
   const queryClient = useQueryClient()
+  const { dictionary } = useDictionary()
 
   const uploadMutation = useUploadReportMutation({
     onSuccess: () => {
@@ -116,18 +118,20 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
           <>
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-sm text-gray-600 mb-2">
-              Перетащите файл Pdf сюда или
+              {dictionary.home.file_upload.drag_pdf_file}
             </p>
             <Button
               variant="outline"
               size="sm"
               className="text-gray-600"
-              onClick={() => document.getElementById('report-file-input')?.click()}
+              onClick={() =>
+                document.getElementById('report-file-input')?.click()
+              }
               disabled={isUploading}>
-              Выберите файл
+              {dictionary.home.file_upload.select_file}
             </Button>
             <p className="text-xs text-gray-500 mt-2">
-              Поддерживаются файлы .pdf
+              {dictionary.home.file_upload.supported_pdf_format}
             </p>
           </>
         ) : (
@@ -172,12 +176,12 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
             {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Загрузка...
+                {dictionary.home.file_upload.uploading}
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить файл
+                {dictionary.home.file_upload.upload_file}
               </>
             )}
           </Button>
@@ -188,7 +192,10 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
       {uploadMutation.isError && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-600">
-            Ошибка загрузки: {uploadMutation.error?.message}
+            {dictionary.home.file_upload.upload_error.replace(
+              '{{message}}',
+              uploadMutation.error?.message || '',
+            )}
           </p>
         </div>
       )}
@@ -196,7 +203,9 @@ export const ReportUpload: React.FC<FileUploadProps> = ({
       {/* Success Message */}
       {uploadMutation.isSuccess && (
         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-sm text-green-600">Файл успешно загружен!</p>
+          <p className="text-sm text-green-600">
+            {dictionary.home.file_upload.file_uploaded_successfully}
+          </p>
         </div>
       )}
     </div>

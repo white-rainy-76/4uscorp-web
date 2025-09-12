@@ -221,7 +221,8 @@ export const RoutePanelOnMap = ({
                         </span>
                         <span className="text-[#9BA9BB] font-normal block text-xs mt-1">
                           {dictionary.home.route_panel.refuel}{' '}
-                          {cartItem.refillLiters} л
+                          {cartItem.refillLiters}{' '}
+                          {dictionary.home.input_fields.liters}
                         </span>
                         {station.isAlgorithm && (
                           <span className="text-[#F59E0B] font-normal block text-xs mt-1">

@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react'
 import { AddDriverModal } from './add-driver-modal'
+import { useDictionary } from '@/shared/lib/hooks'
 
 export const AddDriverButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { dictionary } = useDictionary()
 
   const handleAddClick = () => {
     setIsModalOpen(true)
@@ -19,7 +21,7 @@ export const AddDriverButton: React.FC = () => {
   return (
     <>
       <button onClick={handleAddClick} className={buttonStyles}>
-        add+
+        {dictionary.home.drivers.add}
       </button>
 
       <AddDriverModal isOpen={isModalOpen} onClose={handleCloseModal} />

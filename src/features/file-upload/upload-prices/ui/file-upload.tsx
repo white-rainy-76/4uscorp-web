@@ -5,6 +5,7 @@ import { cn } from '@/shared/ui'
 import { useUploadPricesMutation } from '../api'
 import { useQueryClient } from '@tanstack/react-query'
 import { priceLoadAttemptQueries } from '@/entities/file-upload'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface FileUploadProps {
   className?: string
@@ -21,6 +22,7 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [dragCounter, setDragCounter] = useState(0)
   const queryClient = useQueryClient()
+  const { dictionary } = useDictionary()
 
   const uploadMutation = useUploadPricesMutation({
     onSuccess: () => {
@@ -118,7 +120,7 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
           <>
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-sm text-gray-600 mb-2">
-              Перетащите файлы Excel сюда или
+              {dictionary.home.file_upload.drag_excel_files}
             </p>
             <Button
               variant="outline"
@@ -128,10 +130,10 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
                 document.getElementById('prices-file-input')?.click()
               }
               disabled={isUploading}>
-              Выберите файлы
+              {dictionary.home.file_upload.select_files}
             </Button>
             <p className="text-xs text-gray-500 mt-2">
-              Поддерживаются файлы .xls и .xlsx
+              {dictionary.home.file_upload.supported_excel_formats}
             </p>
           </>
         ) : (
@@ -181,12 +183,15 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
             {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Загрузка...
+                {dictionary.home.file_upload.uploading}
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить {selectedFiles.length} файл(ов)
+                {dictionary.home.file_upload.upload_files.replace(
+                  '{{count}}',
+                  selectedFiles.length.toString(),
+                )}
               </>
             )}
           </Button>
@@ -196,14 +201,19 @@ export const PricesUpload: React.FC<FileUploadProps> = ({
       {uploadMutation.isError && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-600">
-            Ошибка загрузки: {uploadMutation.error?.message}
+            {dictionary.home.file_upload.upload_error.replace(
+              '{{message}}',
+              uploadMutation.error?.message || '',
+            )}
           </p>
         </div>
       )}
 
       {uploadMutation.isSuccess && (
         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-sm text-green-600">Файлы успешно загружены!</p>
+          <p className="text-sm text-green-600">
+            {dictionary.home.file_upload.files_uploaded_successfully}
+          </p>
         </div>
       )}
     </div>

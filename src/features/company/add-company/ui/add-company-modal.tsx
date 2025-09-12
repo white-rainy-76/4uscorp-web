@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog'
 import { AddCompanyForm } from './add-company-form'
+import { useDictionary } from '@/shared/lib/hooks'
 
 interface AddCompanyModalProps {
   isOpen: boolean
@@ -15,12 +16,14 @@ interface AddCompanyModalProps {
 }
 
 export const AddCompanyModal = ({ isOpen, onClose }: AddCompanyModalProps) => {
+  const { dictionary } = useDictionary()
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-text-heading">
-            Добавить компанию
+            {dictionary.home.companies.add_company}
           </DialogTitle>
         </DialogHeader>
 

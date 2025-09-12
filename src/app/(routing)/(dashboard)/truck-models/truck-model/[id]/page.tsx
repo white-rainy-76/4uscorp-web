@@ -65,7 +65,8 @@ export default function TruckModelPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <span className="font-nunito text-base font-extrabold leading-6 tracking-[-0.04em] text-[#000000]">
-                {truckGroup.fuelCapacity} л
+                {truckGroup.fuelCapacity}
+                {dictionary.home.input_fields.liters}
               </span>
               <SetTruckGroupWeightFuelButton
                 truckGroup={truckGroup}

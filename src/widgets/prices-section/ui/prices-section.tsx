@@ -5,8 +5,10 @@ import { useQuery } from '@tanstack/react-query'
 import { priceLoadAttemptQueries } from '@/entities/file-upload'
 import { PricesUpload } from '@/features/file-upload/upload-prices'
 import { Calendar, Check, X } from 'lucide-react'
+import { useDictionary } from '@/shared/lib/hooks'
 
 export const PricesSection = () => {
+  const { dictionary } = useDictionary()
   const { data: attempts = [], isLoading } = useQuery({
     ...priceLoadAttemptQueries.list(),
   })
@@ -38,7 +40,7 @@ export const PricesSection = () => {
                       {new Date(attempt.startedAt).toLocaleDateString('en-CA')}
                     </span>
                     <span className="text-xs text-[#A8A8A8]">
-                      {attempt.totalFiles} файлов
+                      {attempt.totalFiles} {dictionary.home.file_upload.files}
                     </span>
                   </div>
                 </div>
@@ -50,7 +52,8 @@ export const PricesSection = () => {
                       <Check className="w-4 h-4 text-green-500" />
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-green-500 font-medium">
-                          loaded {attempt.successfullyProcessedFiles}/
+                          {dictionary.home.file_upload.loaded}{' '}
+                          {attempt.successfullyProcessedFiles}/
                           {attempt.totalFiles}
                         </span>
                       </div>
@@ -60,7 +63,8 @@ export const PricesSection = () => {
                       <X className="w-4 h-4 text-red-500 " />
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-red-500 font-medium">
-                          failed {attempt.failedFiles}/{attempt.totalFiles}
+                          {dictionary.home.file_upload.failed}{' '}
+                          {attempt.failedFiles}/{attempt.totalFiles}
                         </span>
                       </div>
                     </>
@@ -71,7 +75,7 @@ export const PricesSection = () => {
           </div>
         ) : (
           <div className="text-center text-muted-foreground py-8">
-            Нет попыток загрузки цен
+            {dictionary.home.file_upload.no_price_attempts}
           </div>
         )}
       </div>

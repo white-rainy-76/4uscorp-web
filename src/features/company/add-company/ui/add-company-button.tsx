@@ -3,9 +3,11 @@
 import React, { useState } from 'react'
 import { Button } from '@/shared/ui'
 import { AddCompanyModal } from './add-company-modal'
+import { useDictionary } from '@/shared/lib/hooks'
 
 export const AddCompanyButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { dictionary } = useDictionary()
 
   const handleClick = () => {
     setIsModalOpen(true)
@@ -20,7 +22,7 @@ export const AddCompanyButton = () => {
   return (
     <>
       <button onClick={handleClick} className={buttonStyles}>
-        add+
+        {dictionary.home.companies.add}
       </button>
 
       <AddCompanyModal isOpen={isModalOpen} onClose={handleCloseModal} />

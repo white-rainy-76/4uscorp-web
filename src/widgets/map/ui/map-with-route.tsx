@@ -25,11 +25,13 @@ import {
 import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
 import { RouteData } from '@/entities/route'
 import { TrackTruck } from '@/features/truck/track-truck'
+import { useDictionary } from '@/shared/lib/hooks'
 
 // Компонент для отображения ошибок поверх карты
 const MapErrorsOverlay: React.FC<{
   errors: Array<{ stationId: string; message: string }>
 }> = ({ errors }) => {
+  const { dictionary } = useDictionary()
   if (errors.length === 0) return null
 
   // Разделяем ошибки на общие, связанные с конкретными заправками и ошибки валидации маршрута
@@ -48,13 +50,15 @@ const MapErrorsOverlay: React.FC<{
         <div className="flex items-center">
           <div className="text-red-500 mr-2">⚠️</div>
           <div>
-            <h4 className="font-bold text-sm mb-2">Ошибки топливного плана:</h4>
+            <h4 className="font-bold text-sm mb-2">
+              {dictionary.home.errors.error}:
+            </h4>
             <div className="space-y-1">
               {/* Ошибки валидации маршрута */}
               {routeValidationErrors.map((error, index) => (
                 <div key={`route-validation-${index}`} className="text-xs">
                   <span className="font-semibold text-red-800">
-                    Ошибка маршрута:
+                    {dictionary.home.errors.error}:
                   </span>
                   <span className="ml-2">{error.message}</span>
                 </div>
@@ -63,7 +67,7 @@ const MapErrorsOverlay: React.FC<{
               {generalErrors.map((error, index) => (
                 <div key={`general-${index}`} className="text-xs">
                   <span className="font-semibold text-red-800">
-                    Общая ошибка:
+                    {dictionary.home.errors.error}:
                   </span>
                   <span className="ml-2">{error.message}</span>
                 </div>
@@ -72,7 +76,8 @@ const MapErrorsOverlay: React.FC<{
               {stationErrors.map((error, index) => (
                 <div key={`station-${index}`} className="text-xs">
                   <span className="font-semibold">
-                    Заправка {error.stationId.slice(0, 8)}...
+                    {dictionary.home.route_panel.address}{' '}
+                    {error.stationId.slice(0, 8)}...
                   </span>
                   <span className="ml-2">{error.message}</span>
                 </div>

@@ -1,4 +1,4 @@
-import { DictionaryProvider } from '@/app/providers'
+import { DictionaryProvider, GoogleMapLanguageProvider } from '@/app/providers'
 import { getDictionary } from '@/shared/config/i18n'
 import { locales } from '@/shared/config/i18n'
 
@@ -19,7 +19,7 @@ export default async function DictionaryLayout({
       <DictionaryProvider
         lang={defaultLang}
         initialDictionary={await getDictionary(defaultLang)}>
-        {children}
+        <GoogleMapLanguageProvider>{children}</GoogleMapLanguageProvider>
       </DictionaryProvider>
     )
   }
@@ -28,7 +28,7 @@ export default async function DictionaryLayout({
     <DictionaryProvider
       lang={lang}
       initialDictionary={await getDictionary(lang)}>
-      {children}
+      <GoogleMapLanguageProvider>{children}</GoogleMapLanguageProvider>
     </DictionaryProvider>
   )
 }
