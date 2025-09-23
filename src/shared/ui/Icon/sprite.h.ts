@@ -16,6 +16,7 @@ export interface SpritesMap {
     | 'fuel'
     | 'marker-blue'
     | 'marker-yellow'
+    | 'marker-gray'
     | 'weight'
     | 'dollar'
     | 'calendar'
@@ -44,6 +45,7 @@ export const SPRITES_META: {
     | 'fuel'
     | 'marker-blue'
     | 'marker-yellow'
+    | 'marker-gray'
     | 'weight'
     | 'dollar'
     | 'calendar'
@@ -71,6 +73,7 @@ export const SPRITES_META: {
     'fuel',
     'marker-blue',
     'marker-yellow',
+    'marker-gray',
     'weight',
     'dollar',
     'calendar',

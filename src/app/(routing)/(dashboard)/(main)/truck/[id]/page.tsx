@@ -300,6 +300,11 @@ export default function TruckInfo() {
             <RouteList
               gasStations={combinedGasStations}
               selectedRouteId={selectedRouteId}
+              routeId={
+                routeData?.route?.routeId
+                  ? routeData.route.routeId
+                  : currentDirectionsData?.routeId
+              }
             />
           </InfoCard>
         )}

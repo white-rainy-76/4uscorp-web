@@ -1,6 +1,7 @@
 import { api, authorizedRequest } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
 import { AxiosRequestConfig } from 'axios'
+import { z } from 'zod'
 import {
   AssignRoutePayload,
   GetRouteByIdPayload,
@@ -13,14 +14,21 @@ import {
   GetRoutePayloadSchema,
   GetDistancePayloadSchema,
 } from './payload/route.payload'
-import { RouteByIdData, RouteData, GetDistanceData } from '../model'
+import {
+  RouteByIdData,
+  RouteData,
+  GetDistanceData,
+  FuelStationStatus,
+} from '../model'
 import {
   RouteByIdDtoSchema,
   RouteDataDtoSchema,
   GetDistanceDtoSchema,
+  FuelStationStatusResponseSchema,
 } from './contracts/route.dto.contract'
 import { mapRouteDataDtoToRouteData } from './mapper/route.mapper'
 import { mapRouteByIdDtoToRouteById } from './mapper/route-by-id.mapper'
+import { mapFuelStationStatusDtoToFuelStationStatus } from './mapper/fuel-station-status.mapper'
 import { useAuthStore } from '@/shared/store/auth-store'
 
 export const getRoute = async (
@@ -96,4 +104,23 @@ export const getDistance = async (
     .then(responseContract(GetDistanceDtoSchema))
 
   return response.data
+}
+
+export const getFuelStationArrived = async (
+  routeId: string,
+  config?: AxiosRequestConfig,
+): Promise<FuelStationStatus[]> => {
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  const response = await api
+    .get(
+      `/truckstracking-api/TrucksTracking/GetFuelStationArrived/${routeId}`,
+      authConfig,
+    )
+    .then(responseContract(FuelStationStatusResponseSchema))
+
+  return response.data.fuelStations.map(
+    mapFuelStationStatusDtoToFuelStationStatus,
+  )
 }
