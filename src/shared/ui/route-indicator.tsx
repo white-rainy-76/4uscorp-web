@@ -52,7 +52,7 @@ export const RouteIndicator = ({
       // Серый по умолчанию - круг с бордером и иконкой marker-gray
       return (
         <div className="flex justify-center items-center w-6 h-6 border border-gray-400 rounded-full bg-transparent">
-          <Icon name="common/marker-gray" className="w-4 h-4" />
+          <Icon name="common/marker-gray" fill="none" width={12} height={12} />
         </div>
       )
     }
@@ -64,7 +64,7 @@ export const RouteIndicator = ({
       // Серый статус - круг с бордером и иконкой marker-gray
       return (
         <div className="flex justify-center items-center w-6 h-6 border border-gray-400 rounded-full bg-transparent">
-          <Icon name="common/marker-gray" className="w-4 h-4" />
+          <Icon name="common/marker-gray" fill="none" width={12} height={12} />
         </div>
       )
     }
