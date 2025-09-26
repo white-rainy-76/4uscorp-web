@@ -1,4 +1,4 @@
-import { CoordinatePair } from '../model/directions'
+import { CoordinatePair } from '../api/types/directions'
 
 export const convertToLatLngLiteral = (
   coords: CoordinatePair[],

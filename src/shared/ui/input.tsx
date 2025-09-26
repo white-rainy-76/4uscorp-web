@@ -18,17 +18,17 @@ const sheetVariants = cva(
         default: [
           'bg-white',
           'shadow-[0px_16px_40px_rgba(0,0,0,0.015)]',
-          'text-[hsl(var(--text-strong))]',
-          '[&>input]:text-[hsl(var(--text-strong))]',
-          '[&>input::placeholder]:text-[hsl(var(--placeholder-alt))]',
+          'text-text-strong',
+          '[&>input]:text-text-strong',
+          '[&>input::placeholder]:text-placeholder-alt',
           '[&>input::placeholder]:opacity-70',
           'h-[56px]',
         ].join(' '),
         gray: [
-          'bg-[hsl(var(--input-bg))]',
-          'text-[hsl(var(--placeholder))]',
-          '[&>input]:text-[hsl(var(--text-strong))]',
-          '[&>input::placeholder]:text-[hsl(var(--placeholder))]',
+          'bg-input-bg',
+          'text-placeholder',
+          '[&>input]:text-text-strong',
+          '[&>input::placeholder]:text-placeholder',
           'h-[44px]',
         ].join(' '),
       },
@@ -53,14 +53,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     return (
       <div className={cn(sheetVariants({ variant }), className, 'px-6')}>
-        {showIcon && (
-          <Search className="w-5 h-5 text-[hsl(var(--text-heading))]" />
-        )}
+        {showIcon && <Search className="w-5 h-5 text-text-heading" />}
 
         {prefixText && (
           <div className="flex items-center gap-2 text-sm font-medium">
-            <span>{prefixText}</span>
-            <span className="h-4 w-px bg-[hsl(var(--separator))]" />
+            <span className="text-text-strong">{prefixText}</span>
+            <span className="h-4 w-px bg-separator" />
           </div>
         )}
 

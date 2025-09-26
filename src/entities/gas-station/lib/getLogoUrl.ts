@@ -1,4 +1,4 @@
-export const getLogoUrl = (name: string | undefined): string => {
+export const getLogoUrl = (name: string | undefined | null): string => {
   if (!name) return '/images/default.png'
   const firstName = name.split(' ')[0].toLowerCase()
 

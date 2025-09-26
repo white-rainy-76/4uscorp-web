@@ -1,21 +1,254 @@
 {
   "home": {
-    "test": "Test",
-    "calculate": "Calculate",
-    "departure": "Place of departure",
-    "destination": "Destination",
+    "buttons": {
+      "calculate": "Calculate",
+      "send_route": "Send route",
+      "create": "Create route",
+      "adjust": "Adjust route",
+      "loading": "Please wait",
+      "submit": "Submit",
+      "save": "Save",
+      "save_changes": "Save changes",
+      "add_company": "Add company",
+      "add_driver": "Add driver",
+      "update_driver": "Update driver"
+    },
     "errors": {
-      "departure_required_error": "Select a starting point",
+      "departure_required_error": "Select a departure point",
       "destination_required_error": "Select a destination point",
-      "different_points": "Starting and destination points must be different",
-      "invalid_weight": "Please enter valid weight",
-      "invalid_fuel": "Please enter valid fuel",
-      "valid": "Enter valid address"
+      "different_points": "Departure and destination points must be different",
+      "invalid_weight": "Please enter a valid weight",
+      "invalid_fuel": "Please enter a valid fuel amount",
+      "min_fuel": "Fuel amount must be at least 0",
+      "max_fuel": "Fuel amount cannot exceed 200",
+      "valid": "Enter a valid address",
+      "error": "Error"
+    },
+    "input_fields": {
+      "find_unit_placeholder": "Search by unit number",
+      "departure_placeholder": "Departure point",
+      "destination_placeholder": "Destination point",
+      "weight": "Weight",
+      "weight_placeholder": "Enter weight",
+      "company_name": "Company name",
+      "company_name_placeholder": "Enter company name",
+      "samsara_token": "Samsara token",
+      "samsara_token_placeholder": "Enter Samsara token",
+      "full_name": "Full name",
+      "full_name_placeholder": "Enter full name",
+      "phone": "Phone",
+      "phone_placeholder": "Enter phone number",
+      "email": "Email",
+      "email_placeholder": "Enter email address",
+      "telegram_link": "Telegram link",
+      "telegram_link_placeholder": "Enter Telegram link",
+      "fuel_capacity": "Tank (gal)",
+      "fuel_capacity_placeholder": "Enter tank capacity",
+      "weight_kg": "Weight (lbs)",
+      "weight_kg_placeholder": "Enter weight",
+      "liters": "Gallons",
+      "search_companies": "Search companies...",
+      "search_drivers": "Search drivers..."
+    },
+    "bonus": {
+      "amount": "Bonus Amount",
+      "amount_placeholder": "Enter bonus amount",
+      "reason": "Reason",
+      "reason_placeholder": "Select reason",
+      "add_bonus": "Add Bonus",
+      "remove_bonus": "Remove Bonus",
+      "reasons": {
+        "birthday": "Birthday",
+        "good_work": "Good Work",
+        "overtime": "Overtime",
+        "bonus": "Bonus",
+        "achievement": "Achievement",
+        "holiday": "Holiday"
+      }
+    },
+    "truck": {
+      "select_truck": "Select Truck",
+      "select_truck_placeholder": "Choose a truck...",
+      "search_truck": "Search trucks...",
+      "truck_not_found": "No trucks found",
+      "detach_from_truck": "Detach from truck",
+      "current_truck": "Current Truck",
+      "unit_not_specified": "Unit not specified",
+      "detach_from_truck_btn": "Detach from Truck",
+      "attach_to_truck": "Attach to Truck"
+    },
+    "modals": {
+      "detach_driver_from_truck": "Detach driver from truck",
+      "attach_driver_to_truck": "Attach driver to truck",
+      "add_bonuses": "Add bonuses",
+      "remove_bonuses": "Remove bonuses"
+    },
+    "validation": {
+      "min_bonus": "Minimum bonus amount is 1",
+      "min_fuel_capacity": "Minimum fuel capacity is 0",
+      "min_weight": "Minimum weight is 0",
+      "name_required": "Name is required",
+      "phone_required": "Phone is required",
+      "invalid_email": "Invalid email",
+      "invalid_telegram_url": "Invalid Telegram link",
+      "company_name_required": "Company name is required",
+      "invalid_user_id": "Invalid user ID",
+      "invalid_company_id": "Invalid company ID",
+      "driver_id_required": "Driver ID is required",
+      "samsara_token_required": "Samsara token is required"
+    },
+    "headings": {
+      "driver_info": "Driver information",
+      "route_info": "Route information",
+      "details_info": "Refueling details"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "idle": "Idle"
+    },
+    "driver_info": {
+      "fuel": "Fuel",
+      "bonus": "Bonuses",
+      "unit_number": "Unit number",
+      "truck": "Truck"
+    },
+    "details_info": {
+      "no_gas_stations": "No planned gas stations",
+      "gallons": "Gallons",
+      "adress": "Address",
+      "miles_next": "miles next",
+      "stop_order": "Stop order",
+      "price": "Price",
+      "save": "Save",
+      "discount": "Discount",
+      "total": "Total",
+      "fuel_before_station": "Fuel before gas station"
+    },
+    "trucks": {
+      "no_trucks_found": "No trucks found"
+    },
+    "route": {
+      "departure_city": "Departure city",
+      "destination_city": "Destination city",
+      "adjust_route": "Adjust route",
+      "create_route": "Create route"
+    },
+    "gas_station": {
+      "add_to_cart": "Add to cart",
+      "remove_from_cart": "Remove from cart",
+      "price": "Price",
+      "discount": "Discount",
+      "total": "Total",
+      "fuel_before_station": "Fuel before gas station"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "companies": "Companies",
+      "drivers": "Drivers",
+      "truck_models": "Truck models"
+    },
+    "lists": {
+      "no_companies_found": "No companies found",
+      "no_drivers_found": "No drivers found",
+      "no_trucks_found": "No trucks found"
+    },
+    "auth": {
+      "sign_in": "Sign in",
+      "login": "Login",
+      "login_placeholder": "Enter login",
+      "password": "Password",
+      "password_placeholder": "Enter password",
+      "continue": "Continue",
+      "info_text": "Enter the data sent to you by your manager",
+      "username_required": "Username is required"
+    },
+    "route_panel": {
+      "drive_time": "Drive time:",
+      "miles": "Miles:",
+      "gallons": "Gallons:",
+      "tolls": "Tolls:",
+      "fuel_left": "Fuel Left",
+      "total_price": "Total Price:",
+      "filter": "Filter",
+      "fuel_providers": "Fuel Providers",
+      "gas_stations_list": "Gas Stations List",
+      "items_count": "items",
+      "address": "Address",
+      "refuel": "Refuel:",
+      "algorithmic": "⭐ Algorithmic",
+      "delete": "delete",
+      "no_stations_selected": "No stations selected",
+      "add_stations_message": "Add stations to cart for route planning"
+    },
+    "drivers": {
+      "select_driver": "Select a Driver",
+      "choose_driver_message": "Choose a driver from the list to view details",
+      "drivers": "Drivers",
+      "loading_driver": "Loading driver...",
+      "driver_not_found": "Driver not found",
+      "full_name": "Full Name",
+      "phone": "Phone",
+      "email": "Email",
+      "telegram": "Telegram",
+      "unit_number": "Unit number",
+      "bonuses": "Bonuses",
+      "change": "change",
+      "add": "Add +",
+      "add_bonus": "Add",
+      "decrease_bonus": "Decrease"
+    },
+    "truck_models": {
+      "select_truck_model": "Select a Truck Model",
+      "choose_truck_model_message": "Choose a truck model from the list to view details",
+      "truck_fleet": "Truck fleet",
+      "loading_truck_model": "Loading truck model...",
+      "truck_model_not_found": "Truck model not found",
+      "truck_model_info": "Truck Model Information",
+      "weight": "Weight",
+      "fuel_capacity": "Fuel Tank Capacity",
+      "search_truck_models": "Search truck models...",
+      "no_truck_models_found": "No truck models found"
+    },
+    "companies": {
+      "select_company": "Select a Company",
+      "choose_company_message": "Choose a company from the list to view details",
+      "companies": "Companies",
+      "loading_company": "Loading company...",
+      "company_not_found": "Company not found",
+      "company_info": "Company Information",
+      "prices": "Prices",
+      "reports": "Reports",
+      "manager": "Manager",
+      "truck_fleet": "Truck Fleet",
+      "adding": "Adding...",
+      "add": "Add +",
+      "selected": "Selected",
+      "selecting": "Selecting...",
+      "select_company_btn": "Select Company",
+      "add_company": "Add Company"
+    },
+    "file_upload": {
+      "files": "files",
+      "loaded": "loaded",
+      "failed": "failed",
+      "no_price_attempts": "No price upload attempts",
+      "no_report_attempts": "No report upload attempts",
+      "loading_reports": "Loading reports...",
+      "loading_reports_error": "Error loading reports",
+      "loading_reports_error_with_message": "Error loading reports: {{message}}",
+      "drag_excel_files": "Drag Excel files here or",
+      "drag_pdf_file": "Drag PDF file here or",
+      "select_files": "Select files",
+      "select_file": "Select file",
+      "supported_excel_formats": "Supported formats: .xls and .xlsx",
+      "supported_pdf_format": "Supported format: .pdf",
+      "uploading": "Uploading...",
+      "upload_files": "Upload {{count}} file(s)",
+      "upload_file": "Upload file",
+      "upload_error": "Upload error: {{message}}",
+      "files_uploaded_successfully": "Files uploaded successfully!",
+      "file_uploaded_successfully": "File uploaded successfully!"
     }
-  },
-  "button": {
-    "loading": "Please wait",
-    "estimate": "Estimate",
-    "adjust": "Adjust the route"
   }
 }

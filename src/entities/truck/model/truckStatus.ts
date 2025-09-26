@@ -1,7 +1,0 @@
-export enum TruckStatus {
-  IDLE = 'IDLE',
-  EN_ROUTE = 'EN_ROUTE',
-  LOADING = 'LOADING',
-  ARRIVED = 'ARRIVED',
-  MAINTENANCE = 'MAINTENANCE',
-}

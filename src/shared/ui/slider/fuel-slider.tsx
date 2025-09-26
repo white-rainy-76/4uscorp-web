@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { Slider } from './slider'
-import { useFormContext } from 'react-hook-form'
 
 interface FuelSliderProps {
   defaultValue?: number[]
@@ -14,8 +13,8 @@ interface FuelSliderProps {
 export const FuelSlider = ({
   defaultValue,
   onChange,
-  max,
-  step,
+  max = 100,
+  step = 1,
 }: FuelSliderProps) => {
   const [fuelLevel, setFuelLevel] = useState(defaultValue || [0])
 
@@ -31,14 +30,14 @@ export const FuelSlider = ({
   }
 
   return (
-    <div className="w-full max-w-md flex items-center">
-      <span className="mr-4">{fuelLevel[0]}%</span>
+    <div className="w-full max-w-md">
       <Slider
         value={fuelLevel}
         onValueChange={handleValueChange}
         max={max}
         min={0}
         step={step}
+        showValueLabel={true}
       />
     </div>
   )
