@@ -1,9 +1,3 @@
-export interface Driver {
-  id: string
-  name: string
-  bonuses: number
-  truck: string
-  unitNumber: string
-  phoneNumber: string
-  chatLink: string
-}
+export * from './types/driver'
+export * from './types/driver.dto'
+export * from './types/truck'

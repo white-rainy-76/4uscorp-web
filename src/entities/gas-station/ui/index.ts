@@ -1,2 +1,2 @@
-export * from './custom-pin'
 export * from './gas-station-marker'
+export * from './clustered-gas-station-markers'

@@ -16,8 +16,14 @@ export interface SpritesMap {
     | 'fuel'
     | 'marker-blue'
     | 'marker-yellow'
+    | 'marker-gray'
     | 'weight'
     | 'dollar'
+    | 'calendar'
+    | 'tag'
+    | 'truck-model'
+    | 'users'
+    | 'arrow-right'
 }
 
 export const SPRITES_META: {
@@ -35,7 +41,18 @@ export const SPRITES_META: {
     | 'Palmetto'
   >
   common: Array<
-    'logo' | 'fuel' | 'marker-blue' | 'marker-yellow' | 'weight' | 'dollar'
+    | 'logo'
+    | 'fuel'
+    | 'marker-blue'
+    | 'marker-yellow'
+    | 'marker-gray'
+    | 'weight'
+    | 'dollar'
+    | 'calendar'
+    | 'tag'
+    | 'truck-model'
+    | 'users'
+    | 'arrow-right'
   >
 } = {
   gasStations: [
@@ -51,5 +68,18 @@ export const SPRITES_META: {
     'Road Rangers',
     'Palmetto',
   ],
-  common: ['logo', 'fuel', 'marker-blue', 'marker-yellow', 'weight', 'dollar'],
+  common: [
+    'logo',
+    'fuel',
+    'marker-blue',
+    'marker-yellow',
+    'marker-gray',
+    'weight',
+    'dollar',
+    'calendar',
+    'tag',
+    'truck-model',
+    'users',
+    'arrow-right',
+  ],
 }

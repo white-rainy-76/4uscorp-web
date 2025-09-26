@@ -7,7 +7,7 @@ export function ButtonLoading() {
   return (
     <Button disabled>
       <Loader2 className="animate-spin" />
-      {dictionary.button.loading}
+      {dictionary.home.buttons.loading}
     </Button>
   )
 }

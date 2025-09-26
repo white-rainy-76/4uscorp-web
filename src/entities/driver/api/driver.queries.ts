@@ -1,16 +1,36 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { getDriver } from './get-driver'
-import { DriverQuery } from './query/driver.query'
+import { mapDriver, mapDrivers } from './mapper/driver.mapper'
+import { getAllDrivers, getDriverById } from './driver.service'
+
+export const DRIVERS_ROOT_QUERY_KEY = ['drivers']
 
 export const driverQueries = {
-  all: () => ['driver'],
+  all: () => [...DRIVERS_ROOT_QUERY_KEY],
 
-  lists: () => [...driverQueries.all(), 'list'],
+  lists: (filter?: { name?: string }) => [
+    ...driverQueries.all(),
+    'list',
+    filter ?? {},
+  ],
 
-  list: (query: DriverQuery) =>
+  list: () =>
     queryOptions({
-      queryKey: [...driverQueries.lists(), query.id],
-      queryFn: () => getDriver(query),
+      queryKey: driverQueries.lists(),
+      queryFn: async ({ signal }) => {
+        const { data } = await getAllDrivers({ signal })
+        const drivers = mapDrivers(data)
+        return drivers
+      },
       placeholderData: keepPreviousData,
+    }),
+
+  driver: (id: string) =>
+    queryOptions({
+      queryKey: [...DRIVERS_ROOT_QUERY_KEY, 'driver', id],
+      queryFn: async ({ signal }) => {
+        const { data } = await getDriverById(id, { signal })
+        const driver = mapDriver(data)
+        return driver
+      },
     }),
 }

@@ -1,15 +1,20 @@
 // features/directions/components/RouteMarkers.tsx
 import React from 'react'
 import { Marker } from '@vis.gl/react-google-maps'
+import { GetDistanceData } from '@/entities/route'
+import { DistanceTooltip } from './distance-tooltip'
 
 interface RouteMarkersProps {
   hoverMarker: google.maps.LatLngLiteral | null
   wayPoints: google.maps.LatLngLiteral[]
   startMarker: google.maps.LatLngLiteral | null
   endMarker: google.maps.LatLngLiteral | null
+  distanceData?: GetDistanceData
+  isDistanceLoading?: boolean
   onMarkerDragStart: () => void
   onMarkerDragEnd: (e: google.maps.MapMouseEvent) => void
   onExistingMarkerDragEnd: (index: number, e: google.maps.MapMouseEvent) => void
+  onHoverMarkerClick?: (e: google.maps.MapMouseEvent) => void
 }
 
 export const RouteMarkers = ({
@@ -17,26 +22,37 @@ export const RouteMarkers = ({
   wayPoints,
   startMarker,
   endMarker,
+  distanceData,
+  isDistanceLoading,
   onMarkerDragStart,
   onMarkerDragEnd,
   onExistingMarkerDragEnd,
+  onHoverMarkerClick,
 }: RouteMarkersProps) => {
   return (
     <>
       {hoverMarker && (
-        <Marker
-          position={hoverMarker}
-          draggable
-          onDragStart={onMarkerDragStart}
-          onDragEnd={onMarkerDragEnd}
-          icon={{
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 6,
-            fillColor: '#FF0000',
-            fillOpacity: 1,
-            strokeWeight: 2,
-          }}
-        />
+        <>
+          <Marker
+            position={hoverMarker}
+            draggable
+            onDragStart={onMarkerDragStart}
+            onDragEnd={onMarkerDragEnd}
+            onClick={onHoverMarkerClick}
+            icon={{
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 6,
+              fillColor: '#FF0000',
+              fillOpacity: 1,
+              strokeWeight: 2,
+            }}
+          />
+          <DistanceTooltip
+            position={hoverMarker}
+            distanceData={distanceData}
+            isLoading={isDistanceLoading}
+          />
+        </>
       )}
       {wayPoints.map((marker, index) => (
         <Marker

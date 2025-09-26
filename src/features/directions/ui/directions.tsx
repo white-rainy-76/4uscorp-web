@@ -4,7 +4,12 @@ import { Polyline } from '@/shared/ui/map'
 interface RoutePolylinesProps {
   mainRoute: google.maps.LatLngLiteral[]
   alternativeRoutes: google.maps.LatLngLiteral[][]
-  onHover: (e: google.maps.MapMouseEvent) => void
+  routeSectionIds: string[]
+  onHover: (
+    e: google.maps.MapMouseEvent,
+    routeSectionId: string,
+    routeIndex: number,
+  ) => void
   onHoverOut: () => void
   onAltRouteClick: (index: number) => void
 }
@@ -12,6 +17,7 @@ interface RoutePolylinesProps {
 export const RoutePolylines = ({
   mainRoute,
   alternativeRoutes,
+  routeSectionIds,
   onHover,
   onHoverOut,
   onAltRouteClick,
@@ -23,8 +29,8 @@ export const RoutePolylines = ({
           path={mainRoute}
           strokeColor="#0000FF"
           strokeOpacity={0.8}
-          strokeWeight={6}
-          onMouseMove={onHover}
+          strokeWeight={10}
+          onMouseMove={(e) => onHover(e, routeSectionIds[0] || '', 0)}
           onMouseOut={onHoverOut}
         />
       )}
@@ -35,6 +41,10 @@ export const RoutePolylines = ({
           strokeColor="#141414"
           strokeOpacity={0.5}
           strokeWeight={3}
+          onMouseMove={(e) =>
+            onHover(e, routeSectionIds[index + 1] || '', index + 1)
+          }
+          onMouseOut={onHoverOut}
           onClick={() => onAltRouteClick(index)}
         />
       ))}

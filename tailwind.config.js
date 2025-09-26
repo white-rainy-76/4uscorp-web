@@ -16,6 +16,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        nunito: ['Nunito', 'sans-serif'],
         // avenir: ['Avenir', 'sans-serif'],
         // archivo: ['"Archivo Black"', 'sans-serif'],
       },
@@ -65,20 +66,20 @@ module.exports = {
         },
 
         text: {
-          heading: 'hsl(var(--text-heading))',
-          strong: 'hsl(var(--text-strong))',
-          neutral: 'hsl(var(--text-neutral))',
-          muted: 'hsl(var(--text-muted))',
-          'muted-alt': 'hsl(var(--text-muted-alt))',
+          heading: 'var(--text-heading)',
+          strong: 'var(--text-strong)',
+          neutral: 'var(--text-neutral)',
+          muted: 'var(--text-muted)',
+          'muted-alt': 'var(--text-muted-alt)',
         },
         placeholder: {
-          DEFAULT: 'hsl(var(--placeholder))',
-          alt: 'hsl(var(--placeholder-alt))',
+          DEFAULT: 'var(--placeholder)',
+          alt: 'var(--placeholder-alt)',
         },
-        surface: 'hsl(var(--surface))',
-        'input-bg': 'hsl(var(--input-bg))',
-        separator: 'hsl(var(--separator))',
-        scroll: 'hsl(var(--scroll))',
+        surface: 'var(--surface)',
+        'input-bg': 'var(--input-bg)',
+        separator: 'var(--separator)',
+        scroll: 'var(--scroll)',
       },
       borderRadius: {
         lg: 'var(--radius)',

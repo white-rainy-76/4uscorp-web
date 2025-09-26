@@ -1,1 +1,1 @@
-export * from './convert-string-to-truck-status'
+export { useTruckStats } from './hooks/useTruckStats'

@@ -1,65 +1,105 @@
-// 'use client'
+'use client'
 
-// import React, { useCallback, useEffect, useMemo, useState } from 'react'
-// import { useMap } from '@vis.gl/react-google-maps'
-// import {
-//   type Marker,
-//   MarkerClusterer,
-//   SuperClusterAlgorithm,
-// } from '@googlemaps/markerclusterer'
-// import { GasStationMarker } from './gas-station-marker'
-// import { GasStation } from '../model/gas-station'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMap } from '@vis.gl/react-google-maps'
+import {
+  type Marker,
+  MarkerClusterer,
+  SuperClusterAlgorithm,
+} from '@googlemaps/markerclusterer'
+import { GasStationMarker } from './gas-station-marker'
+import { GasStation } from '../model/types/gas-station'
 
-// type Props = {
-//   gasStations: GasStation[]
-// }
+type Props = {
+  gasStations: GasStation[]
+  onAddToCart: (station: GasStation, refillLiters: number) => void
+  onRemoveFromCart: (stationId: string) => void
+  onUpdateRefillLiters: (stationId: string, liters: number) => void
+  cart: { [stationId: string]: { refillLiters: number } }
+  stationErrors?: { [stationId: string]: string }
+  isStationInCart: (stationId: string) => boolean
+  getStationRefillLiters: (station: GasStation) => number
+  getStationFuelLeftBeforeRefill: (station: GasStation) => number
+}
 
-// export const ClusteredGasStationMarkers: React.FC<Props> = ({
-//   gasStations,
-// }) => {
-//   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
-//   const map = useMap()
+export const ClusteredGasStationMarkers: React.FC<Props> = ({
+  gasStations,
+  onAddToCart,
+  onRemoveFromCart,
+  onUpdateRefillLiters,
+  cart,
+  stationErrors,
+  isStationInCart,
+  getStationRefillLiters,
+  getStationFuelLeftBeforeRefill,
+}) => {
+  const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
+  const map = useMap()
 
-//   const clusterer = useMemo(() => {
-//     if (!map) return null
+  const clusterer = useMemo(() => {
+    if (!map) return null
+    return new MarkerClusterer({
+      map,
+      algorithm: new SuperClusterAlgorithm({}),
+    })
+  }, [map])
 
-//     return new MarkerClusterer({
-//       map,
-//       algorithm: new SuperClusterAlgorithm({
-//         // maxZoom: 1,
-//       }),
-//     })
-//   }, [map])
+  // Очищаем маркеры и кластеры при изменении заправок
+  useEffect(() => {
+    if (!clusterer) return
+    clusterer.clearMarkers()
+    setMarkers({})
+  }, [gasStations, clusterer])
 
-//   useEffect(() => {
-//     if (!clusterer) return
-//     clusterer.clearMarkers()
-//     clusterer.addMarkers(Object.values(markers))
-//   }, [clusterer, markers])
+  // Добавляем валидные маркеры в кластер (исключая isAlgorithm)
+  useEffect(() => {
+    if (!clusterer) return
 
-//   const setMarkerRef = useCallback((marker: Marker | null, key: string) => {
-//     setMarkers((markers) => {
-//       if ((marker && markers[key]) || (!marker && !markers[key])) return markers
+    const validMarkers = Object.entries(markers)
+      .filter(([id]) => {
+        const station = gasStations.find((s) => s.id === id)
+        return station && !station.isAlgorithm
+      })
+      .map(([, marker]) => marker)
 
-//       if (marker) {
-//         return { ...markers, [key]: marker }
-//       } else {
-//         const { [key]: _, ...newMarkers } = markers
+    if (validMarkers.length > 0) {
+      clusterer.addMarkers(validMarkers)
+    }
+  }, [clusterer, markers, gasStations])
 
-//         return newMarkers
-//       }
-//     })
-//   }, [])
+  const setMarkerRef = useCallback((marker: Marker | null, id: string) => {
+    setMarkers((prev) => {
+      if (marker) {
+        return { ...prev, [id]: marker }
+      } else {
+        const { [id]: _, ...rest } = prev
+        return rest
+      }
+    })
+  }, [])
 
-//   return (
-//     <>
-//       {gasStations.map((station) => (
-//         <GasStationMarker
-//           key={station.id}
-//           gasStation={station}
-//           setMarkerRef={setMarkerRef}
-//         />
-//       ))}
-//     </>
-//   )
-// }
+  useEffect(() => {
+    return () => {
+      clusterer?.clearMarkers()
+    }
+  }, [clusterer])
+
+  return (
+    <>
+      {gasStations.map((station) => (
+        <GasStationMarker
+          key={station.id}
+          gasStation={station}
+          setMarkerRef={setMarkerRef}
+          onAddToCart={onAddToCart}
+          onRemoveFromCart={onRemoveFromCart}
+          onUpdateRefillLiters={onUpdateRefillLiters}
+          isInCart={isStationInCart(station.id)}
+          stationErrors={stationErrors}
+          getStationRefillLiters={getStationRefillLiters}
+          getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
+        />
+      ))}
+    </>
+  )
+}

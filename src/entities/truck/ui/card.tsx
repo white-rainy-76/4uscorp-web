@@ -1,49 +1,62 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
-import { TruckCard } from '../model/truckCard'
+import { Avatar, AvatarFallback, AvatarImage, Spinner } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { StatusLabel } from '@/shared/ui'
+import { Truck } from '../model/types/truck'
+import { useConnection } from '@/shared/lib/context'
+import { useTruckStats } from '../lib'
+import { useDictionary } from '@/shared/lib/hooks'
 
-export const Card = ({
-  avatarImage,
-  unitNumber,
-  name,
-  fuelPercentage,
-  status,
-  isActive,
-  setIsActive,
-}: TruckCard) => {
+interface CardProps {
+  truck: Truck
+  isActive: boolean
+}
+
+export const Card = ({ truck, isActive }: CardProps) => {
   const router = useRouter()
+  const { isConnected } = useConnection()
+  const { lang } = useDictionary()
+
   const handleClick = () => {
-    setIsActive()
-    setTimeout(() => {
-      router.push(`/truck/${unitNumber}`)
-    }, 200)
+    router.push(`/${lang}/truck/${truck.id}`)
   }
+
+  const handleMouseEnter = () => {
+    router.prefetch(`/${lang}/truck/${truck.id}`)
+  }
+
+  const { stats, isLoading } = useTruckStats(truck.id, isConnected)
+
+  const driverInitials =
+    truck.driver?.fullName
+      ?.split(' ')
+      .map((name) => name[0])
+      .join('') || ''
 
   return (
     <div
-      className={`h-[104px] rounded-[24px] cursor-pointer transition-colors duration-200 flex items-center justify-between px-4 
-      bg-[hsl(var(--background))] 
-      ${isActive && 'ring-2 ring-[hsl(var(--primary))]'} 
-      hover:bg-[hsl(var(--muted))] 
-      ${isActive && 'hover:bg-[hsl(var(--accent))]'}`}
-      onClick={handleClick}>
+      className={`h-[104px] rounded-[24px] cursor-pointer transition-colors duration-200 flex items-center justify-between px-4
+      bg-background
+      ${isActive && 'ring-2 ring-primary'}
+      hover:bg-muted
+      ${isActive && 'hover:bg-accent'}`}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}>
       {/* Left part */}
       <div className="flex items-center gap-4">
         <Avatar className="w-12 h-12">
-          <AvatarImage src={avatarImage || 'https://github.com/shadcn.png'} />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={'https://github.com/shadcn.png'} />
+          <AvatarFallback> {driverInitials || '?'}</AvatarFallback>
         </Avatar>
         <div>
-          <h2 className="text-[24px] leading-[32px] font-black text-[hsl(var(--text-heading))]">
-            #{unitNumber}
+          <h2 className="text-[18px] leading-[32px] font-black text-text-heading">
+            #{truck.name}
           </h2>
-          <p className="text-sm font-extrabold text-[hsl(var(--text-heading))]">
-            {name}
+          <p className="text-sm font-extrabold text-text-heading">
+            {truck.driver?.fullName}
           </p>
         </div>
       </div>
@@ -52,12 +65,18 @@ export const Card = ({
       <div className="flex items-center">
         <div className="w-[70px] flex items-center justify-end">
           <Icon name="common/fuel" width={14.26} height={17} className="mr-1" />
-          <span className="text-sm font-extrabold text-[hsl(var(--text-strong))]">
-            {fuelPercentage}%
-          </span>
+          {isLoading ? (
+            <Spinner size="sm" color="blue" />
+          ) : (
+            stats && (
+              <span className="text-sm font-extrabold text-text-strong">
+                {stats.fuelPercentage}%
+              </span>
+            )
+          )}
         </div>
         <div className="w-[90px] text-right">
-          <StatusLabel status={status} />
+          <StatusLabel status={truck.status} />
         </div>
       </div>
     </div>
