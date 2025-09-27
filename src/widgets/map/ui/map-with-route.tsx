@@ -196,8 +196,14 @@ export const MapWithRoute = ({
   // Функция для получения приоритетных fuelPlans
   const getPriorityFuelPlans = (): FuelPlan[] | undefined => {
     // Приоритет: fuelPlans из get-gas-stations > fuelPlanId из get-fuel-route-byId
-    if (fuelPlans && fuelPlans.length > 0) {
-      return fuelPlans
+    if (fuelPlans && fuelPlans.length > 0 && selectedRouteId) {
+      // Фильтруем fuelPlans по selectedRouteId (выбранной ветке)
+      const filteredFuelPlans = fuelPlans.filter(
+        (plan) => plan.routeSectionId === selectedRouteId,
+      )
+      if (filteredFuelPlans.length > 0) {
+        return filteredFuelPlans
+      }
     }
 
     if (routeByIdData?.fuelPlanId && selectedRouteId) {
