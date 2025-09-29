@@ -21,7 +21,9 @@ import {
   GasStation,
   GetGasStationsResponse,
   FuelRouteInfo,
+  FuelPlan,
 } from '@/entities/gas-station'
+import { RouteByIdData } from '@/entities/route'
 import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
 import { RouteData } from '@/entities/route'
 import { TrackTruck } from '@/features/truck/track-truck'
@@ -117,6 +119,8 @@ interface MapWithRouteProps {
   fuelRouteInfoDtos?: FuelRouteInfo[]
   routeByIdTotalFuelAmount?: number
   routeByIdTotalPriceAmount?: number
+  fuelPlans?: FuelPlan[]
+  routeByIdData?: RouteByIdData
 }
 
 export const MapWithRoute = ({
@@ -144,6 +148,8 @@ export const MapWithRoute = ({
   fuelRouteInfoDtos,
   routeByIdTotalFuelAmount,
   routeByIdTotalPriceAmount,
+  fuelPlans,
+  routeByIdData,
 }: MapWithRouteProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -186,6 +192,31 @@ export const MapWithRoute = ({
   const [clearAlternativeRoutes, setClearAlternativeRoutes] = useState<
     (() => void) | null
   >(null)
+
+  // Функция для получения приоритетных fuelPlans
+  const getPriorityFuelPlans = (): FuelPlan[] | undefined => {
+    // Приоритет: fuelPlans из get-gas-stations > fuelPlanId из get-fuel-route-byId
+    if (fuelPlans && fuelPlans.length > 0 && selectedRouteId) {
+      // Фильтруем fuelPlans по selectedRouteId (выбранной ветке)
+      const filteredFuelPlans = fuelPlans.filter(
+        (plan) => plan.routeSectionId === selectedRouteId,
+      )
+      if (filteredFuelPlans.length > 0) {
+        return filteredFuelPlans
+      }
+    }
+
+    if (routeByIdData?.fuelPlanId && selectedRouteId) {
+      return [
+        {
+          routeSectionId: selectedRouteId,
+          fuelPlanId: routeByIdData.fuelPlanId,
+        },
+      ]
+    }
+
+    return undefined
+  }
 
   // Новая мутация для изменения топливного плана
   const { mutateAsync: changeFuelPlan } = useChangeFuelPlanMutation({
@@ -310,6 +341,7 @@ export const MapWithRoute = ({
           newRefill: refillLiters,
         },
         operation: FuelPlanOperation.Add,
+        fuelPlans: getPriorityFuelPlans(),
       })
 
       // Если API успешен, добавляем в корзину
@@ -337,6 +369,7 @@ export const MapWithRoute = ({
           newRefill: null,
         },
         operation: FuelPlanOperation.Remove,
+        fuelPlans: getPriorityFuelPlans(),
       })
 
       // Если API успешен, удаляем из корзины
@@ -368,6 +401,7 @@ export const MapWithRoute = ({
           newRefill: liters,
         },
         operation: FuelPlanOperation.Update,
+        fuelPlans: getPriorityFuelPlans(),
       })
 
       // Если API успешен, обновляем корзину

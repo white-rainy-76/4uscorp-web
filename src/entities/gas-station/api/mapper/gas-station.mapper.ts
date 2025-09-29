@@ -5,6 +5,8 @@ import {
   GetGasStationsResponseDto,
   FuelRouteInfo,
   FuelRouteInfoDto,
+  FuelPlan,
+  FuelPlanDto,
 } from '../../model'
 
 /**
@@ -72,6 +74,18 @@ export const mapFuelRouteInfo = (dto: FuelRouteInfoDto): FuelRouteInfo => {
 }
 
 /**
+ * Maps a single FuelPlanDto from the API to a FuelPlan object.
+ * @param dto The FuelPlanDto object from the API response.
+ * @returns A mapped FuelPlan object.
+ */
+export const mapFuelPlan = (dto: FuelPlanDto): FuelPlan => {
+  return {
+    routeSectionId: dto.routeSectionId,
+    fuelPlanId: dto.fuelPlanId,
+  }
+}
+
+/**
  * Maps the full API response DTO (GetGasStationsResponseDto)
  * to the desired application data structure (GetGasStationsResponse).
  * @param dto The raw DTO object received from the server (already validated by Zod).
@@ -83,5 +97,6 @@ export const mapGetGasStations = (
   return {
     fuelStations: dto.fuelStations.map(mapGasStation),
     fuelRouteInfoDtos: dto.fuelRouteInfoDtos.map(mapFuelRouteInfo),
+    fuelPlans: dto.fuelPlans.map(mapFuelPlan),
   }
 }

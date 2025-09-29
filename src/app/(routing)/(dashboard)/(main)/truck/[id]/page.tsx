@@ -258,6 +258,8 @@ export default function TruckInfo() {
                       : currentDirectionsData?.routeId
                   }
                   selectedRouteId={selectedRouteId}
+                  fuelPlans={gasStationsData?.fuelPlans}
+                  routeByIdData={routeByIdData}
                 />
               )}
             </InfoCard>
@@ -292,6 +294,8 @@ export default function TruckInfo() {
               routeData={routeData}
               routeByIdTotalFuelAmount={routeByIdData?.totalFuelAmmount}
               routeByIdTotalPriceAmount={routeByIdData?.totalPriceAmmount}
+              fuelPlans={gasStationsData?.fuelPlans}
+              routeByIdData={routeByIdData}
             />
           </>
         )}

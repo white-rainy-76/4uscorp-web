@@ -32,7 +32,13 @@ export const FuelRouteInfoDtoSchema = z.object({
   validationError: ValidationErrorDtoSchema.nullable(),
 })
 
+export const FuelPlanDtoSchema = z.object({
+  routeSectionId: z.string(),
+  fuelPlanId: z.string(),
+})
+
 export const GetGasStationsResponseDtoSchema = z.object({
   fuelStations: z.array(GasStationDtoSchema),
   fuelRouteInfoDtos: z.array(FuelRouteInfoDtoSchema),
+  fuelPlans: z.array(FuelPlanDtoSchema),
 })

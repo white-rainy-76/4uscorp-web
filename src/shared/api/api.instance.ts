@@ -6,7 +6,8 @@ import { jwt } from '@/shared/lib/jwt'
 import { useAuthStore } from '../store'
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:5000',
+  baseURL:
+    process.env.NEXT_PUBLIC_SERVER_URL ?? 'https://test.foruscorp.net:5011',
   withCredentials: true,
 })
 

@@ -42,7 +42,13 @@ export const FuelRouteInfoSchema = z.object({
   validationError: ValidationErrorSchema.nullable(),
 })
 
+export const FuelPlanSchema = z.object({
+  routeSectionId: z.string(),
+  fuelPlanId: z.string(),
+})
+
 export const GetGasStationsResponseSchema = z.object({
   fuelStations: z.array(GasStationSchema),
   fuelRouteInfoDtos: z.array(FuelRouteInfoSchema),
+  fuelPlans: z.array(FuelPlanSchema),
 })
