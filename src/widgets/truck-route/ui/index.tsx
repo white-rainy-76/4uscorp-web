@@ -35,6 +35,7 @@ interface TruckRouteInfoProps {
   selectedRouteId: string | null
   fuelPlans?: FuelPlan[]
   routeByIdData?: RouteByIdData
+  fuelPlanId?: string
 }
 
 export const TruckRouteInfo = ({
@@ -52,6 +53,7 @@ export const TruckRouteInfo = ({
   selectedRouteId,
   fuelPlans,
   routeByIdData,
+  fuelPlanId,
 }: TruckRouteInfoProps) => {
   const { dictionary } = useDictionary()
   const [isEditing, setIsEditing] = useState(false)
@@ -64,7 +66,7 @@ export const TruckRouteInfo = ({
 
   // Функция для получения приоритетных fuelPlans
   const getPriorityFuelPlans = (): FuelPlan[] | undefined => {
-    // Приоритет: fuelPlans из get-gas-stations > fuelPlanId из get-fuel-route-byId
+    // Приоритет: fuelPlans из get-gas-stations (всегда приоритетнее) > fuelPlanId из get-fuel-route-byId > переданный fuelPlanId
     if (fuelPlans && fuelPlans.length > 0 && selectedRouteId) {
       // Фильтруем fuelPlans по selectedRouteId (выбранной ветке)
       const filteredFuelPlans = fuelPlans.filter(
@@ -80,6 +82,16 @@ export const TruckRouteInfo = ({
         {
           routeSectionId: selectedRouteId,
           fuelPlanId: routeByIdData.fuelPlanId,
+        },
+      ]
+    }
+
+    // Используем переданный fuelPlanId если он есть
+    if (fuelPlanId && selectedRouteId) {
+      return [
+        {
+          routeSectionId: selectedRouteId,
+          fuelPlanId: fuelPlanId,
         },
       ]
     }
