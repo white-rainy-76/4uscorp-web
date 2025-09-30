@@ -149,6 +149,30 @@ export default function TruckInfo() {
     return
   }, [gasStationsData, currentDirectionsData])
 
+  // Определяем fuelPlanId для передачи в компоненты
+  const fuelPlanId = useMemo<string | undefined>(() => {
+    // Приоритет: fuelPlanId из get-gas-stations (всегда приоритетнее) > fuelPlanId из get-fuel-route-byId
+    if (
+      gasStationsData?.fuelPlans &&
+      gasStationsData.fuelPlans.length > 0 &&
+      selectedRouteId
+    ) {
+      const filteredFuelPlan = gasStationsData.fuelPlans.find(
+        (plan) => plan.routeSectionId === selectedRouteId,
+      )
+      if (filteredFuelPlan) {
+        return filteredFuelPlan.fuelPlanId
+      }
+    }
+
+    // Fallback на routeByIdData только если нет данных из get-gas-stations
+    if (routeByIdData?.fuelPlanId) {
+      return routeByIdData.fuelPlanId
+    }
+
+    return undefined
+  }, [gasStationsData?.fuelPlans, selectedRouteId, routeByIdData?.fuelPlanId])
+
   const handleRouteClick = (routeIndex: number) => {
     if (
       currentDirectionsData?.route &&
@@ -260,6 +284,7 @@ export default function TruckInfo() {
                   selectedRouteId={selectedRouteId}
                   fuelPlans={gasStationsData?.fuelPlans}
                   routeByIdData={routeByIdData}
+                  fuelPlanId={fuelPlanId}
                 />
               )}
             </InfoCard>
@@ -296,6 +321,7 @@ export default function TruckInfo() {
               routeByIdTotalPriceAmount={routeByIdData?.totalPriceAmmount}
               fuelPlans={gasStationsData?.fuelPlans}
               routeByIdData={routeByIdData}
+              fuelPlanId={fuelPlanId}
             />
           </>
         )}
