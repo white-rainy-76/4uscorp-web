@@ -7,7 +7,7 @@ import { Phone, MessageSquare } from 'lucide-react'
 
 type DriverInfoProps = {
   truck: Truck
-  truckInfo: TruckStatsUpdate | null
+  truckInfo?: TruckStatsUpdate | null
   isLoadingFuel: boolean
 }
 
@@ -30,11 +30,13 @@ export const DriverInfo = ({
         />
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <FuelIndicator
-            percentage={truckInfo?.fuelPercentage}
-            label={dictionary.home.driver_info.fuel}
-            isLoadingFuel={isLoadingFuel}
-          />
+          {truckInfo && (
+            <FuelIndicator
+              percentage={truckInfo.fuelPercentage}
+              label={dictionary.home.driver_info.fuel}
+              isLoadingFuel={isLoadingFuel}
+            />
+          )}
           <BonusPoints
             points={truck.driver?.bonus || 0}
             label={dictionary.home.driver_info.bonus}

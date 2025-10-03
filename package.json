@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fontsource/archivo-black": "^5.2.8",
     "@formatjs/intl-localematcher": "^0.5.4",
     "@googlemaps/markerclusterer": "^2.5.3",
     "@hookform/resolvers": "^4.1.3",

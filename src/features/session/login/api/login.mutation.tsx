@@ -44,12 +44,13 @@ export function useSignInMutation(
       // Login with the access token (refresh token is handled via httpOnly cookies)
       login(data.token)
 
-      // Extract locale from current pathname and redirect to main page
+      // Extract locale from current pathname and redirect to dashboard main page
       const segments = pathname?.split('/') || []
       const locale =
         segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
 
-      router.push(`/${locale}`)
+      // Redirect to the main dashboard page with proper locale
+      router.push(`/${locale}(routing)/(dashboard)/(main)`)
     },
 
     onError: (error, variables, context) => {

@@ -17,8 +17,7 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         nunito: ['Nunito', 'sans-serif'],
-        // avenir: ['Avenir', 'sans-serif'],
-        // archivo: ['"Archivo Black"', 'sans-serif'],
+        'archivo-black': ['"Archivo Black"', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',

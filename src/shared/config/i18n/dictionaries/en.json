@@ -146,7 +146,8 @@
       "dashboard": "Dashboard",
       "companies": "Companies",
       "drivers": "Drivers",
-      "truck_models": "Truck models"
+      "truck_models": "Truck models",
+      "statistics": "Statistics"
     },
     "lists": {
       "no_companies_found": "No companies found",
@@ -155,6 +156,7 @@
     },
     "auth": {
       "sign_in": "Sign in",
+      "sign_out": "Sign out",
       "login": "Login",
       "login_placeholder": "Enter login",
       "password": "Password",
@@ -249,6 +251,32 @@
       "upload_error": "Upload error: {{message}}",
       "files_uploaded_successfully": "Files uploaded successfully!",
       "file_uploaded_successfully": "File uploaded successfully!"
+    },
+    "statistics": {
+      "select_driver": "Select a driver",
+      "choose_driver_message": "Choose a driver from the list to view detailed statistics",
+      "drivers": "Drivers",
+      "loading_drivers": "Loading drivers...",
+      "no_drivers_found": "No drivers found",
+      "search_drivers": "Search drivers...",
+      "violations": "Violations",
+      "unit_number": "Unit number",
+      "drive_time": "Drive time:",
+      "miles": "Miles:",
+      "gallons": "Gallons:",
+      "tolls": "Tolls:",
+      "address": "Address",
+      "price": "Price",
+      "plan_refill": "Plan refill",
+      "actual_refill": "Actual refill",
+      "gallons_unit": "Gallons",
+      "s_label": "S",
+      "w_label": "W",
+      "choose_driver_for_statistics": "Select a driver to view statistics",
+      "pounds_unit": "Lbt",
+      "miles_unit": "mi",
+      "hours_unit": "h",
+      "minutes_unit": "min"
     }
   }
 }

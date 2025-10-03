@@ -14,6 +14,8 @@ export interface SpritesMap {
   common:
     | 'logo'
     | 'fuel'
+    | 'fuel-green'
+    | 'fuel-red'
     | 'marker-blue'
     | 'marker-yellow'
     | 'marker-gray'
@@ -43,6 +45,8 @@ export const SPRITES_META: {
   common: Array<
     | 'logo'
     | 'fuel'
+    | 'fuel-green'
+    | 'fuel-red'
     | 'marker-blue'
     | 'marker-yellow'
     | 'marker-gray'
@@ -71,6 +75,8 @@ export const SPRITES_META: {
   common: [
     'logo',
     'fuel',
+    'fuel-green',
+    'fuel-red',
     'marker-blue',
     'marker-yellow',
     'marker-gray',

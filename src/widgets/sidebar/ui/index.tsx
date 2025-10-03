@@ -7,6 +7,7 @@ import {
   UsersRound,
   Building2,
   Compass,
+  LogOut,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -22,16 +23,22 @@ import { Icon } from '@/shared/ui/Icon'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import Link from 'next/link'
 import { useAuthStore } from '@/shared/store/auth-store'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useDictionary } from '@/shared/lib/hooks'
 import { LanguageSwitcher } from '@/shared/ui/language-switcher'
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { user } = useAuthStore()
+  const router = useRouter()
+  const { user, logout } = useAuthStore()
   const { dictionary, lang } = useDictionary()
 
   const canAccessCompanies = user ? user.role : false
+
+  const handleLogout = () => {
+    logout()
+    router.push(`/${lang}/auth/sign-in`)
+  }
 
   return (
     <Sidebar>
@@ -107,6 +114,14 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <LanguageSwitcher />
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              tooltip={dictionary.home.auth.sign_out}>
+              <LogOut className="w-5 h-5 text-red-500" />
+            </SidebarMenuButton>
           </SidebarMenuItem>
 
           <Avatar>

@@ -146,7 +146,8 @@
       "dashboard": "Панель управления",
       "companies": "Компании",
       "drivers": "Водители",
-      "truck_models": "Модели грузовиков"
+      "truck_models": "Модели грузовиков",
+      "statistics": "Статистика"
     },
     "lists": {
       "no_companies_found": "Компании не найдены",
@@ -155,6 +156,7 @@
     },
     "auth": {
       "sign_in": "Войти",
+      "sign_out": "Выйти",
       "login": "Логин",
       "login_placeholder": "Введите логин",
       "password": "Пароль",
@@ -249,6 +251,32 @@
       "upload_error": "Ошибка загрузки: {{message}}",
       "files_uploaded_successfully": "Файлы успешно загружены!",
       "file_uploaded_successfully": "Файл успешно загружен!"
+    },
+    "statistics": {
+      "select_driver": "Выберите водителя",
+      "choose_driver_message": "Выберите водителя из списка для просмотра детальной статистики",
+      "drivers": "Водители",
+      "loading_drivers": "Загрузка водителей...",
+      "no_drivers_found": "Водители не найдены",
+      "search_drivers": "Поиск водителей...",
+      "violations": "Нарушения",
+      "unit_number": "Номер юнита",
+      "drive_time": "Время в пути:",
+      "miles": "Мили:",
+      "gallons": "Галлоны:",
+      "tolls": "Платные дороги:",
+      "address": "Адрес",
+      "price": "Цена",
+      "plan_refill": "План заправки",
+      "actual_refill": "Фактическая заправка",
+      "gallons_unit": "Галлоны",
+      "s_label": "S",
+      "w_label": "W",
+      "choose_driver_for_statistics": "Выберите водителя для просмотра статистики",
+      "pounds_unit": "Фунт",
+      "miles_unit": "ми",
+      "hours_unit": "ч",
+      "minutes_unit": "мин"
     }
   }
 }

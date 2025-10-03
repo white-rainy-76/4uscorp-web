@@ -1,6 +1,7 @@
 import { Icon } from '@/shared/ui'
-import { GasStation } from '@/entities/gas-station'
+import { GasStation, getLogoUrl } from '@/entities/gas-station'
 import { useDictionary } from '@/shared/lib/hooks'
+import Image from 'next/image'
 
 interface FuelStopInfoProps {
   station: GasStation
@@ -42,7 +43,13 @@ export const FuelStopInfo = ({ station, isLast }: FuelStopInfoProps) => {
       <div className="flex-[3] flex items-center gap-3">
         <div className="w-12 flex items-center justify-center">
           {station.isAlgorithm && (
-            <Icon name="common/fuel" width={28} height={28} />
+            <Image
+              alt="gas-station"
+              src={getLogoUrl(station.name)}
+              width={28}
+              height={28}
+              className="mx-auto"
+            />
           )}
         </div>
         <div className="text-sm leading-tight space-y-[2px]">
