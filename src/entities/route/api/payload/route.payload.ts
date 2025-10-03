@@ -16,7 +16,7 @@ export const AssignRoutePayloadSchema = z.object({
     .array(
       z.object({
         routeSectionId: z.string(),
-        fuelPlanId: z.string(),
+        fuelPlanId: z.string().optional().nullable(),
       }),
     )
     .optional(),
