@@ -9,6 +9,7 @@ export const FileResultSchema = z.object({
 
 export const ReportLoadAttemptSchema = z.object({
   id: z.string().uuid(),
+  transactionReportFileId: z.string().uuid(),
   startedAt: z.string(),
   completedAt: z.string(),
   isSuccessful: z.boolean(),

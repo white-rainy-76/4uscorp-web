@@ -16,6 +16,14 @@ export const FuelPlanChangePayloadSchema = z.object({
   currentFuelPercent: z.number(),
   fuelStationChange: FuelStationChangeSchema,
   operation: z.nativeEnum(FuelPlanOperation),
+  fuelPlans: z
+    .array(
+      z.object({
+        routeSectionId: z.string(),
+        fuelPlanId: z.string(),
+      }),
+    )
+    .optional(),
 })
 
 export const StepResultSchema = z.object({

@@ -10,6 +10,8 @@ import { useAssignRouteMutation } from '@/entities/route/api/assign-route.mutati
 import { useState } from 'react'
 import { Icon } from '@/shared/ui'
 import { useDictionary } from '@/shared/lib/hooks'
+import { FuelPlan } from '@/entities/gas-station'
+import { RouteByIdData } from '@/entities/route'
 
 interface TruckRouteInfoProps {
   truck: Truck
@@ -31,6 +33,9 @@ interface TruckRouteInfoProps {
   }) => void
   routeId: string | undefined
   selectedRouteId: string | null
+  fuelPlans?: FuelPlan[]
+  routeByIdData?: RouteByIdData
+  fuelPlanId?: string
 }
 
 export const TruckRouteInfo = ({
@@ -46,6 +51,9 @@ export const TruckRouteInfo = ({
   routeId,
   truck,
   selectedRouteId,
+  fuelPlans,
+  routeByIdData,
+  fuelPlanId,
 }: TruckRouteInfoProps) => {
   const { dictionary } = useDictionary()
   const [isEditing, setIsEditing] = useState(false)
@@ -55,6 +63,41 @@ export const TruckRouteInfo = ({
 
   const { mutateAsync: AssignRoute, isPending: isAssignLoading } =
     useAssignRouteMutation({})
+
+  // Функция для получения приоритетных fuelPlans
+  const getPriorityFuelPlans = (): FuelPlan[] | undefined => {
+    // Приоритет: fuelPlans из get-gas-stations (всегда приоритетнее) > fuelPlanId из get-fuel-route-byId > переданный fuelPlanId
+    if (fuelPlans && fuelPlans.length > 0 && selectedRouteId) {
+      // Фильтруем fuelPlans по selectedRouteId (выбранной ветке)
+      const filteredFuelPlans = fuelPlans.filter(
+        (plan) => plan.routeSectionId === selectedRouteId,
+      )
+      if (filteredFuelPlans.length > 0) {
+        return filteredFuelPlans
+      }
+    }
+
+    if (routeByIdData?.fuelPlanId && selectedRouteId) {
+      return [
+        {
+          routeSectionId: selectedRouteId,
+          fuelPlanId: routeByIdData.fuelPlanId,
+        },
+      ]
+    }
+
+    // Используем переданный fuelPlanId если он есть
+    if (fuelPlanId && selectedRouteId) {
+      return [
+        {
+          routeSectionId: selectedRouteId,
+          fuelPlanId: fuelPlanId,
+        },
+      ]
+    }
+
+    return undefined
+  }
 
   if (isEditing) {
     return (
@@ -78,6 +121,7 @@ export const TruckRouteInfo = ({
               truckId: truck.id,
               routeId: routeId ? routeId : '',
               routeSectionId: selectedRouteId ? selectedRouteId : '',
+              fuelPlans: getPriorityFuelPlans(),
             })
           }>
           {dictionary.home.buttons.submit}

@@ -8,9 +8,11 @@ import { Spinner } from '@/shared/ui'
 import { ReportLoadAttempt } from '@/entities/file-upload/api/contracts/report-load-attempt.contract'
 import { FileUpload as ReportUpload } from '@/features/file-upload/upload-report'
 import { useDictionary } from '@/shared/lib/hooks'
+import { useRouter } from 'next/navigation'
 
 export const ReportsSection = () => {
-  const { dictionary } = useDictionary()
+  const { dictionary, lang } = useDictionary()
+  const router = useRouter()
   const {
     data: reports = [],
     isLoading,
@@ -20,6 +22,10 @@ export const ReportsSection = () => {
   })
 
   const typedReports: ReportLoadAttempt[] = reports
+
+  const handleWatchingClick = (transactionReportFileId: string) => {
+    router.push(`/${lang}/statistics/${transactionReportFileId}`)
+  }
 
   if (isLoading) {
     return (
@@ -93,6 +99,16 @@ export const ReportsSection = () => {
                       </div>
                     </>
                   )}
+
+                  {/* Watching button */}
+                  <button
+                    onClick={() =>
+                      handleWatchingClick(report.transactionReportFileId)
+                    }
+                    className="ml-2 text-sm text-blue-600 hover:underline transition-all duration-200"
+                    title="View statistics">
+                    view
+                  </button>
                 </div>
               </div>
             ))}
