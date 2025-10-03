@@ -44,7 +44,7 @@ export const FuelRouteInfoSchema = z.object({
 
 export const FuelPlanSchema = z.object({
   routeSectionId: z.string(),
-  fuelPlanId: z.string(),
+  fuelPlanId: z.string().optional().nullable(),
 })
 
 export const GetGasStationsResponseSchema = z.object({

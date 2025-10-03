@@ -66,7 +66,7 @@ export const RouteByIdSchema = z.object({
   fuelStations: z.array(GasStationSchema),
   totalFuelAmmount: z.number(),
   totalPriceAmmount: z.number(),
-  fuelPlanId: z.string().optional(),
+  fuelPlanId: z.string().optional().nullable(),
 })
 
 // get distance
