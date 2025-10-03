@@ -97,6 +97,6 @@ export const mapGetGasStations = (
   return {
     fuelStations: dto.fuelStations.map(mapGasStation),
     fuelRouteInfoDtos: dto.fuelRouteInfoDtos.map(mapFuelRouteInfo),
-    fuelPlans: dto.fuelPlans.map(mapFuelPlan),
+    fuelPlans: dto.fuelPlans?.map(mapFuelPlan),
   }
 }
