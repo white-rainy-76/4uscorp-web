@@ -40,5 +40,5 @@ export const FuelPlanDtoSchema = z.object({
 export const GetGasStationsResponseDtoSchema = z.object({
   fuelStations: z.array(GasStationDtoSchema),
   fuelRouteInfoDtos: z.array(FuelRouteInfoDtoSchema),
-  fuelPlans: z.array(FuelPlanDtoSchema),
+  fuelPlans: z.array(FuelPlanDtoSchema).optional(),
 })
