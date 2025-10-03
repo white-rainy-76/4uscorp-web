@@ -50,7 +50,7 @@ export function useSignInMutation(
         segments[1] && ['en', 'ru'].includes(segments[1]) ? segments[1] : 'en'
 
       // Redirect to the main dashboard page with proper locale
-      router.push(`/${locale}/`)
+      router.push(`/${locale}/(dashboard)/(main)`)
     },
 
     onError: (error, variables, context) => {
