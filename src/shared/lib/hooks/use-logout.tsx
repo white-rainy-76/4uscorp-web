@@ -1,3 +1,5 @@
+'use client'
+
 import { useAuthStore } from '@/shared/store/auth-store'
 import { useRouter } from 'next/navigation'
 
@@ -12,5 +14,3 @@ export const useLogout = () => {
 
   return { logout: handleLogout }
 }
-
-

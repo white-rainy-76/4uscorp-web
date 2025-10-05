@@ -11,7 +11,8 @@
       "save_changes": "Сохранить изменения",
       "add_company": "Добавить компанию",
       "add_driver": "Добавить водителя",
-      "update_driver": "Обновить водителя"
+      "update_driver": "Обновить водителя",
+      "complete_route": "Завершить маршрут"
     },
     "errors": {
       "departure_required_error": "Выберите точку отправления",
@@ -132,7 +133,13 @@
       "departure_city": "Город отправки",
       "destination_city": "Город назначения",
       "adjust_route": "Корректировать маршрут",
-      "create_route": "Создать маршрут"
+      "create_route": "Создать маршрут",
+      "complete_route_success": "Маршрут успешно завершен",
+      "complete_route_error": "Не удалось завершить маршрут",
+      "view_details": "Просмотр деталей",
+      "retry": "Повторить",
+      "route_id_required": "Требуется ID маршрута",
+      "route_id_required_description": "Пожалуйста, предоставьте действительный ID маршрута для завершения"
     },
     "gas_station": {
       "add_to_cart": "Добавить в корзину",

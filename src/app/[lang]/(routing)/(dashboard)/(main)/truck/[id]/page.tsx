@@ -60,6 +60,7 @@ export default function TruckInfo() {
     routeByIdData,
     apiOrigin,
     apiDestination,
+    refetchRouteData,
   } = useRoute({
     truckId: truckData?.id,
     setOrigin,
@@ -254,6 +255,7 @@ export default function TruckInfo() {
                       : currentDirectionsData?.routeId
                   }
                   selectedRouteId={selectedRouteId}
+                  onRouteCompleted={refetchRouteData}
                 />
               )}
             </InfoCard>

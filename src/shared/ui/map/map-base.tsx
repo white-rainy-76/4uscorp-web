@@ -1,3 +1,5 @@
+'use client'
+
 import { mapOptions } from '@/shared/constants'
 import { Map } from '@vis.gl/react-google-maps'
 import { ReactNode } from 'react'

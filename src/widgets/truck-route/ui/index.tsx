@@ -12,6 +12,7 @@ import { Icon } from '@/shared/ui'
 import { useDictionary } from '@/shared/lib/hooks'
 import { FuelPlan } from '@/entities/gas-station'
 import { RouteByIdData } from '@/entities/route'
+import { CompleteRouteButton } from '@/features/route/complete-route'
 
 interface TruckRouteInfoProps {
   truck: Truck
@@ -36,6 +37,7 @@ interface TruckRouteInfoProps {
   fuelPlans?: FuelPlan[]
   routeByIdData?: RouteByIdData
   fuelPlanId?: string
+  onRouteCompleted?: () => void
 }
 
 export const TruckRouteInfo = ({
@@ -54,6 +56,7 @@ export const TruckRouteInfo = ({
   fuelPlans,
   routeByIdData,
   fuelPlanId,
+  onRouteCompleted,
 }: TruckRouteInfoProps) => {
   const { dictionary } = useDictionary()
   const [isEditing, setIsEditing] = useState(false)
@@ -101,31 +104,42 @@ export const TruckRouteInfo = ({
 
   if (isEditing) {
     return (
-      <div className="space-y-4">
-        <RouteSearchForm
-          originName={originName}
-          destinationName={destinationName}
-          truckWeight={truckWeight}
-          finishFuel={finishFuel}
-          origin={origin}
-          destination={destination}
-          truck={truck}
-          currentFuelPercent={currentFuelPercent}
-          onSubmitForm={onSubmitForm}
-        />
-        <Button
-          className="rounded-full"
-          disabled={!routeId || !selectedRouteId}
-          onClick={() =>
-            AssignRoute({
-              truckId: truck.id,
-              routeId: routeId ? routeId : '',
-              routeSectionId: selectedRouteId ? selectedRouteId : '',
-              fuelPlans: getPriorityFuelPlans(),
-            })
-          }>
-          {dictionary.home.buttons.submit}
-        </Button>
+      <div className="flex items-start gap-4">
+        <div className="flex-1">
+          <RouteSearchForm
+            originName={originName}
+            destinationName={destinationName}
+            truckWeight={truckWeight}
+            finishFuel={finishFuel}
+            origin={origin}
+            destination={destination}
+            truck={truck}
+            currentFuelPercent={currentFuelPercent}
+            onSubmitForm={onSubmitForm}
+          />
+        </div>
+        <div className="flex flex-col gap-3 min-w-[140px]">
+          <Button
+            className="rounded-full min-w-[140px]"
+            disabled={!routeId || !selectedRouteId}
+            onClick={() =>
+              AssignRoute({
+                truckId: truck.id,
+                routeId: routeId ? routeId : '',
+                routeSectionId: selectedRouteId ? selectedRouteId : '',
+                fuelPlans: getPriorityFuelPlans(),
+              })
+            }>
+            {dictionary.home.buttons.submit}
+          </Button>
+          {routeId && (
+            <CompleteRouteButton
+              routeId={routeId}
+              disabled={!routeId}
+              onSuccess={onRouteCompleted}
+            />
+          )}
+        </div>
       </div>
     )
   }

@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { useGetRouteMutation } from '@/entities/route/api/get-route.mutation'
 import { Coordinate } from '@/shared/types'
 import { useGetRouteByIdMutation } from '../../api/get-route-by-id.mutation'
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 type useRouteProps = {
   truckId: string | undefined
@@ -22,6 +24,7 @@ export function useRoute({
   setOriginName,
   setDestinationName,
 }: useRouteProps) {
+  const queryClient = useQueryClient()
   const {
     mutateAsync: getRouteById,
     data: routeByIdData,
@@ -74,6 +77,36 @@ export function useRoute({
     }
   }, [truckId, routeData, getRouteById])
 
+  // Функция для перезапроса данных маршрута
+  const refetchRouteData = async () => {
+    if (truckId) {
+      console.log('Refetching route data for truck:', truckId)
+      toast('Updating route data...', {
+        description: 'Fetching latest route information',
+      })
+      await getRoute({ truckId })
+    }
+  }
+
+  // Отслеживаем инвалидацию запросов и перезапрашиваем данные
+  useEffect(() => {
+    const handleInvalidation = () => {
+      // Небольшая задержка, чтобы дать время серверу обновиться
+      setTimeout(() => {
+        refetchRouteData()
+      }, 500)
+    }
+
+    // Слушаем изменения в кеше
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'updated' && event.query.queryKey.includes('routes')) {
+        handleInvalidation()
+      }
+    })
+
+    return unsubscribe
+  }, [truckId, queryClient, getRoute])
+
   return {
     routeData,
     isRouteLoading,
@@ -90,5 +123,6 @@ export function useRoute({
           }
         : null),
     apiDestination: routeData?.destination,
+    refetchRouteData,
   }
 }

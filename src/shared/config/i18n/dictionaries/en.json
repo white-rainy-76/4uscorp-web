@@ -11,7 +11,8 @@
       "save_changes": "Save changes",
       "add_company": "Add company",
       "add_driver": "Add driver",
-      "update_driver": "Update driver"
+      "update_driver": "Update driver",
+      "complete_route": "Complete route"
     },
     "errors": {
       "departure_required_error": "Select a departure point",
@@ -132,7 +133,13 @@
       "departure_city": "Departure city",
       "destination_city": "Destination city",
       "adjust_route": "Adjust route",
-      "create_route": "Create route"
+      "create_route": "Create route",
+      "complete_route_success": "Route completed successfully",
+      "complete_route_error": "Failed to complete route",
+      "view_details": "View Details",
+      "retry": "Retry",
+      "route_id_required": "Route ID is required",
+      "route_id_required_description": "Please provide a valid route ID to complete the route"
     },
     "gas_station": {
       "add_to_cart": "Add to cart",
