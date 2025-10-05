@@ -132,10 +132,10 @@ export const TruckRouteInfo = ({
             }>
             {dictionary.home.buttons.submit}
           </Button>
-          {routeId && (
+          {routeId && routeByIdData?.routeId && (
             <CompleteRouteButton
               routeId={routeId}
-              disabled={!routeId}
+              disabled={!routeByIdData?.routeId}
               onSuccess={onRouteCompleted}
             />
           )}
