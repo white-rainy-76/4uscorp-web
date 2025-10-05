@@ -48,15 +48,6 @@ export function useCompleteRouteMutation(
         }),
         onSuccess?.(data, variables, context),
       ])
-
-      // Дополнительно принудительно обновляем кеш
-      console.log('Route completed, forcing cache update...')
-      queryClient.removeQueries({
-        queryKey: ['routes', 'get'],
-      })
-      queryClient.removeQueries({
-        queryKey: ['routes', 'getById'],
-      })
     },
 
     onError: (error, variables, context) => {
