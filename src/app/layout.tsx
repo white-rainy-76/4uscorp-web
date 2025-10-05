@@ -8,6 +8,7 @@ import { queryClient } from '@/shared/api/query-client'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Script from 'next/script'
 import { ReactScan } from '@/shared/ui/react-scan'
+import { Toaster } from '@/shared/ui'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -40,7 +41,10 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <SocketProvider>
-              <ThemeProvider>{children}</ThemeProvider>
+              <ThemeProvider>
+                {children}
+                <Toaster />
+              </ThemeProvider>
               <ReactQueryDevtools initialIsOpen={false} />
             </SocketProvider>
           </AuthProvider>

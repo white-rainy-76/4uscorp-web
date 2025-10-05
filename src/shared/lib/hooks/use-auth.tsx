@@ -1,3 +1,4 @@
+'use client'
 import { useAuthStore } from '@/shared/store/auth-store'
 
 export const useAuth = () => {

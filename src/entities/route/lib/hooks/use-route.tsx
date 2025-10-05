@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useGetRouteMutation } from '@/entities/route/api/get-route.mutation'
 import { Coordinate } from '@/shared/types'
 import { useGetRouteByIdMutation } from '../../api/get-route-by-id.mutation'
+import { useQueryClient } from '@tanstack/react-query'
 
 type useRouteProps = {
   truckId: string | undefined
@@ -22,6 +23,7 @@ export function useRoute({
   setOriginName,
   setDestinationName,
 }: useRouteProps) {
+  const queryClient = useQueryClient()
   const {
     mutateAsync: getRouteById,
     data: routeByIdData,
@@ -74,6 +76,17 @@ export function useRoute({
     }
   }, [truckId, routeData, getRouteById])
 
+  // Функция для перезапроса данных маршрута (только при завершении маршрута)
+  const refetchRouteData = async () => {
+    if (truckId) {
+      console.log(
+        'Refetching route data after route completion for truck:',
+        truckId,
+      )
+      await getRoute({ truckId })
+    }
+  }
+
   return {
     routeData,
     isRouteLoading,
@@ -90,5 +103,6 @@ export function useRoute({
           }
         : null),
     apiDestination: routeData?.destination,
+    refetchRouteData,
   }
 }

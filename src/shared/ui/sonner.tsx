@@ -1,30 +1,46 @@
-"use client"
+'use client'
 
-import { useTheme } from "next-themes"
-import { Toaster as Sonner } from "sonner"
-
-type ToasterProps = React.ComponentProps<typeof Sonner>
+import { useTheme } from 'next-themes'
+import { Toaster as Sonner, ToasterProps } from 'sonner'
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = 'system' } = useTheme()
+
+  console.log('Toaster component rendered with theme:', theme)
 
   return (
-    <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
-      toastOptions={{
-        classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton:
-            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton:
-            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-        },
-      }}
-      {...props}
-    />
+    <>
+      {/* Видимый индикатор для проверки рендера */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '10px',
+          left: '10px',
+          background: 'red',
+          color: 'white',
+          padding: '5px',
+          zIndex: 10000,
+          fontSize: '12px',
+        }}>
+        Toaster Rendered
+      </div>
+
+      <Sonner
+        theme={theme as ToasterProps['theme']}
+        className="toaster group"
+        position="top-right"
+        richColors
+        closeButton
+        style={
+          {
+            '--normal-bg': 'var(--popover)',
+            '--normal-text': 'var(--popover-foreground)',
+            '--normal-border': 'var(--border)',
+          } as React.CSSProperties
+        }
+        {...props}
+      />
+    </>
   )
 }
 
