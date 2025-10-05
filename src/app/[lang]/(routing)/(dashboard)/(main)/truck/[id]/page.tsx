@@ -256,6 +256,7 @@ export default function TruckInfo() {
                   }
                   selectedRouteId={selectedRouteId}
                   onRouteCompleted={refetchRouteData}
+                  routeByIdData={routeByIdData}
                 />
               )}
             </InfoCard>
