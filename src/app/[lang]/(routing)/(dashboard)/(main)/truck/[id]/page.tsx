@@ -255,6 +255,8 @@ export default function TruckInfo() {
                       : currentDirectionsData?.routeId
                   }
                   selectedRouteId={selectedRouteId}
+                  fuelPlans={gasStationsData?.fuelPlans}
+                  fuelPlanId={routeByIdData?.fuelPlanId ?? undefined}
                   onRouteCompleted={refetchRouteData}
                   routeByIdData={routeByIdData}
                 />
@@ -291,6 +293,9 @@ export default function TruckInfo() {
               routeData={routeData}
               routeByIdTotalFuelAmount={routeByIdData?.totalFuelAmmount}
               routeByIdTotalPriceAmount={routeByIdData?.totalPriceAmmount}
+              fuelPlans={gasStationsData?.fuelPlans}
+              routeByIdData={routeByIdData}
+              fuelPlanId={routeByIdData?.fuelPlanId ?? undefined}
             />
           </>
         )}

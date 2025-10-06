@@ -195,8 +195,8 @@ export const MapWithRoute = ({
     (() => void) | null
   >(null)
 
-  // Функция для получения приоритетных fuelPlans
-  const getPriorityFuelPlans = (): FuelPlan[] | undefined => {
+  // Функция для получения приоритетного fuelPlanId для changeFuelPlan
+  const getPriorityFuelPlanId = (): string | undefined => {
     // Приоритет: fuelPlans из get-gas-stations (всегда приоритетнее) > fuelPlanId из get-fuel-route-byId > переданный fuelPlanId
     if (fuelPlans && fuelPlans.length > 0 && selectedRouteId) {
       // Фильтруем fuelPlans по selectedRouteId (выбранной ветке)
@@ -204,27 +204,17 @@ export const MapWithRoute = ({
         (plan) => plan.routeSectionId === selectedRouteId,
       )
       if (filteredFuelPlans.length > 0) {
-        return filteredFuelPlans
+        return filteredFuelPlans[0].fuelPlanId || undefined
       }
     }
 
     if (routeByIdData?.fuelPlanId && selectedRouteId) {
-      return [
-        {
-          routeSectionId: selectedRouteId,
-          fuelPlanId: routeByIdData.fuelPlanId,
-        },
-      ]
+      return routeByIdData.fuelPlanId
     }
 
     // Используем переданный fuelPlanId если он есть
     if (fuelPlanId && selectedRouteId) {
-      return [
-        {
-          routeSectionId: selectedRouteId,
-          fuelPlanId: fuelPlanId,
-        },
-      ]
+      return fuelPlanId
     }
 
     return undefined
@@ -353,7 +343,7 @@ export const MapWithRoute = ({
           newRefill: refillLiters,
         },
         operation: FuelPlanOperation.Add,
-        fuelPlans: getPriorityFuelPlans(),
+        fuelPlanId: getPriorityFuelPlanId(),
       })
 
       // Если API успешен, добавляем в корзину
@@ -381,7 +371,7 @@ export const MapWithRoute = ({
           newRefill: null,
         },
         operation: FuelPlanOperation.Remove,
-        fuelPlans: getPriorityFuelPlans(),
+        fuelPlanId: getPriorityFuelPlanId(),
       })
 
       // Если API успешен, удаляем из корзины
@@ -413,7 +403,7 @@ export const MapWithRoute = ({
           newRefill: liters,
         },
         operation: FuelPlanOperation.Update,
-        fuelPlans: getPriorityFuelPlans(),
+        fuelPlanId: getPriorityFuelPlanId(),
       })
 
       // Если API успешен, обновляем корзину
