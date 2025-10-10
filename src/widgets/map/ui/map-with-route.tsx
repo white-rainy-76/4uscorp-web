@@ -488,6 +488,7 @@ export const MapWithRoute = ({
         truckWeight !== 0 && { Weight: truckWeight }),
       FuelProviderNameList: providers,
       CurrentFuel: fuel?.toString(),
+      TankCapacityG: truck?.tankCapacityG,
     })
   }
 
