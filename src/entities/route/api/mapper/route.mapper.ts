@@ -1,5 +1,6 @@
 import { RouteData, RouteDataDto } from '../../model'
 import { RouteDataSchema } from '../contracts/route.contract'
+import { convertCoordinatesToLatLng } from '@/shared/lib/coordinates'
 
 export const mapRouteDataDtoToRouteData = (raw: RouteDataDto): RouteData => {
   const mapped = {
@@ -16,10 +17,7 @@ export const mapRouteDataDtoToRouteData = (raw: RouteDataDto): RouteData => {
           currentLocation: null,
           formattedLocation: raw.routeDto.formattedLocation,
           routeId: raw.routeDto.routeId,
-          mapPoints: raw.routeDto.mapPoints.map((point) => ({
-            lat: point.latitude,
-            lng: point.longitude,
-          })),
+          mapPoints: convertCoordinatesToLatLng(raw.routeDto.mapPoints),
         }
       : {
           isRoute: false,

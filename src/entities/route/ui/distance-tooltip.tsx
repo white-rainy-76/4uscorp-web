@@ -1,18 +1,26 @@
 import React from 'react'
-import { GetDistanceData } from '@/entities/route'
 import { AdvancedMarker } from '@vis.gl/react-google-maps'
+import { useQuery } from '@tanstack/react-query'
+import { routeQueries } from '../api'
 
 interface DistanceTooltipProps {
   position: google.maps.LatLngLiteral
-  distanceData?: GetDistanceData
-  isLoading?: boolean
+  routeSectionId: string
 }
 
 export const DistanceTooltip = ({
   position,
-  distanceData,
-  isLoading,
+  routeSectionId,
 }: DistanceTooltipProps) => {
+  const { data: distanceData, isLoading } = useQuery({
+    ...routeQueries.distance({
+      routeSectionId,
+      latitude: position.lat,
+      longitude: position.lng,
+    }),
+    enabled: !!routeSectionId,
+  })
+
   if (!distanceData && !isLoading) return null
 
   // Конвертируем метры в мили (1 метр = 0.000621371 мили)

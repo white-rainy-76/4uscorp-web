@@ -1,16 +1,13 @@
-// features/directions/components/RouteMarkers.tsx
 import React from 'react'
 import { Marker } from '@vis.gl/react-google-maps'
-import { GetDistanceData } from '@/entities/route'
-import { DistanceTooltip } from './distance-tooltip'
+import { DistanceTooltip } from '@/entities/route'
 
 interface RouteMarkersProps {
   hoverMarker: google.maps.LatLngLiteral | null
+  hoveredRouteSectionId: string | null
   wayPoints: google.maps.LatLngLiteral[]
   startMarker: google.maps.LatLngLiteral | null
   endMarker: google.maps.LatLngLiteral | null
-  distanceData?: GetDistanceData
-  isDistanceLoading?: boolean
   onMarkerDragStart: () => void
   onMarkerDragEnd: (e: google.maps.MapMouseEvent) => void
   onExistingMarkerDragEnd: (index: number, e: google.maps.MapMouseEvent) => void
@@ -19,11 +16,10 @@ interface RouteMarkersProps {
 
 export const RouteMarkers = ({
   hoverMarker,
+  hoveredRouteSectionId,
   wayPoints,
   startMarker,
   endMarker,
-  distanceData,
-  isDistanceLoading,
   onMarkerDragStart,
   onMarkerDragEnd,
   onExistingMarkerDragEnd,
@@ -47,11 +43,12 @@ export const RouteMarkers = ({
               strokeWeight: 2,
             }}
           />
-          <DistanceTooltip
-            position={hoverMarker}
-            distanceData={distanceData}
-            isLoading={isDistanceLoading}
-          />
+          {hoveredRouteSectionId && (
+            <DistanceTooltip
+              position={hoverMarker}
+              routeSectionId={hoveredRouteSectionId}
+            />
+          )}
         </>
       )}
       {wayPoints.map((marker, index) => (

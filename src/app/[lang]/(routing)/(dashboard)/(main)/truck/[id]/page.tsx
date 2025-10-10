@@ -150,13 +150,8 @@ export default function TruckInfo() {
     return
   }, [gasStationsData, currentDirectionsData])
 
-  const handleRouteClick = (routeIndex: number) => {
-    if (
-      currentDirectionsData?.route &&
-      currentDirectionsData.route[routeIndex]
-    ) {
-      setSelectedRouteId(currentDirectionsData.route[routeIndex].routeSectionId)
-    }
+  const handleRouteClick = (routeSectionId: string) => {
+    setSelectedRouteId(routeSectionId)
   }
 
   useEffect(() => {

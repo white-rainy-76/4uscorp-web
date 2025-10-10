@@ -61,8 +61,8 @@ export const RouteSearchForm = ({
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
     defaultValues: {
-      startPoint: originName,
-      endPoint: destinationName,
+      startPoint: originName || '',
+      endPoint: destinationName || '',
       weight: truckWeight?.toString() || '',
       fuelPercent: finishFuel !== undefined ? finishFuel : 0,
     },
