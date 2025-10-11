@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { setTruckGroupWeightFuel } from './set-truck-group-weight-fuel.service'
 import { SetTruckGroupWeightFuelPayload } from './payload/set-truck-group-weight-fuel.payload'
-import { TRUCK_GROUPS_ROOT_QUERY_KEY } from '@/entities/truck/api/truck.queries'
+import {
+  TRUCK_GROUPS_ROOT_QUERY_KEY,
+  TRUCKS_ROOT_QUERY_KEY,
+} from '@/entities/truck/api/truck.queries'
 import { queryClient } from '@/shared/api/query-client'
 import { truckGroupQueries } from '@/entities/truck'
 import { TruckGroup } from '@/entities/truck'
@@ -39,6 +42,10 @@ export const useSetTruckGroupWeightFuelMutation = () => {
       // Инвалидируем кеш truck groups после успешного обновления
       queryClient.invalidateQueries({
         queryKey: TRUCK_GROUPS_ROOT_QUERY_KEY,
+      })
+      // Инвалидируем кеш списка траков и траков по ID
+      queryClient.invalidateQueries({
+        queryKey: TRUCKS_ROOT_QUERY_KEY,
       })
     },
 
