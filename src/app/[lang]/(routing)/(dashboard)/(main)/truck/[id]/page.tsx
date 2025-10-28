@@ -99,7 +99,7 @@ export default function TruckInfo() {
             ...(truckWeight !== undefined &&
               truckWeight !== 0 && { Weight: truckWeight }),
             FuelProviderNameList: selectedProviders,
-            CurrentFuel: stats?.fuelPercentage?.toString(),
+            CurrentFuel: '0', // stats?.fuelPercentage?.toString(),
             TankCapacityG: truckData?.tankCapacityG,
           })
         } else {

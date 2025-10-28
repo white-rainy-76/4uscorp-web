@@ -337,7 +337,7 @@ export const MapWithRoute = ({
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedRouteId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
+        currentFuelPercent: 0, // parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: station.id,
           newRefill: refillLiters,
@@ -365,7 +365,7 @@ export const MapWithRoute = ({
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedRouteId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
+        currentFuelPercent: 0, // parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
           newRefill: null,
@@ -397,7 +397,7 @@ export const MapWithRoute = ({
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedRouteId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
+        currentFuelPercent: 0, // parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
           newRefill: liters,
@@ -487,7 +487,7 @@ export const MapWithRoute = ({
       ...(truckWeight !== undefined &&
         truckWeight !== 0 && { Weight: truckWeight }),
       FuelProviderNameList: providers,
-      CurrentFuel: fuel?.toString(),
+      CurrentFuel: '0', // fuel?.toString(),
       TankCapacityG: truck?.tankCapacityG,
     })
   }
