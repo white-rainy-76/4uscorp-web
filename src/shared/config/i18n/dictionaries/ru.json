@@ -154,7 +154,9 @@
       "companies": "Компании",
       "drivers": "Водители",
       "truck_models": "Модели грузовиков",
-      "statistics": "Статистика"
+      "statistics": "Статистика",
+      "tolls": "Платные дороги",
+      "roads": "Дороги"
     },
     "lists": {
       "no_companies_found": "Компании не найдены",

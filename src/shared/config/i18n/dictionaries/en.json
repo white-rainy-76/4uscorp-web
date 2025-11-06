@@ -154,7 +154,9 @@
       "companies": "Companies",
       "drivers": "Drivers",
       "truck_models": "Truck models",
-      "statistics": "Statistics"
+      "statistics": "Statistics",
+      "tolls": "Tolls",
+      "roads": "Roads"
     },
     "lists": {
       "no_companies_found": "No companies found",
