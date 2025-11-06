@@ -286,6 +286,28 @@
       "miles_unit": "mi",
       "hours_unit": "h",
       "minutes_unit": "min"
+    },
+    "roads": {
+      "title": {
+        "create": "Create Road",
+        "edit": "Edit Road",
+        "selected": "Road Selected",
+        "editing": "Editing Road"
+      },
+      "selected_road": "Selected Road",
+      "id": "ID",
+      "start_editing": "Start Editing",
+      "create_new": "Create New Road",
+      "instructions": "Instructions",
+      "instruction_add_point": "Right-click on map — add point",
+      "instruction_move_point": "Drag marker — move point",
+      "instruction_delete_point": "Click marker — delete point",
+      "points_added": "Points Added",
+      "save": "Save",
+      "reset": "Reset",
+      "cancel_changes": "Cancel Changes",
+      "cancel": "Cancel",
+      "description": "Click &quot;Start Editing&quot; and use right-click on map to add road points."
     }
   }
 }

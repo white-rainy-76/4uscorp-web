@@ -8,7 +8,7 @@ export const DEFAULT_COORDINATES = {
 }
 
 // Схема для формы (работает со строками для удобства ввода)
-export const tollSearchFormSchema = z
+export const boundingBoxSearchFormSchema = z
   .object({
     minLat: z
       .string()
@@ -125,4 +125,6 @@ export const tollSearchFormSchema = z
     }
   })
 
-export type TollSearchFormValues = z.infer<typeof tollSearchFormSchema>
+export type BoundingBoxSearchFormValues = z.infer<
+  typeof boundingBoxSearchFormSchema
+>

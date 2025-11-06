@@ -286,6 +286,28 @@
       "miles_unit": "ми",
       "hours_unit": "ч",
       "minutes_unit": "мин"
+    },
+    "roads": {
+      "title": {
+        "create": "Создание дороги",
+        "edit": "Редактирование дороги",
+        "selected": "Дорога выбрана",
+        "editing": "Редактирование дороги"
+      },
+      "selected_road": "Выбранная дорога",
+      "id": "ID",
+      "start_editing": "Начать редактирование",
+      "create_new": "Создать новую дорогу",
+      "instructions": "Инструкция",
+      "instruction_add_point": "Правый клик на карте — добавить точку",
+      "instruction_move_point": "Перетащите маркер — переместить точку",
+      "instruction_delete_point": "Клик на маркер — удалить точку",
+      "points_added": "Добавлено точек",
+      "save": "Сохранить",
+      "reset": "Reset",
+      "cancel_changes": "Отменить изменения",
+      "cancel": "Отмена",
+      "description": "Нажмите &quot;Начать редактирование&quot; и используйте правый клик на карте для добавления точек дороги."
     }
   }
 }

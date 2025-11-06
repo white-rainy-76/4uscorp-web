@@ -1,13 +1,13 @@
 import React from 'react'
 import { Controller, Control, FieldErrors } from 'react-hook-form'
 import { FormField, FormFieldInput } from './form-field'
-import { TollSearchFormValues } from '../../model/schema'
+import { BoundingBoxSearchFormValues } from '../../model/schema'
 
 interface CoordinateFieldProps {
   name: 'minLat' | 'minLon' | 'maxLat' | 'maxLon'
   label: string
-  control: Control<TollSearchFormValues>
-  errors: FieldErrors<TollSearchFormValues>
+  control: Control<BoundingBoxSearchFormValues>
+  errors: FieldErrors<BoundingBoxSearchFormValues>
   placeholder: string
 }
 

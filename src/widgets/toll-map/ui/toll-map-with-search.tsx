@@ -1,17 +1,13 @@
 'use client'
 
 import React, { useCallback } from 'react'
-import { TollSearchForm } from '@/entities/tolls/ui'
 import { MapWithTolls } from '@/widgets/map'
 import { Toll } from '@/entities/tolls'
 import { useGetTollsByBoundingBoxMutation } from '@/entities/tolls/api'
-
-interface SearchCoordinates {
-  minLat: number
-  minLon: number
-  maxLat: number
-  maxLon: number
-}
+import {
+  BoundingBoxSearchForm,
+  type BoundingBoxCoordinates,
+} from '@/features/forms/bounding-box-search'
 
 interface TollMapWithSearchProps {
   selectedToll?: Toll | null
@@ -35,7 +31,7 @@ export const TollMapWithSearch = ({
   })
 
   const handleSearch = useCallback(
-    (coordinates: SearchCoordinates) => {
+    (coordinates: BoundingBoxCoordinates) => {
       mutate(coordinates)
     },
     [mutate],
@@ -43,8 +39,9 @@ export const TollMapWithSearch = ({
 
   return (
     <main className="flex-1 overflow-y-auto bg-background custom-scroll relative">
-      <TollSearchForm
-        tollsCount={tolls.length}
+      <BoundingBoxSearchForm
+        title="Toll Points Search"
+        resultsCount={tolls.length}
         isLoading={isPending}
         onSearch={handleSearch}
       />
