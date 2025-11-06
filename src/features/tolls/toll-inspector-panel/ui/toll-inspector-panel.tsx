@@ -368,7 +368,7 @@ export const TollInspectorPanel = ({
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Toll</DialogTitle>
+            <DialogTitle className="text-black">Delete Toll</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete &quot;{selectedToll?.name}&quot;?
               This action cannot be undone.
@@ -377,6 +377,7 @@ export const TollInspectorPanel = ({
           <DialogFooter>
             <Button
               variant="outline"
+              className="text-black"
               onClick={() => setShowDeleteDialog(false)}
               disabled={isDeleting}>
               Cancel
