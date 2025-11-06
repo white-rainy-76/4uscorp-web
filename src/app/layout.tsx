@@ -26,12 +26,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const isDev = process.env.NODE_ENV === 'development'
+
   return (
     <html lang="en">
       <head>
-        <Script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        {isDev && (
+          <Script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        )}
       </head>
-      <ReactScan />
+      {isDev && <ReactScan />}
       <body
         suppressHydrationWarning
         className={cn(
@@ -45,7 +49,7 @@ export default function RootLayout({
                 {children}
                 <Toaster />
               </ThemeProvider>
-              <ReactQueryDevtools initialIsOpen={false} />
+              {isDev && <ReactQueryDevtools initialIsOpen={false} />}
             </SocketProvider>
           </AuthProvider>
         </QueryClientProvider>

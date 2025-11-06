@@ -8,6 +8,8 @@ import {
   Building2,
   Compass,
   LogOut,
+  DollarSign,
+  Map,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -93,6 +95,28 @@ export function AppSidebar() {
               asChild>
               <Link href={`/${lang}/truck-models`}>
                 <Truck className="w-5 h-5" />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname?.includes('/tolls')}
+              tooltip={dictionary.home.navigation.tolls}
+              asChild>
+              <Link href={`/${lang}/tolls`}>
+                <DollarSign className="w-5 h-5" />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname?.includes('/roads')}
+              tooltip={dictionary.home.navigation.roads}
+              asChild>
+              <Link href={`/${lang}/roads`}>
+                <Map className="w-5 h-5" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
