@@ -26,11 +26,11 @@ export const TollRoadPolyline: React.FC<TollRoadPolylineProps> = ({
           zIndex={19}
           onClick={(e) => onClick?.(e)}
         />
-        {/* Основная цветная линия (тоньше) */}
+        {/* Основная цветная линия (тоньше) - жёлтая для выделения */}
         <Polyline
           key={road.id}
           path={road.coordinates}
-          strokeColor="#4A90E2"
+          strokeColor="#FFD700"
           strokeOpacity={1}
           strokeWeight={5}
           zIndex={20}
