@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useGetRoadsByBoundingBoxMutation } from '@/entities/roads'
-import { MapWithRoads } from '@/widgets/map'
+import { useCallback, useState } from 'react'
+import { useGetTollRoadsByBoundingBoxMutation } from '@/entities/roads'
+import { MapWithTollRoads } from '@/widgets/map'
 import {
   BoundingBoxSearchForm,
   type BoundingBoxCoordinates,
@@ -10,25 +10,37 @@ import {
 
 // Coordinates covering Colorado area
 const DEFAULT_COORDINATES = {
-  minLat: '37.0', // South of Colorado
-  minLon: '-109.0', // West of Colorado
-  maxLat: '41.0', // North of Colorado
+  minLat: 37.0, // South of Colorado
+  minLon: -109.0, // West of Colorado
+  maxLat: 41.0, // North of Colorado
+  maxLon: -102.0,
+}
+
+const DEFAULT_COORDINATES_STR = {
+  minLat: '37.0',
+  minLon: '-109.0',
+  maxLat: '41.0',
   maxLon: '-102.0',
 }
 
-export default function RoadsPage() {
-  const { mutate, data, isPending } = useGetRoadsByBoundingBoxMutation({
-    onSuccess: (roads) => {
-      console.log('Loaded roads:', roads.length)
-    },
-  })
+export default function TollRoadsPage() {
+  const [currentCoordinates, setCurrentCoordinates] =
+    useState<BoundingBoxCoordinates>(DEFAULT_COORDINATES)
+
+  const { mutate, data, isPending } = useGetTollRoadsByBoundingBoxMutation({})
 
   const handleSearch = useCallback(
     (coordinates: BoundingBoxCoordinates) => {
+      setCurrentCoordinates(coordinates)
       mutate(coordinates)
     },
     [mutate],
   )
+
+  const handleTollRoadsUpdate = useCallback(() => {
+    // Обновляем список дорог после операций (add, update, delete)
+    mutate(currentCoordinates)
+  }, [mutate, currentCoordinates])
 
   return (
     <div
@@ -36,18 +48,22 @@ export default function RoadsPage() {
       style={{ width: 'calc(100vw - 92px)', left: '92px' }}>
       {/* Search Form */}
       <BoundingBoxSearchForm
-        title="Roads Search"
-        description="Enter bounding box coordinates to search for roads"
+        title="Toll Roads Search"
+        description="Enter bounding box coordinates to search for toll roads"
         resultsCount={data?.length}
-        resultsLabel="Found roads"
+        resultsLabel="Found toll roads"
         isLoading={isPending}
         onSearch={handleSearch}
-        defaultCoordinates={DEFAULT_COORDINATES}
+        defaultCoordinates={DEFAULT_COORDINATES_STR}
         className="w-80"
       />
 
       {/* Map */}
-      <MapWithRoads roads={data || []} isLoading={isPending} />
+      <MapWithTollRoads
+        tollRoads={data || []}
+        isLoading={isPending}
+        onTollRoadsUpdate={handleTollRoadsUpdate}
+      />
     </div>
   )
 }
