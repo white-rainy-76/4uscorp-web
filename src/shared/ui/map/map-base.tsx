@@ -14,7 +14,7 @@ export const MapBase = ({ children, onMapClick }: MapBaseProps) => {
     <Map
       colorScheme="LIGHT"
       {...mapOptions}
-      style={{ width: '100%', height: '100%' }}
+      // style={{ width: '100%', height: '100%' }}
       onClick={onMapClick}>
       {children}
     </Map>
