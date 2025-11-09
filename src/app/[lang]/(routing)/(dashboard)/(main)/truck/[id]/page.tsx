@@ -260,6 +260,7 @@ export default function TruckInfo() {
                   fuelPlanId={routeByIdData?.fuelPlanId ?? undefined}
                   onRouteCompleted={refetchRouteData}
                   routeByIdData={routeByIdData}
+                  isCreatingRoute={isDirectionsPending || isGasStationsLoading}
                 />
               )}
             </InfoCard>

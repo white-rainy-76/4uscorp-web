@@ -38,6 +38,7 @@ interface TruckRouteInfoProps {
   routeByIdData?: RouteByIdData
   fuelPlanId?: string
   onRouteCompleted?: () => void
+  isCreatingRoute?: boolean
 }
 
 export const TruckRouteInfo = ({
@@ -57,6 +58,7 @@ export const TruckRouteInfo = ({
   routeByIdData,
   fuelPlanId,
   onRouteCompleted,
+  isCreatingRoute = false,
 }: TruckRouteInfoProps) => {
   const { dictionary } = useDictionary()
   const [isEditing, setIsEditing] = useState(false)
@@ -106,12 +108,13 @@ export const TruckRouteInfo = ({
             truck={truck}
             currentFuelPercent={currentFuelPercent}
             onSubmitForm={onSubmitForm}
+            isCreatingRoute={isCreatingRoute}
           />
         </div>
         <div className="flex flex-col gap-3 min-w-[140px]">
           <Button
             className="rounded-full min-w-[140px]"
-            disabled={!routeId || !selectedRouteId}
+            disabled={!routeId || !selectedRouteId || isAssignLoading}
             onClick={() => {
               AssignRoute({
                 truckId: truck.id,
@@ -171,7 +174,10 @@ export const TruckRouteInfo = ({
         )}
       </div>
 
-      <Button onClick={() => setIsEditing(true)} className="rounded-full">
+      <Button
+        onClick={() => setIsEditing(true)}
+        className="rounded-full"
+        disabled={isCreatingRoute}>
         {isRoute
           ? dictionary.home.route.adjust_route
           : dictionary.home.route.create_route}
