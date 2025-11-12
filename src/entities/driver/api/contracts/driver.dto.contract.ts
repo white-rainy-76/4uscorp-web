@@ -8,6 +8,7 @@ export const TruckInfoDtoSchema = z.object({
 
 export const DriverDtoSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid().nullable().optional(),
   fullName: z.string().nullable(),
   phone: z.string().nullable(),
   email: z.string().nullable(),

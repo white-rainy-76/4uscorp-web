@@ -3,9 +3,11 @@ import React from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { driverQueries } from '@/entities/driver'
+import { userQueries } from '@/entities/user'
 import { UpdateDriverButton } from '@/features/driver/update-driver'
 import { DriverBonusButton } from '@/features/driver/driver-bonus'
 import { AttachDetachDriverButton } from '@/features/driver/attach-detach-driver'
+import { SetUserRoleButton } from '@/features/users/set-user-role'
 import { InfoCard } from '@/shared/ui'
 import { useDictionary } from '@/shared/lib/hooks'
 
@@ -16,6 +18,11 @@ export default function DriverPage() {
   const { data: driver, isLoading } = useQuery({
     ...driverQueries.driver(driverId!),
     enabled: !!driverId,
+  })
+
+  const { data: user, isLoading: isUserLoading } = useQuery({
+    ...userQueries.user(driver?.userId!),
+    enabled: !!driver?.userId,
   })
 
   if (isLoading) {
@@ -187,6 +194,33 @@ export default function DriverPage() {
           <div className="mt-1">
             <span className="font-nunito text-xs font-medium leading-4 tracking-[-0.04em] text-text-heading">
               {dictionary.home.drivers.bonuses}
+            </span>
+          </div>
+        </div>
+
+        {/* User Role Section  */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2">
+              {driver.userId && user && !isUserLoading ? (
+                <div className="flex items-center gap-1">
+                  <span className="font-nunito text-base font-extrabold leading-6 tracking-[-0.04em] text-[#000000]">
+                    {user.roles.join(', ')}
+                  </span>
+                </div>
+              ) : (
+                <span className="font-nunito text-base font-extrabold leading-6 tracking-[-0.04em] text-[#000000]">
+                  {driver.userId ? 'Loading...' : 'No user account'}
+                </span>
+              )}
+              <SetUserRoleButton
+                userId={driver.userId ? driver.userId : null}
+              />
+            </div>
+          </div>
+          <div className="mt-1">
+            <span className="font-nunito text-xs font-medium leading-4 tracking-[-0.04em] text-text-heading">
+              User Role
             </span>
           </div>
         </div>
