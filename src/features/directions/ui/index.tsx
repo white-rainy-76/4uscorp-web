@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { Directions as DirectionType, RouteRequestPayload } from '../api'
 import { RoutePolylines } from './route-polylines'
@@ -8,6 +8,7 @@ import { Coordinate } from '@/shared/types'
 import { convertCoordinatePairsToLatLng } from '@/shared/lib/coordinates'
 import { useGetNearestDropPointMutation } from '../api/get-nearest-drop-point.mutation'
 import { useWaypointManagement, useRouteSwitching, useRouteHover } from '../lib'
+import { useRouteFormStore, useRouteInfoStore } from '@/shared/store'
 
 interface DirectionsProps {
   data?: DirectionType | undefined
@@ -17,26 +18,20 @@ interface DirectionsProps {
     RouteRequestPayload,
     unknown
   >
-  origin: Coordinate | null
-  destination: Coordinate | null
-  onRouteClick?: (routeSectionId: string) => void
   truckId: string
-  destinationName: string | undefined
-  originName: string | undefined
   onClearAlternativeRoutes?: (clearFn: () => void) => void
 }
 
 export const Directions = ({
   data,
   directionsMutation,
-  origin,
-  destination,
-  onRouteClick,
   truckId,
-  destinationName,
-  originName,
   onClearAlternativeRoutes,
 }: DirectionsProps) => {
+  // Получаем данные из store
+  const { origin, destination, originName, destinationName } =
+    useRouteFormStore()
+  const { setSelectedSectionId, setRouteInfo } = useRouteInfoStore()
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
     google.maps.LatLngLiteral[][]
@@ -90,7 +85,22 @@ export const Directions = ({
       setMainRoute,
       setAlternativeRoutes,
       setRouteSectionIds,
-      onRouteClick,
+      onRouteClick: (routeSectionId: string) => {
+        // Находим данные маршрута для выбранной секции
+        const selectedRoute = data?.route?.find(
+          (r) => r.routeSectionId === routeSectionId,
+        )
+
+        if (selectedRoute) {
+          setRouteInfo({
+            selectedSectionId: routeSectionId,
+            miles: selectedRoute.routeInfo.miles,
+            driveTime: selectedRoute.routeInfo.driveTime,
+          })
+        } else {
+          setSelectedSectionId(routeSectionId)
+        }
+      },
       clearHoverState,
     })
 
@@ -140,13 +150,6 @@ export const Directions = ({
       console.error('Error processing route data:', error)
     }
   }, [data])
-
-  //? Уведомляем родительский компонент об изменении выбранного маршрута
-  useEffect(() => {
-    if (onRouteClick && routeSectionIds.length > 0) {
-      onRouteClick(routeSectionIds[0])
-    }
-  }, [routeSectionIds, onRouteClick])
 
   /**
    * Обработка клика на hover marker

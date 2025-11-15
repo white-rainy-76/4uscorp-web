@@ -3,9 +3,11 @@
 import React from 'react'
 import { Calendar, Check } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { reportLoadAttemptQueries } from '@/entities/file-upload'
+import {
+  reportLoadAttemptQueries,
+  ReportLoadAttempt,
+} from '@/entities/file-upload'
 import { Spinner } from '@/shared/ui'
-import { ReportLoadAttempt } from '@/entities/file-upload/api/contracts/report-load-attempt.contract'
 import { FileUpload as ReportUpload } from '@/features/file-upload/upload-report'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useRouter } from 'next/navigation'

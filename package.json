@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.45.3",
+    "@redux-devtools/extension": "^3.3.0",
     "@testing-library/jest-dom": "^6.4.7",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20",

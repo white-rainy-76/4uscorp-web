@@ -67,3 +67,13 @@ export const convertCoordinatePairsToLatLng = (
   return pairs.map(([lat, lng]) => ({ lat, lng }))
 }
 
+/**
+ * Преобразует координату (latitude/longitude) в пару координат [latitude, longitude]
+ * @param coordinate - Координата в формате { latitude, longitude }
+ * @returns Кортеж [latitude, longitude]
+ */
+export const convertCoordinateToPair = (
+  coordinate: Coordinate,
+): [number, number] => {
+  return [coordinate.latitude, coordinate.longitude]
+}

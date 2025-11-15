@@ -1,11 +1,5 @@
 import { z } from 'zod'
-
-export const FileResultSchema = z.object({
-  fileName: z.string(),
-  isSuccess: z.boolean(),
-  errorMessage: z.string().nullable(),
-  processedAt: z.string(),
-})
+import { FileResultSchema } from './file-result.contract'
 
 export const ReportLoadAttemptSchema = z.object({
   id: z.string().uuid(),
@@ -23,9 +17,3 @@ export const ReportLoadAttemptSchema = z.object({
 })
 
 export const ReportLoadAttemptsResponseSchema = z.array(ReportLoadAttemptSchema)
-
-export type ReportFileResult = z.infer<typeof FileResultSchema>
-export type ReportLoadAttempt = z.infer<typeof ReportLoadAttemptSchema>
-export type ReportLoadAttemptsResponse = z.infer<
-  typeof ReportLoadAttemptsResponseSchema
->

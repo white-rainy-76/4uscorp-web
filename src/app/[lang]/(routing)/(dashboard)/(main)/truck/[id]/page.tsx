@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { InfoCard } from '@/shared/ui/info-card'
 import { useDictionary } from '@/shared/lib/hooks'
@@ -17,10 +17,20 @@ import { useGetGasStationsMutation } from '@/entities/gas-station/api/get-gas-st
 import { useConnection } from '@/shared/lib/context'
 import { useRoute } from '@/entities/route/lib/hooks/use-route'
 
-import { Directions, RouteRequestPayload } from '@/features/directions/api'
+import {
+  Directions,
+  RouteRequestPayload,
+  Route,
+} from '@/features/directions/api'
 import { GasStation } from '@/entities/gas-station'
 import { useTruckStats } from '@/entities/truck/lib'
 import { DriverInfo, DriverInfoSkeleton } from '@/widgets/info/driver-info'
+import {
+  useRouteFormStore,
+  useRouteInfoStore,
+  useCartStore,
+} from '@/shared/store'
+import { convertCoordinateToPair } from '@/shared/lib/coordinates'
 
 export default function TruckInfo() {
   const { dictionary } = useDictionary()
@@ -28,14 +38,15 @@ export default function TruckInfo() {
   const router = useRouter()
   const { isConnected } = useConnection()
 
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
-  const [origin, setOrigin] = useState<Coordinate | null>(null)
-  const [destination, setDestination] = useState<Coordinate | null>(null)
-  const [originName, setOriginName] = useState<string | undefined>()
-  const [destinationName, setDestinationName] = useState<string | undefined>()
-  const [finishFuel, setFinishFuel] = useState<number | undefined>()
-  const [truckWeight, setTruckWeight] = useState<number | undefined>()
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
+
+  const { finishFuel, truckWeight, setRouteForm, clearRouteForm } =
+    useRouteFormStore()
+
+  const { selectedSectionId, setRouteInfo, clearRouteInfo } =
+    useRouteInfoStore()
+
+  const { clearCart, setFuelPlanId, setCart } = useCartStore()
 
   const truckId = useMemo(() => {
     const truckIdParam = params?.id
@@ -55,20 +66,12 @@ export default function TruckInfo() {
 
   const {
     routeData,
+    routeByIdData,
     isRouteLoading,
     isRouteByIdLoading,
-    routeByIdData,
-    apiOrigin,
-    apiDestination,
     refetchRouteData,
   } = useRoute({
     truckId: truckData?.id,
-    setOrigin,
-    setDestination,
-    setFinishFuel,
-    setTruckWeight,
-    setOriginName,
-    setDestinationName,
   })
 
   const {
@@ -76,6 +79,60 @@ export default function TruckInfo() {
     data: gasStationsData,
     isPending: isGasStationsLoading,
   } = useGetGasStationsMutation({
+    onSuccess: (data) => {
+      // Добавляем алгоритмические заправки в cart только для выбранной секции
+      if (
+        data.fuelStations &&
+        data.fuelStations.length > 0 &&
+        selectedSectionId
+      ) {
+        const algorithmStations: {
+          [stationId: string]: { refillLiters: number }
+        } = {}
+
+        data.fuelStations.forEach((station) => {
+          if (
+            station.isAlgorithm &&
+            station.roadSectionId === selectedSectionId &&
+            station.refill
+          ) {
+            const refillLiters = parseFloat(station.refill)
+            if (!isNaN(refillLiters) && refillLiters > 0) {
+              algorithmStations[station.id] = { refillLiters }
+            }
+          }
+        })
+
+        // Устанавливаем корзину с алгоритмическими заправками для выбранной секции
+        setCart(algorithmStations)
+      }
+
+      // Обновляем данные маршрута по выбранной секции
+      if (data.fuelRouteInfoDtos && selectedSectionId) {
+        const selectedRouteInfo = data.fuelRouteInfoDtos.find(
+          (info) => info.roadSectionId === selectedSectionId,
+        )
+
+        if (selectedRouteInfo) {
+          setRouteInfo({
+            gallons: selectedRouteInfo.totalFuelAmmount,
+            totalPrice: selectedRouteInfo.totalPriceAmmount,
+            fuelLeft: selectedRouteInfo.finishInfo.remainingFuelLiters,
+          })
+        }
+      }
+
+      // Устанавливаем fuelPlanId из fuelPlans по selectedSectionId
+      if (data.fuelPlans && selectedSectionId) {
+        const selectedFuelPlan = data.fuelPlans.find(
+          (plan) => plan.routeSectionId === selectedSectionId,
+        )
+
+        if (selectedFuelPlan?.fuelPlanId) {
+          setFuelPlanId(selectedFuelPlan.fuelPlanId)
+        }
+      }
+    },
     onError: (error) => {
       console.error('Update gas stations mutation error:', error)
     },
@@ -88,13 +145,27 @@ export default function TruckInfo() {
   } = useHandleDirectionsMutation(
     routeData?.route?.isRoute ? 'edit' : 'create',
     {
-      onSuccess: (data) => {
+      onSuccess: (data: Directions) => {
         if (data?.routeId) {
+          // Extract section IDs
+          const sectionIdsList = data.route.map(
+            (routeDto: Route) => routeDto.routeSectionId,
+          )
+          const firstRoute = data.route[0]
+
+          // Update route info store
+          setRouteInfo({
+            routeId: data.routeId,
+            sectionIds: sectionIdsList,
+            selectedSectionId:
+              sectionIdsList.length > 0 ? sectionIdsList[0] : null,
+            miles: firstRoute?.routeInfo?.miles,
+            driveTime: firstRoute?.routeInfo?.driveTime,
+          })
+
           updateGasStations({
             routeId: data.routeId,
-            routeSectionIds: data.route.map(
-              (routeDto) => routeDto.routeSectionId,
-            ),
+            routeSectionIds: sectionIdsList,
             FinishFuel: finishFuel,
             ...(truckWeight !== undefined &&
               truckWeight !== 0 && { Weight: truckWeight }),
@@ -107,15 +178,11 @@ export default function TruckInfo() {
           )
         }
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         console.error('Directions mutation error:', error)
       },
     },
   )
-
-  const latLngToCoordinatePair = (point: Coordinate): [number, number] => {
-    return [point.latitude, point.longitude]
-  }
 
   const currentDirectionsData = useMemo<Directions | undefined>(() => {
     if (routeByIdData && !directionsResponseData) {
@@ -125,7 +192,7 @@ export default function TruckInfo() {
           {
             routeSectionId: routeByIdData.sectionId,
 
-            mapPoints: routeByIdData.mapPoints.map(latLngToCoordinatePair),
+            mapPoints: routeByIdData.mapPoints.map(convertCoordinateToPair),
 
             routeInfo: routeByIdData.routeInfo,
           },
@@ -150,25 +217,82 @@ export default function TruckInfo() {
     return
   }, [gasStationsData, currentDirectionsData])
 
-  const handleRouteClick = (routeSectionId: string) => {
-    setSelectedRouteId(routeSectionId)
-  }
-
+  // Обновляем данные маршрута при смене секции из fuelRouteInfoDtos
   useEffect(() => {
     if (
-      currentDirectionsData?.route &&
-      currentDirectionsData.route.length > 0 &&
-      !selectedRouteId
+      gasStationsData?.fuelRouteInfoDtos &&
+      selectedSectionId &&
+      gasStationsData.fuelStations
     ) {
-      setSelectedRouteId(currentDirectionsData.route[0].routeSectionId)
+      // Находим данные для выбранной секции
+      const selectedRouteInfo = gasStationsData.fuelRouteInfoDtos.find(
+        (info) => info.roadSectionId === selectedSectionId,
+      )
+
+      if (selectedRouteInfo) {
+        setRouteInfo({
+          gallons: selectedRouteInfo.totalFuelAmmount,
+          totalPrice: selectedRouteInfo.totalPriceAmmount,
+          fuelLeft: selectedRouteInfo.finishInfo.remainingFuelLiters,
+        })
+      }
+
+      // Обновляем fuelPlanId из fuelPlans
+      if (gasStationsData.fuelPlans) {
+        const selectedFuelPlan = gasStationsData.fuelPlans.find(
+          (plan) => plan.routeSectionId === selectedSectionId,
+        )
+
+        if (selectedFuelPlan?.fuelPlanId) {
+          setFuelPlanId(selectedFuelPlan.fuelPlanId)
+        }
+      }
+
+      // Обновляем корзину с алгоритмическими заправками для выбранной секции
+      const algorithmStations: {
+        [stationId: string]: { refillLiters: number }
+      } = {}
+
+      gasStationsData.fuelStations.forEach((station) => {
+        if (
+          station.isAlgorithm &&
+          station.roadSectionId === selectedSectionId &&
+          station.refill
+        ) {
+          const refillLiters = parseFloat(station.refill)
+          if (!isNaN(refillLiters) && refillLiters > 0) {
+            algorithmStations[station.id] = { refillLiters }
+          }
+        }
+      })
+
+      setCart(algorithmStations)
     }
-  }, [currentDirectionsData, selectedRouteId])
+    // Убрали функции-сеттеры из зависимостей, так как они стабильны в Zustand
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedSectionId,
+    // gasStationsData?.fuelRouteInfoDtos,
+    // gasStationsData?.fuelPlans,
+    // gasStationsData?.fuelStations,
+  ])
 
   useEffect(() => {
     if (!truckId || (isTruckError && !isTruckLoading)) {
       router.replace('/404')
     }
   }, [truckId, isTruckError, isTruckLoading, router])
+
+  // Cleanup stores on unmount
+  useEffect(() => {
+    return () => {
+      clearRouteForm()
+      clearRouteInfo()
+      clearCart()
+    }
+    // Убрали функции-сеттеры из зависимостей, так как они стабильны в Zustand
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const isLoadingRouteRelated =
     isTruckLoading ||
@@ -177,36 +301,42 @@ export default function TruckInfo() {
     isDirectionsPending ||
     isGasStationsLoading
 
-  const handleSubmitRoute = (formPayload: {
-    origin: Coordinate
-    destination: Coordinate
-    originName: string
-    destinationName: string
-    truckWeight?: number
-    finishFuel?: number
-  }) => {
-    if (!truckData) {
-      console.error('Truck data is not available for route submission.')
-      return
-    }
+  const handleSubmitRoute = useCallback(
+    (formPayload: {
+      origin: Coordinate
+      destination: Coordinate
+      originName: string
+      destinationName: string
+      truckWeight?: number
+      finishFuel?: number
+    }) => {
+      if (!truckData) {
+        console.error('Truck data is not available for route submission.')
+        return
+      }
 
-    setOrigin(formPayload.origin)
-    setDestination(formPayload.destination)
-    setOriginName(formPayload.originName)
-    setDestinationName(formPayload.destinationName)
-    setTruckWeight(formPayload.truckWeight)
-    setFinishFuel(formPayload.finishFuel)
+      // Update store with form data
+      setRouteForm({
+        origin: formPayload.origin,
+        destination: formPayload.destination,
+        originName: formPayload.originName,
+        destinationName: formPayload.destinationName,
+        truckWeight: formPayload.truckWeight,
+        finishFuel: formPayload.finishFuel,
+      })
 
-    const payload: RouteRequestPayload = {
-      origin: formPayload.origin,
-      destination: formPayload.destination,
-      TruckId: truckData.id,
-      originName: formPayload.originName,
-      destinationName: formPayload.destinationName,
-    }
+      const payload: RouteRequestPayload = {
+        origin: formPayload.origin,
+        destination: formPayload.destination,
+        TruckId: truckData.id,
+        originName: formPayload.originName,
+        destinationName: formPayload.destinationName,
+      }
 
-    handleDirectionsMutation(payload)
-  }
+      handleDirectionsMutation(payload)
+    },
+    [truckData, setRouteForm, handleDirectionsMutation],
+  )
 
   return (
     truckId && (
@@ -231,12 +361,6 @@ export default function TruckInfo() {
               {routeData && (
                 <TruckRouteInfo
                   truck={truckData}
-                  origin={apiOrigin || null}
-                  destination={apiDestination || null}
-                  originName={originName}
-                  destinationName={destinationName}
-                  truckWeight={truckWeight}
-                  finishFuel={finishFuel}
                   currentFuelPercent={
                     stats?.fuelPercentage
                       ? parseFloat(stats.fuelPercentage)
@@ -249,7 +373,6 @@ export default function TruckInfo() {
                       ? routeData.route.routeId
                       : currentDirectionsData?.routeId
                   }
-                  selectedRouteId={selectedRouteId}
                   fuelPlans={gasStationsData?.fuelPlans}
                   fuelPlanId={routeByIdData?.fuelPlanId ?? undefined}
                   onRouteCompleted={refetchRouteData}
@@ -258,10 +381,6 @@ export default function TruckInfo() {
               )}
             </InfoCard>
             <MapWithRoute
-              origin={origin}
-              destination={destination}
-              originName={originName}
-              destinationName={destinationName}
               directionsData={currentDirectionsData}
               gasStations={combinedGasStations}
               remainingFuelLiters={
@@ -276,21 +395,14 @@ export default function TruckInfo() {
               isRoutePending={isLoadingRouteRelated}
               mutateAsync={handleDirectionsMutation}
               truck={truckData}
-              truckWeight={truckWeight}
               updateGasStations={updateGasStations}
-              selectedRouteId={selectedRouteId}
-              handleRouteClick={handleRouteClick}
               fuelRouteInfoDtos={gasStationsData?.fuelRouteInfoDtos}
-              finishFuel={finishFuel}
               selectedProviders={selectedProviders}
               setSelectedProviders={setSelectedProviders}
               fuel={stats?.fuelPercentage}
               routeData={routeData}
-              routeByIdTotalFuelAmount={routeByIdData?.totalFuelAmmount}
-              routeByIdTotalPriceAmount={routeByIdData?.totalPriceAmmount}
               fuelPlans={gasStationsData?.fuelPlans}
               routeByIdData={routeByIdData}
-              fuelPlanId={routeByIdData?.fuelPlanId ?? undefined}
             />
           </>
         )}
@@ -298,7 +410,6 @@ export default function TruckInfo() {
           <InfoCard title={dictionary.home.headings.details_info}>
             <RouteList
               gasStations={combinedGasStations}
-              selectedRouteId={selectedRouteId}
               routeId={
                 routeData?.route?.routeId
                   ? routeData.route.routeId

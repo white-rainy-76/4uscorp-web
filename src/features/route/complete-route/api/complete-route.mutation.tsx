@@ -4,7 +4,7 @@ import {
   UseMutationOptions,
   useQueryClient,
 } from '@tanstack/react-query'
-import { completeRoutePayloadSchema } from '../payload/route.payload'
+import { completeRoutePayloadSchema } from './payload/route.payload'
 import { completeRoute } from './route.service'
 import { CompleteRoutePayload } from '../types/route.payload'
 

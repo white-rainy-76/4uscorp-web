@@ -42,3 +42,15 @@ export const GetGasStationsResponseDtoSchema = z.object({
   fuelRouteInfoDtos: z.array(FuelRouteInfoDtoSchema),
   fuelPlans: z.array(FuelPlanDtoSchema).optional(),
 })
+
+// fuel station status
+export const FuelStationStatusDtoSchema = z.object({
+  fuelStationId: z.string(),
+  status: z.number().int().min(1).max(3), // 1 - ok, 2 - not ok, 3 - не доехал ещё
+})
+
+export const FuelStationStatusResponseSchema = z.object({
+  fuelStations: z.array(FuelStationStatusDtoSchema),
+})
+
+export type FuelStationStatusDto = z.infer<typeof FuelStationStatusDtoSchema>

@@ -4,4 +4,5 @@ export {
   convertLatLngToCoordinate,
   convertCoordinateToLatLng,
   convertCoordinatePairsToLatLng,
+  convertCoordinateToPair,
 } from './convert-coordinates'

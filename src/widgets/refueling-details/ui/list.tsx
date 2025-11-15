@@ -1,35 +1,34 @@
 import { RouteIndicator } from '@/shared/ui'
 import React, { useMemo } from 'react'
 import { FuelStopInfo } from './card'
-import { GasStation } from '@/entities/gas-station'
+import {
+  GasStation,
+  FuelStationStatusType,
+  gasStationQueries,
+} from '@/entities/gas-station'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useQuery } from '@tanstack/react-query'
-import { routeQueries } from '@/entities/route/api/route.queries'
-import { FuelStationStatusType } from '@/entities/route/model/types/fuel-station-status'
+import { useRouteInfoStore } from '@/shared/store'
 
 interface RouteListProps {
   gasStations: GasStation[]
-  selectedRouteId: string | null
   routeId?: string | null
 }
 
-export const RouteList = ({
-  gasStations,
-  selectedRouteId,
-  routeId,
-}: RouteListProps) => {
+export const RouteList = ({ gasStations, routeId }: RouteListProps) => {
   const { dictionary } = useDictionary()
+  const { selectedSectionId } = useRouteInfoStore()
 
   const algorithmStations = gasStations
     .filter(
       (station) =>
-        station.roadSectionId === selectedRouteId && station.isAlgorithm,
+        station.roadSectionId === selectedSectionId && station.isAlgorithm,
     )
     .sort((a, b) => (a.stopOrder || 0) - (b.stopOrder || 0))
 
   // Получаем статусы заправок каждые 2 секунды
   const { data: fuelStationStatuses = [] } = useQuery({
-    ...routeQueries.fuelStationArrived(routeId || ''),
+    ...gasStationQueries.fuelStationArrived(routeId || ''),
     enabled: !!routeId,
   })
 

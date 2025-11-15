@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from '@/shared/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,21 +6,16 @@ import { RouteSearchFormValues, routeSearchSchema } from '../model/schema'
 import { AutocompleteCustom } from './autocomplete'
 import { GooglePlace } from '@/shared/types/place'
 import { useDictionary } from '@/shared/lib/hooks'
-import { getLocalizedErrorMessage } from '../lib'
 import { Input } from '@/shared/ui'
-import { FuelSlider } from '@/shared/ui'
+import { FuelSlider } from './fuel-slider'
 import { Icon } from '@/shared/ui'
 import { Coordinate } from '@/shared/types'
-import { RouteRequestPayload } from '@/features/directions/api'
 import { Truck } from '@/entities/truck'
+import { useFuelSliderMax } from '../lib/hooks'
+import { FieldError } from './field-error'
+import { useRouteFormStore } from '@/shared/store'
 
 interface RouteSearchFormProps {
-  destinationName: string | undefined
-  originName: string | undefined
-  truckWeight: number | undefined
-  finishFuel: number | undefined
-  origin?: Coordinate | null
-  destination?: Coordinate | null
   truck?: Truck
   currentFuelPercent?: number
   onSubmitForm: (payload: {
@@ -34,12 +29,6 @@ interface RouteSearchFormProps {
 }
 
 export const RouteSearchForm = ({
-  destinationName,
-  originName,
-  finishFuel,
-  truckWeight,
-  origin,
-  destination,
   truck,
   currentFuelPercent,
   onSubmitForm,
@@ -51,20 +40,30 @@ export const RouteSearchForm = ({
     null,
   )
 
+  // Get route form data from store
+  const {
+    origin,
+    destination,
+    originName,
+    destinationName,
+    finishFuel,
+    truckWeight,
+  } = useRouteFormStore()
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     setError,
-    reset,
     watch,
+    reset,
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
     defaultValues: {
       startPoint: originName || '',
       endPoint: destinationName || '',
       weight: truckWeight?.toString() || '',
-      fuelPercent: finishFuel !== undefined ? finishFuel : 0,
+      fuelPercent: finishFuel ?? 0,
     },
   })
 
@@ -73,27 +72,14 @@ export const RouteSearchForm = ({
   const currentWeight = watchedWeight ? parseFloat(watchedWeight) : 0
 
   // Recalculate max fuel slider value when weight changes
-  const dynamicMaxFuelSliderValue = useMemo(() => {
-    if (!truck || currentFuelPercent === undefined) {
-      return 100 // Default fallback
-    }
-
-    const { tankCapacityG, overWeight, poundPerGallon } = truck
-
-    // Formula: Math.Min(((OverWeight - TruckWeight) / PoundPerGalon) + (CurrentFuelPercent * (TankCapacityG / 100.0), TankCapacityG)
-    const calculatedMax = Math.min(
-      (overWeight - currentWeight) / poundPerGallon +
-        currentFuelPercent * (tankCapacityG / 100.0),
-      tankCapacityG,
-    )
-    console.log('calculatedMax', calculatedMax)
-    // Convert to percentage (0-100)
-    return calculatedMax
-  }, [truck, currentFuelPercent, currentWeight])
+  const dynamicMaxFuelSliderValue = useFuelSliderMax(
+    truck,
+    currentFuelPercent,
+    currentWeight,
+  )
 
   const onSubmit = (data: RouteSearchFormValues) => {
-    // Проверяем, есть ли координаты (либо из API, либо выбранные пользователем)
-
+    // Проверяем, есть ли координаты (либо из стора, либо выбранные пользователем)
     const hasStartCoordinates = selectedStartPoint?.location || origin
     const hasEndCoordinates = selectedEndPoint?.location || destination
 
@@ -106,7 +92,7 @@ export const RouteSearchForm = ({
     }
 
     if (hasStartCoordinates && hasEndCoordinates) {
-      // Используем координаты из выбранных мест или из API напрямую
+      // Используем координаты из выбранных мест или из стора
       const startCoords = selectedStartPoint?.location
         ? {
             latitude: selectedStartPoint.location.lat(),
@@ -131,13 +117,6 @@ export const RouteSearchForm = ({
       })
     }
   }
-
-  const FieldError = ({ error }: { error?: { message?: string } }) =>
-    error?.message ? (
-      <p className="text-red-500 text-sm mt-1">
-        {getLocalizedErrorMessage(error.message, dictionary)}
-      </p>
-    ) : null
 
   return (
     <form

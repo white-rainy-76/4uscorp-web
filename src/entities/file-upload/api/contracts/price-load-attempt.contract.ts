@@ -1,11 +1,5 @@
 import { z } from 'zod'
-
-export const FileResultSchema = z.object({
-  fileName: z.string(),
-  isSuccess: z.boolean(),
-  errorMessage: z.string().nullable(),
-  processedAt: z.string(),
-})
+import { FileResultSchema } from './file-result.contract'
 
 export const PriceLoadAttemptSchema = z.object({
   id: z.string().uuid(),
@@ -22,9 +16,3 @@ export const PriceLoadAttemptSchema = z.object({
 })
 
 export const PriceLoadAttemptsResponseSchema = z.array(PriceLoadAttemptSchema)
-
-export type PriceFileResult = z.infer<typeof FileResultSchema>
-export type PriceLoadAttempt = z.infer<typeof PriceLoadAttemptSchema>
-export type PriceLoadAttemptsResponse = z.infer<
-  typeof PriceLoadAttemptsResponseSchema
->

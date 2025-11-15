@@ -10,9 +10,9 @@ import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'
 import { MapControl, ControlPosition } from '@vis.gl/react-google-maps'
 import { useDictionary } from '@/shared/lib/hooks'
+import { useRouteInfoStore } from '@/shared/store'
 
 interface Props {
-  selectedRouteId: string | null
   onDeleteGasStation: (id: string) => void
   onFilterChange: (providers: string[]) => void
   onGasStationClick: (lat: number, lng: number) => void
@@ -39,7 +39,6 @@ const FUEL_PROVIDERS = [
 ].map((provider) => ({ label: provider, value: provider }))
 
 export const RoutePanelOnMap = ({
-  selectedRouteId,
   onDeleteGasStation,
   onFilterChange,
   onGasStationClick,
@@ -56,18 +55,19 @@ export const RoutePanelOnMap = ({
   routeByIdTotalPriceAmount,
 }: Props) => {
   const { dictionary } = useDictionary()
+  const { selectedSectionId } = useRouteInfoStore()
   const route = directions?.route.find(
-    (r) => r.routeSectionId === selectedRouteId,
+    (r) => r.routeSectionId === selectedSectionId,
   )
   const routeInfo = route?.routeInfo
 
   // Находим информацию о топливе для текущей секции маршрута
   const currentFuelRouteInfo = useMemo(() => {
-    if (!selectedRouteId || !fuelRouteInfoDtos) return null
+    if (!selectedSectionId || !fuelRouteInfoDtos) return null
     return fuelRouteInfoDtos.find(
-      (info) => info.roadSectionId === selectedRouteId,
+      (info) => info.roadSectionId === selectedSectionId,
     )
-  }, [selectedRouteId, fuelRouteInfoDtos])
+  }, [selectedSectionId, fuelRouteInfoDtos])
 
   // Определяем какое значение топлива показывать
   const displayFuelAmount =

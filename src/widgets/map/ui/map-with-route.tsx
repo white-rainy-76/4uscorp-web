@@ -27,12 +27,13 @@ import {
   useGasStationFilters,
   useFuelPlanId,
 } from '../lib/hooks'
+import {
+  useRouteFormStore,
+  useRouteInfoStore,
+  useCartStore,
+} from '@/shared/store'
 
 interface MapWithRouteProps {
-  origin: Coordinate | null
-  destination: Coordinate | null
-  destinationName: string | undefined
-  originName: string | undefined
   directionsData: Directions | undefined
   gasStations: GasStation[] | undefined
   remainingFuelLiters: number | undefined
@@ -40,55 +41,51 @@ interface MapWithRouteProps {
   isGasStationsPending: boolean
   isRoutePending: boolean
   truck: Truck
-  selectedRouteId: string | null
-  handleRouteClick: (routeSectionId: string) => void
   mutateAsync: (variables: RouteRequestPayload) => Promise<Directions>
   updateGasStations: (
     variables: GetGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
-  finishFuel: number | undefined
   selectedProviders: string[]
   setSelectedProviders: (value: string[]) => void
   fuel: string | undefined
-  truckWeight: number | undefined
   routeData: RouteData | undefined
   fuelRouteInfoDtos?: FuelRouteInfo[]
-  routeByIdTotalFuelAmount?: number
-  routeByIdTotalPriceAmount?: number
   fuelPlans?: FuelPlan[]
   routeByIdData?: RouteByIdData
-  fuelPlanId?: string
 }
 
 export const MapWithRoute = ({
-  origin,
-  destination,
   directionsData,
   gasStations,
   remainingFuelLiters,
   isDirectionsPending,
   isRoutePending,
   isGasStationsPending,
-  handleRouteClick,
-  selectedRouteId,
   truck,
   mutateAsync,
   updateGasStations,
   selectedProviders,
   setSelectedProviders,
-  finishFuel,
   fuel,
-  truckWeight,
   routeData,
-  originName,
-  destinationName,
   fuelRouteInfoDtos,
-  routeByIdTotalFuelAmount,
-  routeByIdTotalPriceAmount,
   fuelPlans,
   routeByIdData,
-  fuelPlanId,
 }: MapWithRouteProps) => {
+  // Получаем данные из store
+  const {
+    origin,
+    destination,
+    originName,
+    destinationName,
+    finishFuel,
+    truckWeight,
+  } = useRouteFormStore()
+
+  const { selectedSectionId, gallons, totalPrice } = useRouteInfoStore()
+
+  const { fuelPlanId: cartFuelPlanId } = useCartStore()
+
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
   const [clearAlternativeRoutes, setClearAlternativeRoutes] = useState<
@@ -99,8 +96,7 @@ export const MapWithRoute = ({
   const { getPriorityFuelPlanId } = useFuelPlanId({
     fuelPlans,
     routeByIdData,
-    fuelPlanId,
-    selectedRouteId,
+    fuelPlanId: cartFuelPlanId ?? undefined,
   })
 
   const {
@@ -122,7 +118,6 @@ export const MapWithRoute = ({
     setMapErrors,
     setFinalFuelAmount,
   } = useGasStationCart({
-    selectedRouteId,
     fuel,
     getPriorityFuelPlanId,
     clearAlternativeRoutes,
@@ -140,11 +135,11 @@ export const MapWithRoute = ({
 
   // Фильтруем заправки по выбранному маршруту
   const filteredGasStations = useMemo(() => {
-    if (!gasStations || !selectedRouteId) return []
+    if (!gasStations || !selectedSectionId) return []
     return gasStations.filter(
-      (station) => station.roadSectionId === selectedRouteId,
+      (station) => station.roadSectionId === selectedSectionId,
     )
-  }, [gasStations, selectedRouteId])
+  }, [gasStations, selectedSectionId])
 
   const handleGasStationClick = (lat: number, lng: number) => {
     if (map) {
@@ -160,14 +155,14 @@ export const MapWithRoute = ({
 
   // Инициализация корзины алгоритмическими заправками
   useEffect(() => {
-    if (!gasStations || !selectedRouteId) return
+    if (!gasStations || !selectedSectionId) return
 
     // Создаем корзину из алгоритмических заправок
     const algorithmStations: { [stationId: string]: { refillLiters: number } } =
       {}
 
     gasStations.forEach((station) => {
-      if (station.isAlgorithm && station.roadSectionId === selectedRouteId) {
+      if (station.isAlgorithm && station.roadSectionId === selectedSectionId) {
         algorithmStations[station.id] = {
           refillLiters: parseFloat(station.refill || '0'),
         }
@@ -181,9 +176,9 @@ export const MapWithRoute = ({
     setCartData(algorithmStations)
 
     // Проверяем validationError для выбранного маршрута
-    if (fuelRouteInfoDtos && selectedRouteId) {
+    if (fuelRouteInfoDtos && selectedSectionId) {
       const selectedRouteInfo = fuelRouteInfoDtos.find(
-        (info) => info.roadSectionId === selectedRouteId,
+        (info) => info.roadSectionId === selectedSectionId,
       )
 
       if (selectedRouteInfo?.validationError) {
@@ -205,15 +200,9 @@ export const MapWithRoute = ({
 
     // Сбрасываем finalFuelAmount, чтобы снова показывать fuelLeftOver
     setFinalFuelAmount(undefined)
-  }, [
-    gasStations,
-    selectedRouteId,
-    fuelRouteInfoDtos,
-    clearCartAndErrors,
-    setCartData,
-    setMapErrors,
-    setFinalFuelAmount,
-  ])
+    // Убрали функции из зависимостей, так как они стабильны благодаря useCallback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gasStations, selectedSectionId, fuelRouteInfoDtos])
 
   return (
     <div ref={mapContainerRef}>
@@ -228,13 +217,8 @@ export const MapWithRoute = ({
         <MapErrorsOverlay errors={mapErrors} />
 
         <DirectionsRoutes
-          origin={origin}
-          destination={destination}
-          originName={originName}
-          destinationName={destinationName}
           data={directionsData}
           directionsMutation={mutateAsync}
-          onRouteClick={handleRouteClick}
           truckId={truck.id}
           onClearAlternativeRoutes={handleGetClearAlternativeRoutes}
         />
@@ -272,7 +256,6 @@ export const MapWithRoute = ({
           />
         )}
         <RoutePanelOnMap
-          selectedRouteId={selectedRouteId}
           onDeleteGasStation={handleRemoveFromCart}
           onFilterChange={handleFilterChange}
           onGasStationClick={handleGasStationClick}
@@ -285,8 +268,8 @@ export const MapWithRoute = ({
           fuelRouteInfoDtos={fuelRouteInfoDtos}
           updatedFuelAmount={updatedFuelAmount}
           updatedPriceAmount={updatedPriceAmount}
-          routeByIdTotalFuelAmount={routeByIdTotalFuelAmount}
-          routeByIdTotalPriceAmount={routeByIdTotalPriceAmount}
+          routeByIdTotalFuelAmount={gallons}
+          routeByIdTotalPriceAmount={totalPrice}
         />
 
         <FullScreenController mapRef={mapContainerRef} />

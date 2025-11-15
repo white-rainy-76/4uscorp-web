@@ -27,19 +27,20 @@ interface MapError {
   message: string
 }
 
+import { useRouteInfoStore } from '@/shared/store'
+
 interface UseGasStationCartProps {
-  selectedRouteId: string | null
   fuel: string | undefined
   getPriorityFuelPlanId: () => string | undefined
   clearAlternativeRoutes?: (() => void) | null
 }
 
 export const useGasStationCart = ({
-  selectedRouteId,
   fuel,
   getPriorityFuelPlanId,
   clearAlternativeRoutes,
 }: UseGasStationCartProps) => {
+  const { selectedSectionId } = useRouteInfoStore()
   const [cart, setCart] = useState<GasStationCart>({})
   const [stationErrors, setStationErrors] = useState<StationErrors>({})
   const [stationChanges, setStationChanges] = useState<StationChanges>({})
@@ -160,7 +161,7 @@ export const useGasStationCart = ({
     try {
       // Сначала вызываем API
       await changeFuelPlan({
-        routeSectionId: selectedRouteId || '',
+        routeSectionId: selectedSectionId || '',
         currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: station.id,
@@ -188,7 +189,7 @@ export const useGasStationCart = ({
     try {
       // Сначала вызываем API
       await changeFuelPlan({
-        routeSectionId: selectedRouteId || '',
+        routeSectionId: selectedSectionId || '',
         currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
@@ -220,7 +221,7 @@ export const useGasStationCart = ({
     try {
       // Сначала вызываем API
       await changeFuelPlan({
-        routeSectionId: selectedRouteId || '',
+        routeSectionId: selectedSectionId || '',
         currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
