@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { FileResultSchema } from '../../api/contracts/file-result.contract'
 import {
-  FileResultSchema,
   ReportLoadAttemptSchema,
   ReportLoadAttemptsResponseSchema,
 } from '../../api/contracts/report-load-attempt.contract'

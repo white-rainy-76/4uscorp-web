@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { FileResultSchema } from '../../api/contracts/file-result.contract'
 import {
-  FileResultSchema,
   PriceLoadAttemptSchema,
   PriceLoadAttemptsResponseSchema,
 } from '../../api/contracts/price-load-attempt.contract'
