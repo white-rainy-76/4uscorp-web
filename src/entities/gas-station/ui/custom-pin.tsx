@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import { GasStation } from '../model/types/gas-station'
 import { Input } from '@/shared/ui'
 import { useDictionary } from '@/shared/lib/hooks'
+import { useCartStore } from '@/shared/store'
 
 interface Props {
   setClicked: (value: boolean) => void
@@ -15,8 +16,6 @@ interface Props {
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
   errorMessage?: string
-  getStationRefillLiters: (station: GasStation) => number
-  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const CustomPin: React.FC<Props> = ({
@@ -27,19 +26,35 @@ export const CustomPin: React.FC<Props> = ({
   onRemoveFromCart,
   onUpdateRefillLiters,
   errorMessage,
-  getStationRefillLiters,
-  getStationFuelLeftBeforeRefill,
 }) => {
   const { dictionary } = useDictionary()
+  const { cart } = useCartStore()
+
+  // Получаем refillLiters из cart или из исходных данных
+  const getRefillLiters = useCallback(() => {
+    if (isInCart && cart[gasStation.id]) {
+      return cart[gasStation.id].refillLiters
+    }
+    return parseFloat(gasStation.refill || '0')
+  }, [isInCart, cart, gasStation.id])
+
+  // Получаем fuelBeforeRefill из cart или из исходных данных
+  const getFuelBeforeRefill = useCallback(() => {
+    if (isInCart && cart[gasStation.id]?.fuelBeforeRefill !== undefined) {
+      return cart[gasStation.id].fuelBeforeRefill!
+    }
+    return gasStation.fuelLeftBeforeRefill || 0
+  }, [isInCart, cart, gasStation.id, gasStation.fuelLeftBeforeRefill])
+
   // Инициализируем refillLiters из корзины или из исходных данных
-  const [refillLiters, setRefillLiters] = useState<string>(
-    getStationRefillLiters(gasStation).toString(),
+  const [refillLiters, setRefillLiters] = useState<string>(() =>
+    getRefillLiters().toString(),
   )
 
-  // Синхронизируем refillLiters при изменении isInCart
+  // Синхронизируем refillLiters при изменении isInCart или cart
   useEffect(() => {
-    setRefillLiters(getStationRefillLiters(gasStation).toString())
-  }, [isInCart, getStationRefillLiters, gasStation])
+    setRefillLiters(getRefillLiters().toString())
+  }, [getRefillLiters])
 
   const handleCartClick = () => {
     const refillNum = parseFloat(refillLiters)
@@ -61,7 +76,7 @@ export const CustomPin: React.FC<Props> = ({
   }
 
   // Получаем обновленный fuelLeftBeforeRefill
-  const updatedFuelLeftBeforeRefill = getStationFuelLeftBeforeRefill(gasStation)
+  const updatedFuelLeftBeforeRefill = getFuelBeforeRefill()
 
   return (
     <div className="custom-pin bg-white rounded-md p-2 border border-gray-300 relative shadow-md w-56">

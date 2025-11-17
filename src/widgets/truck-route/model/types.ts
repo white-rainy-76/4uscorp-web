@@ -8,10 +8,7 @@ export interface TruckRouteInfoProps {
   isRoute: boolean
   currentFuelPercent?: number
   onSubmitForm: (payload: RouteFormPayload) => void
-  routeId: string | undefined
-  fuelPlans?: FuelPlan[]
   routeByIdData?: RouteByIdData
-  fuelPlanId?: string
   onRouteCompleted?: () => void
 }
 
@@ -37,10 +34,7 @@ export interface RouteInfoEditorProps {
 
 export interface RouteActionsProps {
   truck: Truck
-  routeId: string | undefined
-  fuelPlans?: FuelPlan[]
   routeByIdData?: RouteByIdData
-  fuelPlanId?: string
   onRouteCompleted?: () => void
   submitButtonText: string
 }

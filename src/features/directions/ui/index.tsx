@@ -4,7 +4,6 @@ import { Directions as DirectionType, RouteRequestPayload } from '../api'
 import { RoutePolylines } from './route-polylines'
 import { RouteMarkers } from './markers'
 
-import { Coordinate } from '@/shared/types'
 import { convertCoordinatePairsToLatLng } from '@/shared/lib/coordinates'
 import { useGetNearestDropPointMutation } from '../api/get-nearest-drop-point.mutation'
 import { useWaypointManagement, useRouteSwitching, useRouteHover } from '../lib'

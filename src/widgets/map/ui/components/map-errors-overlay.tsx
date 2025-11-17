@@ -2,32 +2,19 @@
 
 import React from 'react'
 import { useDictionary } from '@/shared/lib/hooks'
+import { useErrorsStore } from '@/shared/store'
 
-interface MapError {
-  stationId: string
-  message: string
-}
-
-interface MapErrorsOverlayProps {
-  errors: MapError[]
-}
-
-export const MapErrorsOverlay: React.FC<MapErrorsOverlayProps> = ({
-  errors,
-}) => {
+export const MapErrorsOverlay: React.FC = () => {
   const { dictionary } = useDictionary()
+  const { globalErrors, gasStationGlobalErrors, gasStationErrors } =
+    useErrorsStore()
 
-  if (errors.length === 0) return null
+  const hasErrors =
+    globalErrors.length > 0 ||
+    gasStationGlobalErrors.length > 0 ||
+    Object.keys(gasStationErrors).length > 0
 
-  // Разделяем ошибки на общие, связанные с конкретными заправками и ошибки валидации маршрута
-  const generalErrors = errors.filter((error) => error.stationId === 'general')
-  const stationErrors = errors.filter(
-    (error) =>
-      error.stationId !== 'general' && error.stationId !== 'route-validation',
-  )
-  const routeValidationErrors = errors.filter(
-    (error) => error.stationId === 'route-validation',
-  )
+  if (!hasErrors) return null
 
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] pointer-events-none">
@@ -39,32 +26,32 @@ export const MapErrorsOverlay: React.FC<MapErrorsOverlayProps> = ({
               {dictionary.home.errors.error}:
             </h4>
             <div className="space-y-1">
-              {/* Ошибки валидации маршрута */}
-              {routeValidationErrors.map((error, index) => (
-                <div key={`route-validation-${index}`} className="text-xs">
+              {/* Глобальные ошибки из get-gas-stations (validationError) */}
+              {globalErrors.map((error, index) => (
+                <div key={`global-${index}`} className="text-xs">
                   <span className="font-semibold text-red-800">
                     {dictionary.home.errors.error}:
                   </span>
-                  <span className="ml-2">{error.message}</span>
+                  <span className="ml-2">{error}</span>
                 </div>
               ))}
-              {/* Общие ошибки */}
-              {generalErrors.map((error, index) => (
-                <div key={`general-${index}`} className="text-xs">
+              {/* Глобальные ошибки от change-fuel-plan */}
+              {gasStationGlobalErrors.map((error, index) => (
+                <div key={`gas-station-global-${index}`} className="text-xs">
                   <span className="font-semibold text-red-800">
                     {dictionary.home.errors.error}:
                   </span>
-                  <span className="ml-2">{error.message}</span>
+                  <span className="ml-2">{error}</span>
                 </div>
               ))}
               {/* Ошибки конкретных заправок */}
-              {stationErrors.map((error, index) => (
-                <div key={`station-${index}`} className="text-xs">
+              {Object.entries(gasStationErrors).map(([stationId, error]) => (
+                <div key={`station-${stationId}`} className="text-xs">
                   <span className="font-semibold">
                     {dictionary.home.route_panel.address}{' '}
-                    {error.stationId.slice(0, 8)}...
+                    {stationId.slice(0, 8)}...
                   </span>
-                  <span className="ml-2">{error.message}</span>
+                  <span className="ml-2">{error}</span>
                 </div>
               ))}
             </div>

@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useGetRouteMutation } from '@/entities/route/api/get-route.mutation'
 import { useGetRouteByIdMutation } from '../../api/get-route-by-id.mutation'
-import { useQueryClient } from '@tanstack/react-query'
 import {
   useRouteFormStore,
   useRouteInfoStore,
@@ -56,7 +55,11 @@ export function useRoute({ truckId }: useRouteProps) {
           if (station.isAlgorithm && station.refill) {
             const refillLiters = parseFloat(station.refill)
             if (!isNaN(refillLiters) && refillLiters > 0) {
-              addToCart(station.id, refillLiters)
+              addToCart(
+                station.id,
+                refillLiters,
+                station.fuelLeftBeforeRefill ?? undefined,
+              )
             }
           }
         })

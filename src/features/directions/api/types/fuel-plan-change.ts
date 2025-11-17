@@ -13,7 +13,7 @@ export const FuelStationChangeSchema = z.object({
 
 export const FuelPlanChangePayloadSchema = z.object({
   routeSectionId: z.string(),
-  currentFuelPercent: z.number(),
+  currentFuelPercent: z.number().optional(),
   fuelStationChange: FuelStationChangeSchema,
   operation: z.nativeEnum(FuelPlanOperation),
   fuelPlanId: z.string().optional().nullable(),

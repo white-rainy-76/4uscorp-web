@@ -7,25 +7,18 @@ import { useRouteInfoStore } from '@/shared/store'
 
 export const RouteActions = ({
   truck,
-  routeId,
-  fuelPlans,
   routeByIdData,
-  fuelPlanId,
   onRouteCompleted,
   submitButtonText,
 }: RouteActionsProps) => {
-  const { selectedSectionId } = useRouteInfoStore()
+  const { routeId } = useRouteInfoStore()
 
   return (
     <div className="flex flex-col gap-3 min-w-[140px]">
-      {routeId && selectedSectionId && (
+      {routeId && (
         <AssignRouteButton
           truckId={truck.id}
           routeId={routeId}
-          routeSectionId={selectedSectionId}
-          fuelPlans={fuelPlans}
-          routeByIdData={routeByIdData}
-          fuelPlanId={fuelPlanId}
           buttonText={submitButtonText}
         />
       )}

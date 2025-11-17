@@ -1,11 +1,11 @@
 'use client'
 
 import { useConnection } from '@/shared/lib/context/socket-context'
-import signalRService from '@/shared/socket/signalRService'
 import { TruckStatsUpdate } from '@/shared/types/truck'
 import { Polyline } from '@/shared/ui'
 import { useEffect, useRef, useState } from 'react'
 import { TruckMarker } from './truck-marker'
+import { useTruckStats } from '@/entities/truck/lib'
 
 interface Props {
   truckId: string
@@ -22,35 +22,24 @@ export const TrackTruck = ({
   resetClick,
   showPolyline = true,
 }: Props) => {
-  const { connection, isConnected } = useConnection()
+  const { isConnected } = useConnection()
   const [truckPath, setTruckPath] = useState<google.maps.LatLngLiteral[]>([])
   const truckPathRef = useRef<google.maps.LatLngLiteral[]>([])
 
-  const [stats, setStats] = useState<TruckStatsUpdate | null>(null)
+  const { stats } = useTruckStats(truckId, isConnected, {
+    trackedFields: ['latitude', 'longitude', 'headingDegrees'],
+  })
+
   useEffect(() => {
-    if (!isConnected) {
-      setStats(null)
-      return
+    if (!stats) return
+
+    const newPoint: google.maps.LatLngLiteral = {
+      lat: stats.latitude,
+      lng: stats.longitude,
     }
-
-    if (!truckId) return
-
-    const handleUpdate = (update: TruckStatsUpdate) => {
-      setStats(update)
-      const newPoint: google.maps.LatLngLiteral = {
-        lat: update.latitude,
-        lng: update.longitude,
-      }
-      truckPathRef.current = [...truckPathRef.current, newPoint]
-      setTruckPath(truckPathRef.current)
-    }
-
-    signalRService.subscribe(truckId, handleUpdate)
-
-    return () => {
-      signalRService.unsubscribe(truckId, handleUpdate)
-    }
-  }, [truckId, isConnected])
+    truckPathRef.current = [...truckPathRef.current, newPoint]
+    setTruckPath(truckPathRef.current)
+  }, [stats])
 
   if (!stats) return null
 

@@ -8,23 +8,28 @@ import {
 } from '@/entities/gas-station'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useQuery } from '@tanstack/react-query'
-import { useRouteInfoStore } from '@/shared/store'
+import { useRouteInfoStore, useCartStore } from '@/shared/store'
 
 interface RouteListProps {
   gasStations: GasStation[]
-  routeId?: string | null
 }
 
-export const RouteList = ({ gasStations, routeId }: RouteListProps) => {
+export const RouteList = ({ gasStations }: RouteListProps) => {
   const { dictionary } = useDictionary()
-  const { selectedSectionId } = useRouteInfoStore()
+  const { selectedSectionId, routeId } = useRouteInfoStore()
+  const { cart } = useCartStore()
 
-  const algorithmStations = gasStations
-    .filter(
-      (station) =>
-        station.roadSectionId === selectedSectionId && station.isAlgorithm,
-    )
-    .sort((a, b) => (a.stopOrder || 0) - (b.stopOrder || 0))
+  // Получаем заправки из cart, фильтруем по selectedSectionId и находим полные данные
+  const cartStations = useMemo(() => {
+    const stationIds = Object.keys(cart)
+    return gasStations
+      .filter(
+        (station) =>
+          stationIds.includes(station.id) &&
+          station.roadSectionId === selectedSectionId,
+      )
+      .sort((a, b) => (a.stopOrder || 0) - (b.stopOrder || 0))
+  }, [cart, gasStations, selectedSectionId])
 
   // Получаем статусы заправок каждые 2 секунды
   const { data: fuelStationStatuses = [] } = useQuery({
@@ -43,10 +48,10 @@ export const RouteList = ({ gasStations, routeId }: RouteListProps) => {
 
   // Получаем ID заправок в правильном порядке
   const gasStationIds = useMemo(() => {
-    return algorithmStations.map((station) => station.id)
-  }, [algorithmStations])
+    return cartStations.map((station) => station.id)
+  }, [cartStations])
 
-  if (algorithmStations.length === 0) {
+  if (cartStations.length === 0) {
     return (
       <div className="text-text-strong text-center py-4">
         {dictionary.home.details_info.no_gas_stations}
@@ -58,18 +63,19 @@ export const RouteList = ({ gasStations, routeId }: RouteListProps) => {
     <div className="flex gap-6">
       <div className="mt-3">
         <RouteIndicator
-          pointCount={algorithmStations.length}
+          pointCount={cartStations.length}
           fuelStationStatuses={statusMap}
           gasStationIds={gasStationIds}
         />
       </div>
 
       <div className="flex flex-col space-y-6 w-full">
-        {algorithmStations.map((station, index) => (
+        {cartStations.map((station, index) => (
           <FuelStopInfo
             key={station.id}
             station={station}
-            isLast={index === algorithmStations.length - 1}
+            refillLiters={cart[station.id]?.refillLiters}
+            isLast={index === cartStations.length - 1}
           />
         ))}
       </div>

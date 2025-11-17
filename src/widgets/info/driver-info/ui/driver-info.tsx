@@ -1,22 +1,25 @@
-import { Truck, TruckStatus } from '@/entities/truck'
+import { Truck, TruckStatus, useTruckStats } from '@/entities/truck'
 import { useDictionary } from '@/shared/lib/hooks'
-import { TruckStatsUpdate } from '@/shared/types'
 import { Avatar, AvatarImage, AvatarFallback, cn, Spinner } from '@/shared/ui'
 import { Icon } from '@/shared/ui'
 import { Phone, MessageSquare } from 'lucide-react'
+import { useConnection } from '@/shared/lib/context'
 
 type DriverInfoProps = {
   truck: Truck
-  truckInfo?: TruckStatsUpdate | null
-  isLoadingFuel: boolean
 }
 
-export const DriverInfo = ({
-  truck,
-  truckInfo,
-  isLoadingFuel,
-}: DriverInfoProps) => {
+export const DriverInfo = ({ truck }: DriverInfoProps) => {
   const { dictionary } = useDictionary()
+  const { isConnected } = useConnection()
+
+  const { stats: truckInfo, isLoading: isLoadingFuel } = useTruckStats(
+    truck.id,
+    isConnected,
+    {
+      trackedFields: ['fuelPercentage'],
+    },
+  )
 
   return (
     <>

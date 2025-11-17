@@ -1,52 +1,61 @@
 import { useState, useCallback } from 'react'
 import { GetGasStationsPayload } from '@/entities/gas-station/model/types/gas-station.payload'
 import { GetGasStationsResponse } from '@/entities/gas-station/model/types/gas-station'
-import { Directions } from '@/features/directions/api'
+import {
+  useRouteFormStore,
+  useRouteInfoStore,
+  useCartStore,
+  useErrorsStore,
+} from '@/shared/store'
 
 interface UseGasStationFiltersProps {
   updateGasStations: (
     variables: GetGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
-  directionsData: Directions | undefined
-  finishFuel: number | undefined
-  truckWeight: number | undefined
-  fuel: string | undefined
 }
 
 export const useGasStationFilters = ({
   updateGasStations,
-  directionsData,
-  finishFuel,
-  truckWeight,
-  fuel,
 }: UseGasStationFiltersProps) => {
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
+  const { finishFuel, truckWeight } = useRouteFormStore()
+  const { routeId, sectionIds } = useRouteInfoStore()
+  const { selectedProviders, setSelectedProviders } = useCartStore()
+  const { clearAllErrors } = useErrorsStore()
   const [markersKey, setMarkersKey] = useState(0)
 
   const handleFilterChange = useCallback(
     async (providers: string[]) => {
+      // Очищаем ошибки при изменении фильтров
+      clearAllErrors()
+
       setSelectedProviders(providers)
       setMarkersKey((prevKey) => prevKey + 1)
 
-      if (!directionsData?.routeId || !directionsData.route) return
+      if (!routeId || sectionIds.length === 0) return
 
       await updateGasStations({
-        routeId: directionsData.routeId,
-        routeSectionIds: directionsData.route.map((r) => r.routeSectionId),
+        routeId: routeId,
+        routeSectionIds: sectionIds,
         FinishFuel: finishFuel,
         ...(truckWeight !== undefined &&
           truckWeight !== 0 && { Weight: truckWeight }),
         FuelProviderNameList: providers,
-        CurrentFuel: fuel?.toString(),
       })
     },
-    [updateGasStations, directionsData, finishFuel, truckWeight, fuel],
+    [
+      updateGasStations,
+      finishFuel,
+      truckWeight,
+      routeId,
+      sectionIds,
+      setSelectedProviders,
+      clearAllErrors,
+    ],
   )
 
   return {
     selectedProviders,
     markersKey,
     handleFilterChange,
-    setSelectedProviders,
   }
 }

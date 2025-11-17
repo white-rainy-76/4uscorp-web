@@ -1,0 +1,1 @@
+export { TruckDetailsWidget } from './ui'

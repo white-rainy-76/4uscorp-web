@@ -1,86 +1,39 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import {
-  GasStation,
-  FuelRouteInfo,
-} from '@/entities/gas-station/model/types/gas-station'
-import { Directions as DirectionsType } from '@/features/directions/api'
+import { GasStation } from '@/entities/gas-station/model/types/gas-station'
 import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'
 import { MapControl, ControlPosition } from '@vis.gl/react-google-maps'
 import { useDictionary } from '@/shared/lib/hooks'
-import { useRouteInfoStore } from '@/shared/store'
+import { useCartStore, useRouteInfoStore } from '@/shared/store'
 
 interface Props {
   onDeleteGasStation: (id: string) => void
   onFilterChange: (providers: string[]) => void
   onGasStationClick: (lat: number, lng: number) => void
-  directions?: DirectionsType
-  selectedProviders: string[]
-  cart: { [stationId: string]: { refillLiters: number } }
-  gasStations?: GasStation[] // Добавляем gasStations для получения информации о заправках
-  fuelLeftOver: number | undefined
-  finalFuelAmount: number | undefined
-  fuelRouteInfoDtos?: FuelRouteInfo[] // Добавляем fuelRouteInfoDtos для получения информации о топливе по секциям
-  updatedFuelAmount?: number // Новые значения из change-fuel-plan API
-  updatedPriceAmount?: number // Новые значения из change-fuel-plan API
-  routeByIdTotalFuelAmount?: number // Новые значения из route by id API
-  routeByIdTotalPriceAmount?: number // Новые значения из route by id API
+  gasStations?: GasStation[]
 }
 
-const FUEL_PROVIDERS = [
-  'TA',
-  'Pilot',
-  'Loves',
-  'Sapp Bros',
-  'Road Rangers',
-  'Petro',
-].map((provider) => ({ label: provider, value: provider }))
+const FUEL_PROVIDERS = ['TA', 'Pilot', 'Loves'].map((provider) => ({
+  label: provider,
+  value: provider,
+}))
 
 export const RoutePanelOnMap = ({
   onDeleteGasStation,
   onFilterChange,
   onGasStationClick,
-  directions,
-  selectedProviders,
-  cart,
   gasStations,
-  fuelLeftOver,
-  finalFuelAmount,
-  fuelRouteInfoDtos,
-  updatedFuelAmount,
-  updatedPriceAmount,
-  routeByIdTotalFuelAmount,
-  routeByIdTotalPriceAmount,
 }: Props) => {
   const { dictionary } = useDictionary()
-  const { selectedSectionId } = useRouteInfoStore()
-  const route = directions?.route.find(
-    (r) => r.routeSectionId === selectedSectionId,
-  )
-  const routeInfo = route?.routeInfo
-
-  // Находим информацию о топливе для текущей секции маршрута
-  const currentFuelRouteInfo = useMemo(() => {
-    if (!selectedSectionId || !fuelRouteInfoDtos) return null
-    return fuelRouteInfoDtos.find(
-      (info) => info.roadSectionId === selectedSectionId,
-    )
-  }, [selectedSectionId, fuelRouteInfoDtos])
-
-  // Определяем какое значение топлива показывать
-  const displayFuelAmount =
-    finalFuelAmount !== undefined ? finalFuelAmount : fuelLeftOver
+  const { fuelLeft, gallons, totalPrice, driveTime, miles } =
+    useRouteInfoStore()
+  const { cart, selectedProviders } = useCartStore()
 
   const displayDriveTime = useMemo(() => {
-    if (
-      !routeInfo ||
-      typeof routeInfo.driveTime !== 'number' ||
-      routeInfo.driveTime < 0
-    )
-      return ''
-    const totalMinutes = Math.floor(routeInfo.driveTime / 60)
+    if (typeof driveTime !== 'number' || driveTime < 0) return ''
+    const totalMinutes = Math.floor(driveTime / 60)
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
 
@@ -89,20 +42,15 @@ export const RoutePanelOnMap = ({
     } else {
       return `${minutes}min`
     }
-  }, [routeInfo])
+  }, [driveTime])
 
   const displayMiles = useMemo(() => {
-    if (
-      !routeInfo ||
-      typeof routeInfo.miles !== 'number' ||
-      routeInfo.miles < 0
-    )
-      return '-'
-    const milesInMeters = routeInfo.miles
+    if (typeof miles !== 'number' || miles < 0) return '-'
+    const milesInMeters = miles
     const convertedMiles = (milesInMeters * 0.000621371).toFixed(1)
 
     return convertedMiles
-  }, [routeInfo])
+  }, [miles])
 
   return (
     <MapControl position={ControlPosition.TOP_RIGHT}>
@@ -129,11 +77,7 @@ export const RoutePanelOnMap = ({
               {dictionary.home.route_panel.gallons}
             </span>
             <span className="font-bold whitespace-nowrap">
-              {(
-                updatedFuelAmount ??
-                currentFuelRouteInfo?.totalFuelAmmount ??
-                routeByIdTotalFuelAmount
-              )?.toFixed(2) ?? '-'}
+              {gallons?.toFixed(2) ?? '-'}
             </span>
           </div>
           <div className="flex flex-col items-start">
@@ -141,7 +85,8 @@ export const RoutePanelOnMap = ({
               {dictionary.home.route_panel.tolls}
             </span>
             <span className=" font-bold whitespace-nowrap">
-              ${routeInfo?.tolls ?? '-'}
+              {/*! Tolls больше не приходят с directions API, поэтому поле можно оставить как "-" или убрать */}
+              -
             </span>
           </div>
           <div className="flex flex-col items-start">
@@ -149,7 +94,7 @@ export const RoutePanelOnMap = ({
               {dictionary.home.route_panel.fuel_left}
             </span>
             <span className=" font-bold whitespace-nowrap">
-              {displayFuelAmount?.toFixed(2) ?? '-'}
+              {fuelLeft?.toFixed(2) ?? '-'}
             </span>
           </div>
           <div className="flex flex-col items-start">
@@ -157,12 +102,7 @@ export const RoutePanelOnMap = ({
               {dictionary.home.route_panel.total_price}
             </span>
             <span className=" font-bold whitespace-nowrap">
-              $
-              {(
-                updatedPriceAmount ??
-                currentFuelRouteInfo?.totalPriceAmmount ??
-                routeByIdTotalPriceAmount
-              )?.toFixed(2) ?? '-'}
+              ${totalPrice?.toFixed(2) ?? '-'}
             </span>
           </div>
         </div>

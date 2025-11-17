@@ -10,14 +10,14 @@ import { Input } from '@/shared/ui'
 import { FuelSlider } from './fuel-slider'
 import { Icon } from '@/shared/ui'
 import { Coordinate } from '@/shared/types'
-import { Truck } from '@/entities/truck'
+import { Truck, useTruckStats } from '@/entities/truck'
 import { useFuelSliderMax } from '../lib/hooks'
 import { FieldError } from './field-error'
 import { useRouteFormStore } from '@/shared/store'
+import { useConnection } from '@/shared/lib/context'
 
 interface RouteSearchFormProps {
   truck?: Truck
-  currentFuelPercent?: number
   onSubmitForm: (payload: {
     origin: Coordinate
     destination: Coordinate
@@ -30,10 +30,18 @@ interface RouteSearchFormProps {
 
 export const RouteSearchForm = ({
   truck,
-  currentFuelPercent,
   onSubmitForm,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
+  const { isConnected } = useConnection()
+
+  const { stats } = useTruckStats(truck?.id, isConnected, {
+    trackedFields: ['fuelPercentage'],
+  })
+
+  const currentFuelPercent = stats?.fuelPercentage
+    ? parseFloat(stats.fuelPercentage)
+    : undefined
   const [selectedStartPoint, setSelectedStartPoint] =
     useState<GooglePlace | null>(null)
   const [selectedEndPoint, setSelectedEndPoint] = useState<GooglePlace | null>(

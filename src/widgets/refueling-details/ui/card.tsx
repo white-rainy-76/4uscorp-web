@@ -5,12 +5,24 @@ import Image from 'next/image'
 
 interface FuelStopInfoProps {
   station: GasStation
+  refillLiters?: number
   isLast?: boolean
 }
 
-export const FuelStopInfo = ({ station, isLast }: FuelStopInfoProps) => {
+export const FuelStopInfo = ({
+  station,
+  refillLiters,
+  isLast,
+}: FuelStopInfoProps) => {
   const { dictionary } = useDictionary()
-  const gallons = (station.refill ? Number(station.refill) : 0).toFixed(0)
+  // Используем refillLiters из cart, если передан, иначе из station.refill
+  const gallons = (
+    refillLiters !== undefined
+      ? refillLiters
+      : station.refill
+        ? Number(station.refill)
+        : 0
+  ).toFixed(0)
   const price = station.fuelPrice?.finalPrice
     ? Number(station.fuelPrice.finalPrice)
     : station.fuelPrice?.price

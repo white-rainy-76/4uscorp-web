@@ -9,17 +9,14 @@ import {
 } from '@googlemaps/markerclusterer'
 import { GasStationMarker } from './gas-station-marker'
 import { GasStation } from '../model/types/gas-station'
+import { GasStationClusterRenderer } from '../lib/gas-station-cluster-renderer'
 
 type Props = {
   gasStations: GasStation[]
   onAddToCart: (station: GasStation, refillLiters: number) => void
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
-  cart: { [stationId: string]: { refillLiters: number } }
-  stationErrors?: { [stationId: string]: string }
   isStationInCart: (stationId: string) => boolean
-  getStationRefillLiters: (station: GasStation) => number
-  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const ClusteredGasStationMarkers: React.FC<Props> = ({
@@ -27,11 +24,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
   onAddToCart,
   onRemoveFromCart,
   onUpdateRefillLiters,
-  cart,
-  stationErrors,
   isStationInCart,
-  getStationRefillLiters,
-  getStationFuelLeftBeforeRefill,
 }) => {
   const [markers, setMarkers] = useState<{ [key: string]: Marker }>({})
   const map = useMap()
@@ -41,6 +34,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
     return new MarkerClusterer({
       map,
       algorithm: new SuperClusterAlgorithm({}),
+      renderer: new GasStationClusterRenderer(),
     })
   }, [map])
 
@@ -88,16 +82,13 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
     <>
       {gasStations.map((station) => (
         <GasStationMarker
-          key={station.id}
+          key={`${station.id}-${station.roadSectionId}`}
           gasStation={station}
           setMarkerRef={setMarkerRef}
           onAddToCart={onAddToCart}
           onRemoveFromCart={onRemoveFromCart}
           onUpdateRefillLiters={onUpdateRefillLiters}
           isInCart={isStationInCart(station.id)}
-          stationErrors={stationErrors}
-          getStationRefillLiters={getStationRefillLiters}
-          getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
         />
       ))}
     </>

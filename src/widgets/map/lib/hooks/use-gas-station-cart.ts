@@ -1,125 +1,86 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { GasStation } from '@/entities/gas-station'
 import {
   useChangeFuelPlanMutation,
   FuelPlanOperation,
   FuelPlanChangeResponse,
 } from '@/features/directions/api'
-
-interface GasStationCartItem {
-  refillLiters: number
-}
-
-interface GasStationCart {
-  [stationId: string]: GasStationCartItem
-}
-
-interface StationErrors {
-  [stationId: string]: string
-}
-
-interface StationChanges {
-  [stationId: string]: number
-}
-
-interface MapError {
-  stationId: string
-  message: string
-}
-
-import { useRouteInfoStore } from '@/shared/store'
+import { useCartStore, useRouteInfoStore, useErrorsStore } from '@/shared/store'
 
 interface UseGasStationCartProps {
-  fuel: string | undefined
-  getPriorityFuelPlanId: () => string | undefined
   clearAlternativeRoutes?: (() => void) | null
 }
 
 export const useGasStationCart = ({
-  fuel,
-  getPriorityFuelPlanId,
   clearAlternativeRoutes,
 }: UseGasStationCartProps) => {
-  const { selectedSectionId } = useRouteInfoStore()
-  const [cart, setCart] = useState<GasStationCart>({})
-  const [stationErrors, setStationErrors] = useState<StationErrors>({})
-  const [stationChanges, setStationChanges] = useState<StationChanges>({})
-  const [mapErrors, setMapErrors] = useState<MapError[]>([])
-  const [finalFuelAmount, setFinalFuelAmount] = useState<number | undefined>(
-    undefined,
-  )
-  const [updatedFuelAmount, setUpdatedFuelAmount] = useState<
-    number | undefined
-  >(undefined)
-  const [updatedPriceAmount, setUpdatedPriceAmount] = useState<
-    number | undefined
-  >(undefined)
+  const { selectedSectionId, setRouteInfo } = useRouteInfoStore()
+  const { cart, setCart, clearCart, fuelPlanId, updateCartItem } =
+    useCartStore()
+  const {
+    setGasStationError,
+    clearGasStationErrors,
+    setGasStationGlobalErrors,
+  } = useErrorsStore()
 
   const { mutateAsync: changeFuelPlan } = useChangeFuelPlanMutation({
     onSuccess: (data: FuelPlanChangeResponse) => {
       console.log('Fuel plan change response:', data)
 
       if (!data.isValid && data.stepResults) {
-        // Обрабатываем ошибки и создаем объект ошибок для маркеров
-        const errors: StationErrors = {}
-        const mapErrorMessages: MapError[] = []
+        // Очищаем предыдущие ошибки
+        clearGasStationErrors()
+        setGasStationGlobalErrors([])
+
+        const gasStationGlobalErrorsList: string[] = []
 
         data.stepResults.forEach((result) => {
           if (!result.isValid && result.notes) {
             // Игнорируем ошибки с stationId равным "00000000-0000-0000-0000-000000000000"
             if (result.stationId !== '00000000-0000-0000-0000-000000000000') {
-              errors[result.stationId] = result.notes
-              mapErrorMessages.push({
-                stationId: result.stationId,
-                message: result.notes,
-              })
+              // Устанавливаем ошибку для конкретной заправки
+              setGasStationError(result.stationId, result.notes)
             } else {
-              // Для общих ошибок добавляем их в mapErrors без привязки к конкретной заправке
-              mapErrorMessages.push({
-                stationId: 'general',
-                message: result.notes,
-              })
+              // Для общих ошибок добавляем их в gasStationGlobalErrors
+              gasStationGlobalErrorsList.push(result.notes)
             }
           }
         })
 
-        setStationErrors(errors)
-        setMapErrors(mapErrorMessages)
+        if (gasStationGlobalErrorsList.length > 0) {
+          setGasStationGlobalErrors(gasStationGlobalErrorsList)
+        }
       } else {
         // Очищаем ошибки если все валидно
-        setStationErrors({})
-        setMapErrors([])
+        clearGasStationErrors()
+        setGasStationGlobalErrors([])
       }
 
-      // Обрабатываем изменения для обновления fuelLeftBeforeRefill
+      // Обрабатываем изменения для обновления refillLiters и fuelBeforeRefill в cart
       if (data.changes && data.changes.length > 0) {
         console.log('Processing changes:', data.changes)
-        const changes: StationChanges = {}
 
         data.changes.forEach((change) => {
-          if (change.fuelStationId !== '00000000-0000-0000-0000-000000000000') {
-            changes[change.fuelStationId] = change.newCurrentFuel
-            console.log(
-              `Updated fuel for station ${change.fuelStationId}: ${change.newCurrentFuel}`,
+          if (
+            change.fuelStationId !== '00000000-0000-0000-0000-000000000000' &&
+            cart[change.fuelStationId]
+          ) {
+            // Обновляем refillLiters из newRefill и fuelBeforeRefill из newCurrentFuel
+            updateCartItem(
+              change.fuelStationId,
+              change.newRefill,
+              change.newCurrentFuel,
             )
           }
         })
-
-        setStationChanges(changes)
       }
 
-      // Сохраняем finalFuelAmount из ответа API
-      if (data.finalFuelAmount !== undefined) {
-        setFinalFuelAmount(data.finalFuelAmount)
-      }
-
-      // Сохраняем новые значения totalFuelAmmount и totalPriceAmmount из ответа API
-      if (data.totalFuelAmmount !== undefined) {
-        setUpdatedFuelAmount(data.totalFuelAmmount)
-      }
-      if (data.totalPriceAmmount !== undefined) {
-        setUpdatedPriceAmount(data.totalPriceAmmount)
-      }
+      // Обновляем route info store с данными из ответа
+      setRouteInfo({
+        fuelLeft: data.finalFuelAmount,
+        gallons: data.totalFuelAmmount,
+        totalPrice: data.totalPriceAmmount,
+      })
     },
     onError: (error: any) => {
       console.error('Fuel plan change error:', error)
@@ -134,48 +95,25 @@ export const useGasStationCart = ({
     [cart],
   )
 
-  // Получаем refillLiters для заправки (из корзины или из исходных данных)
-  const getStationRefillLiters = useCallback(
-    (station: GasStation) => {
-      if (isStationInCart(station.id)) {
-        return cart[station.id].refillLiters
-      }
-      return parseFloat(station.refill || '0')
-    },
-    [cart, isStationInCart],
-  )
-
-  // Получаем обновленный fuelLeftBeforeRefill для заправки (из изменений или из исходных данных)
-  const getStationFuelLeftBeforeRefill = useCallback(
-    (station: GasStation) => {
-      if (stationChanges[station.id] !== undefined) {
-        return stationChanges[station.id]
-      }
-      return station.fuelLeftBeforeRefill || 0
-    },
-    [stationChanges],
-  )
-
   // Добавление заправки в корзину
   const handleAddToCart = async (station: GasStation, refillLiters: number) => {
     try {
+      setCart({
+        ...cart,
+        [station.id]: {
+          refillLiters,
+        },
+      })
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedSectionId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: station.id,
           newRefill: refillLiters,
         },
         operation: FuelPlanOperation.Add,
-        fuelPlanId: getPriorityFuelPlanId(),
+        fuelPlanId: fuelPlanId ?? undefined,
       })
-
-      // Если API успешен, добавляем в корзину
-      setCart((prev) => ({
-        ...prev,
-        [station.id]: { refillLiters },
-      }))
 
       // Очищаем альтернативные маршруты
       clearAlternativeRoutes?.()
@@ -187,23 +125,17 @@ export const useGasStationCart = ({
   // Удаление заправки из корзины
   const handleRemoveFromCart = async (stationId: string) => {
     try {
+      const { [stationId]: removed, ...rest } = cart
+      setCart(rest)
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedSectionId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
           newRefill: null,
         },
         operation: FuelPlanOperation.Remove,
-        fuelPlanId: getPriorityFuelPlanId(),
-      })
-
-      // Если API успешен, удаляем из корзины
-      setCart((prev) => {
-        const newCart = { ...prev }
-        delete newCart[stationId]
-        return newCart
+        fuelPlanId: fuelPlanId ?? undefined,
       })
 
       // Очищаем альтернативные маршруты
@@ -222,20 +154,13 @@ export const useGasStationCart = ({
       // Сначала вызываем API
       await changeFuelPlan({
         routeSectionId: selectedSectionId || '',
-        currentFuelPercent: parseFloat(fuel || '0'),
         fuelStationChange: {
           fuelStationId: stationId,
           newRefill: liters,
         },
         operation: FuelPlanOperation.Update,
-        fuelPlanId: getPriorityFuelPlanId(),
+        fuelPlanId: fuelPlanId ?? undefined,
       })
-
-      // Если API успешен, обновляем корзину
-      setCart((prev) => ({
-        ...prev,
-        [stationId]: { refillLiters: liters },
-      }))
 
       // Очищаем альтернативные маршруты
       clearAlternativeRoutes?.()
@@ -246,44 +171,17 @@ export const useGasStationCart = ({
 
   // Очистка корзины и ошибок
   const clearCartAndErrors = useCallback(() => {
-    setCart({})
-    setStationErrors({})
-    setStationChanges({})
-    setMapErrors([])
-    setFinalFuelAmount(undefined)
-  }, [])
-
-  // Установка корзины (для инициализации алгоритмическими заправками)
-  const setCartData = useCallback((cartData: GasStationCart) => {
-    setCart(cartData)
-  }, [])
-
-  // Обертки для сеттеров с useCallback
-  const updateMapErrors = useCallback((errors: MapError[]) => {
-    setMapErrors(errors)
-  }, [])
-
-  const updateFinalFuelAmount = useCallback((amount: number | undefined) => {
-    setFinalFuelAmount(amount)
-  }, [])
+    clearCart()
+    clearGasStationErrors()
+    setGasStationGlobalErrors([])
+  }, [clearCart, clearGasStationErrors, setGasStationGlobalErrors])
 
   return {
     cart,
-    stationErrors,
-    stationChanges,
-    mapErrors,
-    finalFuelAmount,
-    updatedFuelAmount,
-    updatedPriceAmount,
     isStationInCart,
-    getStationRefillLiters,
-    getStationFuelLeftBeforeRefill,
     handleAddToCart,
     handleRemoveFromCart,
     handleUpdateRefillLiters,
     clearCartAndErrors,
-    setCartData,
-    setMapErrors: updateMapErrors,
-    setFinalFuelAmount: updateFinalFuelAmount,
   }
 }
