@@ -36,7 +36,7 @@ export const CustomPin: React.FC<Props> = ({
       return cart[gasStation.id].refillLiters
     }
     return parseFloat(gasStation.refill || '0')
-  }, [isInCart, cart, gasStation.id])
+  }, [isInCart, cart, gasStation.id, gasStation.refill])
 
   // Получаем fuelBeforeRefill из cart или из исходных данных
   const getFuelBeforeRefill = useCallback(() => {
