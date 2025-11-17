@@ -156,7 +156,8 @@
       "truck_models": "Truck models",
       "statistics": "Statistics",
       "tolls": "Tolls",
-      "roads": "Roads"
+      "roads": "Roads",
+      "saved_routes": "Saved Routes"
     },
     "lists": {
       "no_companies_found": "No companies found",

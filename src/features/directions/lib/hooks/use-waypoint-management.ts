@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { Coordinate } from '@/shared/types'
-import { convertLatLngToCoordinates } from '@/shared/lib/coordinates'
+import {
+  convertLatLngToCoordinates,
+  sortWaypointsAlongRoute,
+} from '@/shared/lib/coordinates'
 import { Directions, RouteRequestPayload } from '../../api'
 
 interface NearestPointResponse {
@@ -10,7 +13,7 @@ interface NearestPointResponse {
 }
 
 interface UseWaypointManagementProps {
-  truckId: string
+  truckId?: string
   origin: Coordinate | null
   destination: Coordinate | null
   originName: string | undefined
@@ -42,14 +45,23 @@ export const useWaypointManagement = ({
 
   // Создание payload для directions API
   const createDirectionsPayload = useCallback(
-    (viaPoints: google.maps.LatLngLiteral[]): RouteRequestPayload => ({
-      TruckId: truckId,
-      origin: origin || { latitude: 0, longitude: 0 },
-      destination: destination || { latitude: 0, longitude: 0 },
-      destinationName: destinationName || '',
-      originName: originName || '',
-      ViaPoints: convertLatLngToCoordinates(viaPoints),
-    }),
+    (viaPoints: google.maps.LatLngLiteral[]): RouteRequestPayload => {
+      // Сортируем viaPoints по их положению вдоль маршрута от origin к destination
+      const sortedViaPoints = sortWaypointsAlongRoute(
+        viaPoints,
+        origin,
+        destination,
+      )
+
+      return {
+        ...(truckId && { TruckId: truckId }),
+        origin: origin || { latitude: 0, longitude: 0 },
+        destination: destination || { latitude: 0, longitude: 0 },
+        destinationName: destinationName || '',
+        originName: originName || '',
+        ViaPoints: convertLatLngToCoordinates(sortedViaPoints),
+      }
+    },
     [truckId, origin, destination, originName, destinationName],
   )
 

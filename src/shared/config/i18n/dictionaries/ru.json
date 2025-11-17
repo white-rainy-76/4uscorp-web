@@ -156,7 +156,8 @@
       "truck_models": "Модели грузовиков",
       "statistics": "Статистика",
       "tolls": "Платные дороги",
-      "roads": "Дороги"
+      "roads": "Дороги",
+      "saved_routes": "Сохранённые маршруты"
     },
     "lists": {
       "no_companies_found": "Компании не найдены",

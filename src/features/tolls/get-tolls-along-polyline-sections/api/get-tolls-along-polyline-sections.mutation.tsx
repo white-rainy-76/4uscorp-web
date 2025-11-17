@@ -3,15 +3,16 @@ import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query'
-import { saveBestFuelRoute } from './save-best-fuel-route.service'
-import { SaveBestFuelRoutePayload } from './payload/save-best-fuel-route.payload'
+import { getTollsAlongPolylineSections } from './get-tolls-along-polyline-sections.service'
+import { GetTollsAlongPolylineSectionsPayload } from './payload/get-tolls-along-polyline-sections.payload'
+import { GetTollsAlongPolylineSectionsResponse } from '../types/toll-with-section'
 
-export function useSaveBestFuelRouteMutation(
+export function useGetTollsAlongPolylineSectionsMutation(
   options: Pick<
     UseMutationOptions<
-      void,
+      GetTollsAlongPolylineSectionsResponse,
       DefaultError,
-      SaveBestFuelRoutePayload,
+      GetTollsAlongPolylineSectionsPayload,
       { abortController: AbortController }
     >,
     'mutationKey' | 'onMutate' | 'onSuccess' | 'onError' | 'onSettled'
@@ -20,11 +21,11 @@ export function useSaveBestFuelRouteMutation(
   const { mutationKey = [], onMutate, onSuccess, onError, onSettled } = options
 
   return useMutation({
-    mutationKey: ['route', 'save-best-fuel-route', ...mutationKey],
+    mutationKey: ['tolls', 'get-tolls-along-polyline-sections', ...mutationKey],
 
-    mutationFn: async (payload: SaveBestFuelRoutePayload) => {
+    mutationFn: async (payload: GetTollsAlongPolylineSectionsPayload) => {
       const controller = new AbortController()
-      return saveBestFuelRoute(payload, controller.signal)
+      return getTollsAlongPolylineSections(payload, controller.signal)
     },
 
     onMutate: async (variables) => {

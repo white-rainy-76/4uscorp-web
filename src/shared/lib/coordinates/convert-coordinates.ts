@@ -77,3 +77,68 @@ export const convertCoordinateToPair = (
 ): [number, number] => {
   return [coordinate.latitude, coordinate.longitude]
 }
+
+/**
+ * Сортирует точки waypoints по их положению вдоль маршрута от origin к destination
+ * Вычисляет проекцию каждой точки на линию от origin к destination и сортирует по расстоянию
+ * @param waypoints - Массив точек для сортировки
+ * @param origin - Точка начала маршрута
+ * @param destination - Точка окончания маршрута
+ * @returns Отсортированный массив точек
+ */
+export const sortWaypointsAlongRoute = (
+  waypoints: google.maps.LatLngLiteral[],
+  origin: Coordinate | null,
+  destination: Coordinate | null,
+): google.maps.LatLngLiteral[] => {
+  if (!origin || !destination || waypoints.length === 0) {
+    return waypoints
+  }
+
+  const originLatLng: google.maps.LatLngLiteral = {
+    lat: origin.latitude,
+    lng: origin.longitude,
+  }
+  const destinationLatLng: google.maps.LatLngLiteral = {
+    lat: destination.latitude,
+    lng: destination.longitude,
+  }
+
+  // Создаем копию массива для сортировки
+  const sortedWaypoints = [...waypoints]
+
+  // Вычисляем проекцию каждой точки на вектор от origin к destination
+  // Используем скалярное произведение для нахождения проекции точки на линию от origin к destination
+  const vectorDest = {
+    lat: destinationLatLng.lat - originLatLng.lat,
+    lng: destinationLatLng.lng - originLatLng.lng,
+  }
+
+  // Длина вектора от origin к destination
+  const destLength = Math.sqrt(
+    vectorDest.lat * vectorDest.lat + vectorDest.lng * vectorDest.lng,
+  )
+
+  if (destLength === 0) return sortedWaypoints
+
+  sortedWaypoints.sort((a, b) => {
+    const vectorA = {
+      lat: a.lat - originLatLng.lat,
+      lng: a.lng - originLatLng.lng,
+    }
+    const vectorB = {
+      lat: b.lat - originLatLng.lat,
+      lng: b.lng - originLatLng.lng,
+    }
+
+    // Проекция точки A на вектор от origin к destination (скалярное произведение)
+    const dotA = vectorA.lat * vectorDest.lat + vectorA.lng * vectorDest.lng
+    // Проекция точки B на вектор от origin к destination (скалярное произведение)
+    const dotB = vectorB.lat * vectorDest.lat + vectorB.lng * vectorDest.lng
+
+    // Сортируем по проекции (точки с меньшей проекцией идут первыми)
+    return dotA - dotB
+  })
+
+  return sortedWaypoints
+}

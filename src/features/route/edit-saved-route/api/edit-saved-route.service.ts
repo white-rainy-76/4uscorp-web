@@ -1,20 +1,24 @@
 import { api, authorizedRequest } from '@/shared/api/api.instance'
 import { AxiosRequestConfig } from 'axios'
 import {
-  SaveBestFuelRoutePayload,
-  SaveBestFuelRoutePayloadSchema,
-} from './payload/save-best-fuel-route.payload'
+  EditSavedRoutePayload,
+  EditSavedRoutePayloadSchema,
+} from './payload/edit-saved-route.payload'
 import { useAuthStore } from '@/shared/store/auth-store'
 
-export const saveBestFuelRoute = async (
-  payload: SaveBestFuelRoutePayload,
+export const editSavedRoute = async (
+  payload: EditSavedRoutePayload,
   signal?: AbortSignal,
 ): Promise<void> => {
-  const validatedPayload = SaveBestFuelRoutePayloadSchema.parse(payload)
+  const validatedPayload = EditSavedRoutePayloadSchema.parse(payload)
 
   const config: AxiosRequestConfig = { signal }
   const getAuthToken = () => useAuthStore.getState().accessToken
   const authConfig = authorizedRequest(getAuthToken, config)
 
-  await api.post('/fuelroutes-api/FuelRoute/Save', validatedPayload, authConfig)
+  await api.put(
+    '/fuelroutes-api/FuelRoute/editSavedRoute',
+    validatedPayload,
+    authConfig,
+  )
 }

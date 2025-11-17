@@ -15,3 +15,6 @@ export const RoadDtoSchema = z.object({
 })
 
 export const GetRoadsByBoundingBoxResponseDtoSchema = z.array(RoadDtoSchema)
+
+// Toll roads by section IDs
+export const GetTollRoadsResponseDtoSchema = z.array(RoadDtoSchema)

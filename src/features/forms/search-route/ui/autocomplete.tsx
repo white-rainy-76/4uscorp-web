@@ -111,7 +111,7 @@ export const AutocompleteCustom = ({
       />
 
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute top-14 z-10 w-full bg-white border border-gray-300 rounded-md shadow-md ">
+        <ul className="absolute top-14 z-[100] w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
