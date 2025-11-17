@@ -13,4 +13,5 @@ export const GetGasStationsPayloadSchema = z.object({
   Weight: z.number().optional(),
   FuelProviderNameList: z.array(z.string()).optional(),
   CurrentFuel: z.string().optional(),
+  TankCapacityG: z.number().optional(),
 })

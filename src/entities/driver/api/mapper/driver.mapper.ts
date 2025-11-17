@@ -15,6 +15,7 @@ export const mapDriver = (rawDriver: DriverDto): Driver => {
 
   return {
     id: rawDriver.id,
+    userId: rawDriver.userId,
     fullName: rawDriver.fullName,
     phone: rawDriver.phone,
     email: rawDriver.email,

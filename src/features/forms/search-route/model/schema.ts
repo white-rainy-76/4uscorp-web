@@ -20,7 +20,7 @@ export const routeSearchSchema = z
     fuelPercent: z
       .number({ invalid_type_error: 'invalidFuel' })
       .min(0, 'minFuel')
-      .max(200, 'maxFuel')
+      .max(500, 'maxFuel')
       .optional(),
   })
   .refine((data) => data.startPoint !== data.endPoint, {

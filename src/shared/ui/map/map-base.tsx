@@ -11,7 +11,11 @@ type MapBaseProps = {
 
 export const MapBase = ({ children, onMapClick }: MapBaseProps) => {
   return (
-    <Map colorScheme="LIGHT" {...mapOptions} onClick={onMapClick}>
+    <Map
+      colorScheme="LIGHT"
+      {...mapOptions}
+      // style={{ width: '100%', height: '100%' }}
+      onClick={onMapClick}>
       {children}
     </Map>
   )

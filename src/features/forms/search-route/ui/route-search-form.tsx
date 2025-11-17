@@ -26,11 +26,13 @@ interface RouteSearchFormProps {
     truckWeight?: number
     finishFuel?: number
   }) => void
+  isCreatingRoute?: boolean
 }
 
 export const RouteSearchForm = ({
   truck,
   onSubmitForm,
+  isCreatingRoute = false,
 }: RouteSearchFormProps) => {
   const { dictionary } = useDictionary()
   const { isConnected } = useConnection()
@@ -218,7 +220,7 @@ export const RouteSearchForm = ({
         </div>
       </div>
       <FieldError error={errors.fuelPercent} />
-      <Button type="submit" className="w-full mt-4">
+      <Button type="submit" className="w-full mt-4" disabled={isCreatingRoute}>
         {dictionary.home.buttons.calculate}
       </Button>
     </form>

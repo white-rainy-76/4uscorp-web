@@ -4,7 +4,7 @@ import { FileResultSchema } from './file-result.contract'
 export const PriceLoadAttemptSchema = z.object({
   id: z.string().uuid(),
   startedAt: z.string(),
-  completedAt: z.string(),
+  completedAt: z.string().nullable(),
   isSuccessful: z.boolean(),
   errorMessage: z.string().nullable(),
   totalFiles: z.number(),
