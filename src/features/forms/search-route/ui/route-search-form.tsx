@@ -15,6 +15,13 @@ import { useFuelSliderMax } from '../lib/hooks'
 import { FieldError } from './field-error'
 import { useRouteFormStore } from '@/shared/store'
 import { useConnection } from '@/shared/lib/context'
+import {
+  useSavedRoutesLookup,
+  SavedRoutesModal,
+  SavedRouteSelection,
+  SavedRouteItem,
+} from '@/features/route/saved-routes-selector'
+import { convertToCoordinate } from '@/shared/lib/coordinates'
 
 interface RouteSearchFormProps {
   truck?: Truck
@@ -25,6 +32,7 @@ interface RouteSearchFormProps {
     destinationName: string
     truckWeight?: number
     finishFuel?: number
+    savedRouteId?: string
   }) => void
   isCreatingRoute?: boolean
 }
@@ -49,6 +57,9 @@ export const RouteSearchForm = ({
   const [selectedEndPoint, setSelectedEndPoint] = useState<GooglePlace | null>(
     null,
   )
+  const [selectedSavedRoute, setSelectedSavedRoute] =
+    useState<SavedRouteItem | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Get route form data from store
   const {
@@ -88,6 +99,25 @@ export const RouteSearchForm = ({
     currentWeight,
   )
 
+  // Lookup saved routes when coordinates are available (selected from autocomplete)
+  const {
+    savedRoutes,
+    isLoading: isLoadingSavedRoutes,
+    hasSavedRoutes,
+  } = useSavedRoutesLookup({
+    origin: convertToCoordinate(selectedStartPoint?.location || origin),
+    destination: convertToCoordinate(selectedEndPoint?.location || destination),
+    enabled: true,
+  })
+
+  // Clear selected saved route when origin or destination changes
+  useEffect(() => {
+    if (selectedSavedRoute) {
+      setSelectedSavedRoute(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStartPoint, selectedEndPoint])
+
   const onSubmit = (data: RouteSearchFormValues) => {
     // Проверяем, есть ли координаты (либо из стора, либо выбранные пользователем)
     const hasStartCoordinates = selectedStartPoint?.location || origin
@@ -124,8 +154,17 @@ export const RouteSearchForm = ({
         destinationName: data.endPoint,
         truckWeight: Number(data.weight),
         finishFuel: data.fuelPercent,
+        savedRouteId: selectedSavedRoute?.id,
       })
     }
+  }
+
+  const handleSelectRoute = (route: SavedRouteItem) => {
+    setSelectedSavedRoute(route)
+  }
+
+  const handleClearRoute = () => {
+    setSelectedSavedRoute(null)
   }
 
   return (
@@ -220,9 +259,64 @@ export const RouteSearchForm = ({
         </div>
       </div>
       <FieldError error={errors.fuelPercent} />
-      <Button type="submit" className="w-full mt-4" disabled={isCreatingRoute}>
-        {dictionary.home.buttons.calculate}
-      </Button>
+
+      {/* Selected Saved Route Display */}
+      {selectedSavedRoute && (
+        <div className="mt-4">
+          <SavedRouteSelection
+            selectedRoute={selectedSavedRoute}
+            onClear={handleClearRoute}
+            onOpenModal={() => setIsModalOpen(true)}
+          />
+        </div>
+      )}
+
+      {/* Saved Routes Button or Calculate Button */}
+      <div className="mt-4 space-y-2">
+        {!selectedSavedRoute && hasSavedRoutes && !isLoadingSavedRoutes && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full font-semibold border-primary text-primary hover:bg-primary hover:text-white transition-all duration-200"
+            onClick={() => setIsModalOpen(true)}>
+            <span className="flex items-center gap-2">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+              Use Saved Route ({savedRoutes.length})
+            </span>
+          </Button>
+        )}
+
+        <Button type="submit" className="w-full" disabled={isCreatingRoute}>
+          {dictionary.home.buttons.calculate}
+        </Button>
+      </div>
+
+      {/* Loading indicator */}
+      {isLoadingSavedRoutes && (
+        <div className="flex items-center justify-center gap-2 mt-2 text-sm">
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="text-text-muted">Checking for saved routes...</span>
+        </div>
+      )}
+
+      {/* Saved Routes Modal */}
+      <SavedRoutesModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        savedRoutes={savedRoutes}
+        onSelect={handleSelectRoute}
+      />
     </form>
   )
 }

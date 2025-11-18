@@ -13,6 +13,7 @@ type SubmitRouteFormPayload = {
   destinationName: string
   truckWeight?: number
   finishFuel?: number
+  savedRouteId?: string
 }
 
 type UseSubmitRouteParams = {
@@ -55,6 +56,7 @@ export function useSubmitRoute({
         TruckId: truckData.id,
         originName: formPayload.originName,
         destinationName: formPayload.destinationName,
+        savedRouteId: formPayload.savedRouteId,
       }
 
       handleDirectionsMutation(payload)

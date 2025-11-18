@@ -6,3 +6,10 @@ export const GetRoadsByBoundingBoxPayloadSchema = z.object({
   maxLat: z.number(),
   maxLon: z.number(),
 })
+
+export const GetTollRoadsPayloadSchema = z.array(z.string().uuid())
+
+export type GetRoadsByBoundingBoxPayload = z.infer<
+  typeof GetRoadsByBoundingBoxPayloadSchema
+>
+export type GetTollRoadsPayload = z.infer<typeof GetTollRoadsPayloadSchema>

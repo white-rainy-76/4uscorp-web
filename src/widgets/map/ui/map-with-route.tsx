@@ -22,6 +22,11 @@ import { TrackTruck } from '@/features/truck/track-truck'
 import { MapErrorsOverlay, MapLoadingOverlay } from './components'
 import { useGasStationCart, useGasStationFilters } from '../lib/hooks'
 import { useRouteInfoStore } from '@/shared/store'
+import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
+import { TollMarker } from '@/entities/tolls/ui'
+import { convertTollWithSectionToToll } from '../lib/helpers/convert-toll-with-section'
+import { TollRoad } from '@/entities/roads'
+import { TollRoadPolyline } from '@/entities/roads/ui'
 
 interface MapWithRouteProps {
   directionsData: Directions | undefined
@@ -33,6 +38,8 @@ interface MapWithRouteProps {
     variables: GetGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
   routeData: RouteData | undefined
+  tolls?: TollWithSection[]
+  tollRoads?: TollRoad[]
 }
 
 export const MapWithRoute = ({
@@ -43,6 +50,8 @@ export const MapWithRoute = ({
   mutateAsync,
   updateGasStations,
   routeData,
+  tolls,
+  tollRoads,
 }: MapWithRouteProps) => {
   const { selectedSectionId } = useRouteInfoStore()
 
@@ -74,6 +83,12 @@ export const MapWithRoute = ({
       (station) => station.roadSectionId === selectedSectionId,
     )
   }, [gasStations, selectedSectionId])
+
+  // Фильтруем tolls по выбранной секции
+  const filteredTolls = useMemo(() => {
+    if (!tolls || !selectedSectionId) return []
+    return tolls.filter((toll) => toll.routeSection === selectedSectionId)
+  }, [tolls, selectedSectionId])
 
   const handleGasStationClick = (lat: number, lng: number) => {
     if (map) {
@@ -112,6 +127,22 @@ export const MapWithRoute = ({
             isStationInCart={isStationInCart}
           />
         )}
+
+        {/* Отображение tolls для выбранной секции */}
+        {filteredTolls.length > 0 &&
+          filteredTolls.map((toll) => (
+            <TollMarker
+              key={toll.id}
+              toll={convertTollWithSectionToToll(toll)}
+            />
+          ))}
+
+        {/* Отображение toll roads */}
+        {tollRoads &&
+          tollRoads.map((tollRoad) => (
+            <TollRoadPolyline key={tollRoad.id} road={tollRoad} />
+          ))}
+
         {truck && (
           <TrackTruck
             key={truck.id}

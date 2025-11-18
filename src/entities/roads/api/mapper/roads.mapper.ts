@@ -1,10 +1,12 @@
 import type {
   Road,
   GetRoadsByBoundingBoxResponse,
+  GetTollRoadsResponse,
 } from '../../model/types/roads'
 import type {
   RoadDto,
   GetRoadsByBoundingBoxResponseDto,
+  GetTollRoadsResponseDto,
   CoordinateDto,
 } from '../../model/types/roads.dto'
 
@@ -36,5 +38,17 @@ export const mapRoad = (dto: RoadDto): Road => {
 export const mapGetRoadsByBoundingBox = (
   dto: GetRoadsByBoundingBoxResponseDto,
 ): GetRoadsByBoundingBoxResponse => {
+  return dto.map(mapRoad)
+}
+
+/**
+ * Maps the full API response DTO (GetTollRoadsResponseDto)
+ * to the desired application data structure (GetTollRoadsResponse).
+ * @param dto The raw DTO object received from the server (already validated by Zod).
+ * @returns The mapped GetTollRoadsResponse object.
+ */
+export const mapGetTollRoads = (
+  dto: GetTollRoadsResponseDto,
+): GetTollRoadsResponse => {
   return dto.map(mapRoad)
 }

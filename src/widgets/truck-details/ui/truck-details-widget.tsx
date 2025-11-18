@@ -14,6 +14,8 @@ import { useCurrentDirections } from '@/features/truck-route-management/lib/hook
 import { useCombinedGasStations } from '@/features/truck-route-management/lib/hooks/use-combined-gas-stations'
 import { useSubmitRoute } from '@/features/truck-route-management/lib/hooks/use-submit-route'
 import { useRouteFuelManagement } from '@/features/truck-route-management/lib/hooks/use-route-fuel-management'
+import { useRouteTolls } from '@/features/truck-route-management/lib/hooks/use-route-tolls'
+import { useRouteTollRoads } from '@/features/truck-route-management/lib/hooks/use-route-toll-roads'
 import { useCleanupStores } from '../lib/hooks/use-cleanup-stores'
 
 interface TruckDetailsWidgetProps {
@@ -53,6 +55,15 @@ export function TruckDetailsWidget({
     routeData,
   })
 
+  const { tollsData, isTollsLoading } = useRouteTolls({
+    routeByIdData,
+    directionsResponseData,
+  })
+
+  const { tollRoadsData, isTollRoadsLoading } = useRouteTollRoads({
+    directionsResponseData,
+  })
+
   const currentDirectionsData = useCurrentDirections({
     routeByIdData,
     directionsResponseData,
@@ -68,7 +79,9 @@ export function TruckDetailsWidget({
     isRouteLoading ||
     isRouteByIdLoading ||
     isDirectionsPending ||
-    isGasStationsLoading
+    isGasStationsLoading ||
+    isTollsLoading ||
+    isTollRoadsLoading
 
   const { handleSubmitRoute } = useSubmitRoute({
     truckData,
@@ -107,6 +120,8 @@ export function TruckDetailsWidget({
             isPending={isLoadingRouteRelated}
             mutateAsync={handleDirectionsMutation}
             updateGasStations={updateGasStations}
+            tolls={tollsData}
+            tollRoads={tollRoadsData}
           />
         </>
       )}
