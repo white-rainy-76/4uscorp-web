@@ -39,7 +39,6 @@ export function useRoute({ truckId }: useRouteProps) {
         miles: data.routeInfo.miles,
         driveTime: data.routeInfo.driveTime,
         gallons: data.totalFuelAmmount,
-        tolls: data.routeInfo.tolls,
         fuelLeft: data.remainingFuel,
         totalPrice: data.totalPriceAmmount,
       })

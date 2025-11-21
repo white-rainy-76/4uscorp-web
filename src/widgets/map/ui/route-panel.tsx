@@ -27,8 +27,15 @@ export const RoutePanelOnMap = ({
   gasStations,
 }: Props) => {
   const { dictionary } = useDictionary()
-  const { fuelLeft, gallons, totalPrice, driveTime, miles } =
-    useRouteInfoStore()
+  const {
+    fuelLeft,
+    gallons,
+    totalPrice,
+    driveTime,
+    miles,
+    tollsOnline,
+    tollsIPass,
+  } = useRouteInfoStore()
   const { cart, selectedProviders } = useCartStore()
 
   const displayDriveTime = useMemo(() => {
@@ -82,15 +89,6 @@ export const RoutePanelOnMap = ({
           </div>
           <div className="flex flex-col items-start">
             <span className="font-normal ">
-              {dictionary.home.route_panel.tolls}
-            </span>
-            <span className=" font-bold whitespace-nowrap">
-              {/*! Tolls больше не приходят с directions API, поэтому поле можно оставить как "-" или убрать */}
-              -
-            </span>
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-normal ">
               {dictionary.home.route_panel.fuel_left}
             </span>
             <span className=" font-bold whitespace-nowrap">
@@ -103,6 +101,18 @@ export const RoutePanelOnMap = ({
             </span>
             <span className=" font-bold whitespace-nowrap">
               ${totalPrice?.toFixed(2) ?? '-'}
+            </span>
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-normal ">Tolls Online</span>
+            <span className=" font-bold whitespace-nowrap">
+              {tollsOnline !== undefined ? `$${tollsOnline.toFixed(2)}` : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-normal ">IPass</span>
+            <span className=" font-bold whitespace-nowrap">
+              {tollsIPass !== undefined ? `$${tollsIPass.toFixed(2)}` : '-'}
             </span>
           </div>
         </div>

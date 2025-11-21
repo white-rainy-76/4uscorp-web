@@ -17,5 +17,7 @@ export function convertTollWithSectionToToll(
     comment: tollWithSection.comment,
     isDynamic: tollWithSection.isDynamic,
     nodeId: tollWithSection.nodeId,
+    payOnline: tollWithSection.payOnline,
+    iPass: tollWithSection.iPass,
   }
 }

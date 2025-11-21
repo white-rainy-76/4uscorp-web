@@ -10,7 +10,8 @@ interface RouteInfoState {
   gallons: number | undefined
   fuelLeft: number | undefined
   totalPrice: number | undefined
-  tolls: number | undefined
+  tollsOnline: number | undefined
+  tollsIPass: number | undefined
 }
 
 interface RouteInfoActions {
@@ -22,7 +23,8 @@ interface RouteInfoActions {
   setGallons: (gallons: number | undefined) => void
   setFuelLeft: (fuelLeft: number | undefined) => void
   setTotalPrice: (totalPrice: number | undefined) => void
-  setTolls: (tolls: number | undefined) => void
+  setTollsOnline: (tollsOnline: number | undefined) => void
+  setTollsIPass: (tollsIPass: number | undefined) => void
   setRouteInfo: (data: Partial<RouteInfoState>) => void
   clearRouteInfo: () => void
 }
@@ -38,7 +40,8 @@ const initialState: RouteInfoState = {
   gallons: undefined,
   fuelLeft: undefined,
   totalPrice: undefined,
-  tolls: undefined,
+  tollsOnline: undefined,
+  tollsIPass: undefined,
 }
 
 export const useRouteInfoStore = create<RouteInfoStore>()(
@@ -61,7 +64,10 @@ export const useRouteInfoStore = create<RouteInfoStore>()(
         set({ fuelLeft }, undefined, 'routeInfo/setFuelLeft'),
       setTotalPrice: (totalPrice) =>
         set({ totalPrice }, undefined, 'routeInfo/setTotalPrice'),
-      setTolls: (tolls) => set({ tolls }, undefined, 'routeInfo/setTolls'),
+      setTollsOnline: (tollsOnline) =>
+        set({ tollsOnline }, undefined, 'routeInfo/setTollsOnline'),
+      setTollsIPass: (tollsIPass) =>
+        set({ tollsIPass }, undefined, 'routeInfo/setTollsIPass'),
 
       setRouteInfo: (data) =>
         set(

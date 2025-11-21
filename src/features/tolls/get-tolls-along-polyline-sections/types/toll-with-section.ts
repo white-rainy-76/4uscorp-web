@@ -12,6 +12,8 @@ export const TollWithSectionSchema = z.object({
   comment: z.string().nullable(),
   isDynamic: z.boolean(),
   routeSection: z.string().nullable(),
+  payOnline: z.number().optional(),
+  iPass: z.number().optional(),
 })
 
 export type TollWithSection = z.infer<typeof TollWithSectionSchema>

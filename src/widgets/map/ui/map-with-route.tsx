@@ -117,9 +117,15 @@ export const MapWithRoute = ({
           onClearAlternativeRoutes={handleGetClearAlternativeRoutes}
         />
 
+        {/* Отображение toll roads */}
+        {tollRoads &&
+          tollRoads.map((tollRoad) => (
+            <TollRoadPolyline key={tollRoad.id} road={tollRoad} />
+          ))}
+
         {filteredGasStations.length > 0 && (
           <ClusteredGasStationMarkers
-            key={markersKey}
+            key={`${markersKey}-${selectedSectionId}`}
             gasStations={filteredGasStations}
             onAddToCart={handleAddToCart}
             onRemoveFromCart={handleRemoveFromCart}
@@ -135,12 +141,6 @@ export const MapWithRoute = ({
               key={toll.id}
               toll={convertTollWithSectionToToll(toll)}
             />
-          ))}
-
-        {/* Отображение toll roads */}
-        {tollRoads &&
-          tollRoads.map((tollRoad) => (
-            <TollRoadPolyline key={tollRoad.id} road={tollRoad} />
           ))}
 
         {truck && (

@@ -47,7 +47,7 @@ export const ClusteredGasStationMarkers: React.FC<Props> = ({
 
   // Добавляем валидные маркеры в кластер (исключая isAlgorithm)
   useEffect(() => {
-    if (!clusterer) return
+    if (!clusterer || Object.keys(markers).length === 0) return
 
     const validMarkers = Object.entries(markers)
       .filter(([id]) => {

@@ -6,23 +6,32 @@ import { Icon } from '@/shared/ui/Icon'
 
 interface Props {
   toll: Toll
-  selectedToll?: Toll | null
-  onTollSelect?: (toll: Toll) => void
+  selectedTolls?: Toll[]
+  onTollSelect?: (toll: Toll, isSingleSelect?: boolean) => void
 }
 
 export const TollMarker: React.FC<Props> = ({
   toll,
-  selectedToll,
+  selectedTolls = [],
   onTollSelect,
 }) => {
   const [hovered, setHovered] = useState(false)
 
-  const isSelected = selectedToll?.id === toll.id
+  const isSelected = selectedTolls.some(
+    (selectedToll) => selectedToll.id === toll.id,
+  )
+  const hasNoKey = !toll.key
 
   const handleMarkerClick = (e: google.maps.MapMouseEvent) => {
     e.domEvent?.stopPropagation()
     if (onTollSelect) {
-      onTollSelect(toll)
+      // Проверяем, нажата ли клавиша Ctrl (Windows/Linux) или Cmd (Mac)
+      const domEvent = e.domEvent
+      const isCtrlOrCmd =
+        (domEvent instanceof MouseEvent &&
+          (domEvent.ctrlKey || domEvent.metaKey)) ||
+        false
+      onTollSelect(toll, isCtrlOrCmd)
     }
   }
 
@@ -70,25 +79,46 @@ export const TollMarker: React.FC<Props> = ({
         {/* Сам маркер */}
         <div
           className={classNames(
-            'relative rounded-full p-1.5 border shadow-sm flex items-center justify-center transition-all duration-300',
+            'relative rounded-full border shadow-sm flex items-center justify-center transition-all duration-300',
             {
-              'shadow-md border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 scale-105':
-                hovered && !isSelected,
-              'border-gray-300 bg-white': !hovered && !isSelected,
-              'border-blue-600 bg-gradient-to-br from-blue-100 via-blue-50 to-white border-[1px] shadow-2xl shadow-blue-500/40 scale-125':
+              'p-1.5 shadow-md border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 scale-105':
+                hovered && !isSelected && !hasNoKey,
+              'p-1.5 border-gray-300 bg-white':
+                !hovered && !isSelected && !hasNoKey,
+              'p-2 border-blue-600 bg-gradient-to-br from-blue-100 via-blue-50 to-white border-[1px] shadow-2xl shadow-blue-500/40 scale-125':
                 isSelected,
+              'p-1.5 border-yellow-400 bg-yellow-200 shadow-md':
+                hasNoKey && !isSelected,
+              'p-1.5 border-yellow-500 bg-yellow-300 scale-105':
+                hasNoKey && !isSelected && hovered,
             },
           )}>
-          <Icon
-            name="common/dollar"
-            width={16}
-            height={16}
-            className={classNames('transition-all duration-300', {
-              'text-blue-600': !isSelected && !hovered,
-              'text-blue-700': isSelected,
-              'text-blue-700 scale-110': hovered && !isSelected,
-            })}
-          />
+          <div className="flex flex-col items-center justify-center gap-0.5">
+            <Icon
+              name="common/dollar"
+              width={16}
+              height={16}
+              className={classNames('transition-all duration-300', {
+                'text-blue-600': !isSelected && !hovered,
+                'text-blue-700': isSelected,
+                'text-blue-700 scale-110': hovered && !isSelected,
+              })}
+            />
+            {toll.payOnline !== undefined && (
+              <span
+                className={classNames(
+                  'text-[10px] font-bold leading-none whitespace-nowrap',
+                  {
+                    'text-blue-700': isSelected,
+                    'text-blue-600': hovered && !isSelected && !hasNoKey,
+                    'text-gray-600': !hovered && !isSelected && !hasNoKey,
+                    'text-yellow-800': hasNoKey,
+                  },
+                )}>
+                ${toll.payOnline.toFixed(2)}
+              </span>
+            )}
+          </div>
         </div>
         {/* Внутренняя тень для выбранного маркера */}
         {isSelected && (

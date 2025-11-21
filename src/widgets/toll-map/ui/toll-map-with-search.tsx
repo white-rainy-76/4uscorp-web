@@ -10,19 +10,21 @@ import {
 } from '@/features/forms/bounding-box-search'
 
 interface TollMapWithSearchProps {
-  selectedToll?: Toll | null
+  selectedTolls?: Toll[]
   draftTollPosition?: { lat: number; lng: number } | null
   onTollSelect?: (toll: Toll) => void
   tolls: Toll[]
   onTollsChange: (tolls: Toll[] | ((prev: Toll[]) => Toll[])) => void
+  onTollsDeselect?: () => void
 }
 
 export const TollMapWithSearch = ({
-  selectedToll,
+  selectedTolls,
   draftTollPosition,
   onTollSelect,
   tolls,
   onTollsChange,
+  onTollsDeselect,
 }: TollMapWithSearchProps) => {
   const { mutate, isPending } = useGetTollsByBoundingBoxMutation({
     onSuccess: (data) => {
@@ -32,13 +34,15 @@ export const TollMapWithSearch = ({
 
   const handleSearch = useCallback(
     (coordinates: BoundingBoxCoordinates) => {
+      // Сбрасываем выбранные маркеры при новом запросе
+      onTollsDeselect?.()
       mutate(coordinates)
     },
-    [mutate],
+    [mutate, onTollsDeselect],
   )
 
   return (
-    <main className="flex-1 overflow-y-auto bg-background custom-scroll relative">
+    <main className="flex-1 h-full bg-background relative overflow-hidden">
       <BoundingBoxSearchForm
         title="Toll Points Search"
         resultsCount={tolls.length}
@@ -50,7 +54,7 @@ export const TollMapWithSearch = ({
         tolls={tolls}
         isLoading={isPending}
         draftTollPosition={draftTollPosition}
-        selectedToll={selectedToll}
+        selectedTolls={selectedTolls}
         onTollSelect={onTollSelect}
       />
     </main>

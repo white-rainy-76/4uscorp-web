@@ -17,33 +17,27 @@ import {
 } from '../../update-toll/api/payload/update-toll.payload'
 import { Label } from '@/shared/ui/label'
 import { Toll } from '@/entities/tolls'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/dialog'
+import { DeleteTollDialog } from '@/features/tolls/delete-toll'
 
 interface TollInspectorPanelProps {
-  selectedToll: Toll | null
-  onTollSelect: (toll: Toll | null) => void
+  selectedTolls: Toll[]
+  onTollsDeselect: () => void
   onDraftPositionChange: (position: { lat: number; lng: number } | null) => void
   tolls: Toll[]
   onTollsChange: (tolls: Toll[] | ((prev: Toll[]) => Toll[])) => void
 }
 
 export const TollInspectorPanel = ({
-  selectedToll,
-  onTollSelect,
+  selectedTolls,
+  onTollsDeselect,
   onDraftPositionChange,
   tolls,
   onTollsChange,
 }: TollInspectorPanelProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
 
-  const mode = selectedToll ? 'edit' : 'create'
+  const mode = selectedTolls.length > 0 ? 'edit' : 'create'
+  const selectedToll = selectedTolls.length === 1 ? selectedTolls[0] : null
 
   const {
     register,
@@ -63,28 +57,113 @@ export const TollInspectorPanel = ({
       latitude: 0,
       longitude: 0,
       isDynamic: false,
+      iPass: undefined,
+      iPassOvernight: undefined,
+      payOnline: undefined,
+      payOnlineOvernight: undefined,
     },
   })
 
   // Заполняем форму при выборе toll для редактирования
   useEffect(() => {
-    if (selectedToll && mode === 'edit') {
-      setValue('name', selectedToll.name, { shouldValidate: true })
-      setValue('key', selectedToll.key || '', {
-        shouldValidate: true,
-      })
-      setValue('price', selectedToll.price, { shouldValidate: true })
-      setValue('latitude', selectedToll.position.lat, { shouldValidate: true })
-      setValue('longitude', selectedToll.position.lng, {
-        shouldValidate: true,
-      })
-      setValue('isDynamic', selectedToll.isDynamic || false, {
-        shouldValidate: true,
-      })
-      // id не нужен в форме, он передаётся в URL
-      // Не показываем draft маркер при редактировании - выбранный toll уже виден на карте
+    if (selectedTolls.length > 0 && mode === 'edit') {
+      // Если выбран один маркер, заполняем форму его данными
+      if (selectedTolls.length === 1) {
+        const toll = selectedTolls[0]
+        setValue('name', toll.name, { shouldValidate: true })
+        setValue('key', toll.key || '', {
+          shouldValidate: true,
+        })
+        setValue('price', toll.price, { shouldValidate: true })
+        setValue('latitude', toll.position.lat, { shouldValidate: true })
+        setValue('longitude', toll.position.lng, {
+          shouldValidate: true,
+        })
+        setValue('isDynamic', toll.isDynamic || false, {
+          shouldValidate: true,
+        })
+        setValue('iPass', toll.iPass, { shouldValidate: true })
+        setValue('iPassOvernight', toll.iPassOvernight, {
+          shouldValidate: true,
+        })
+        setValue('payOnline', toll.payOnline, { shouldValidate: true })
+        setValue('payOnlineOvernight', toll.payOnlineOvernight, {
+          shouldValidate: true,
+        })
+      } else {
+        // Если выбрано несколько маркеров, проверяем, одинаковые ли у них значения
+        const firstToll = selectedTolls[0]
+        const allSameName = selectedTolls.every(
+          (t) => t.name === firstToll.name,
+        )
+        const allSameKey = selectedTolls.every((t) => t.key === firstToll.key)
+        const allSamePrice = selectedTolls.every(
+          (t) => t.price === firstToll.price,
+        )
+        const allSameIsDynamic = selectedTolls.every(
+          (t) => (t.isDynamic || false) === (firstToll.isDynamic || false),
+        )
+        const allSameIPass = selectedTolls.every(
+          (t) => t.iPass === firstToll.iPass,
+        )
+        const allSameIPassOvernight = selectedTolls.every(
+          (t) => t.iPassOvernight === firstToll.iPassOvernight,
+        )
+        const allSamePayOnline = selectedTolls.every(
+          (t) => t.payOnline === firstToll.payOnline,
+        )
+        const allSamePayOnlineOvernight = selectedTolls.every(
+          (t) => t.payOnlineOvernight === firstToll.payOnlineOvernight,
+        )
+
+        setValue('name', allSameName ? firstToll.name : '', {
+          shouldValidate: true,
+        })
+        setValue('key', allSameKey ? firstToll.key || '' : '', {
+          shouldValidate: true,
+        })
+        setValue('price', allSamePrice ? firstToll.price : 0, {
+          shouldValidate: true,
+        })
+        setValue('latitude', firstToll.position.lat, { shouldValidate: true })
+        setValue('longitude', firstToll.position.lng, {
+          shouldValidate: true,
+        })
+        setValue(
+          'isDynamic',
+          allSameIsDynamic ? firstToll.isDynamic || false : false,
+          {
+            shouldValidate: true,
+          },
+        )
+        setValue('iPass', allSameIPass ? firstToll.iPass : undefined, {
+          shouldValidate: true,
+        })
+        setValue(
+          'iPassOvernight',
+          allSameIPassOvernight ? firstToll.iPassOvernight : undefined,
+          {
+            shouldValidate: true,
+          },
+        )
+        setValue(
+          'payOnline',
+          allSamePayOnline ? firstToll.payOnline : undefined,
+          {
+            shouldValidate: true,
+          },
+        )
+        setValue(
+          'payOnlineOvernight',
+          allSamePayOnlineOvernight ? firstToll.payOnlineOvernight : undefined,
+          {
+            shouldValidate: true,
+          },
+        )
+      }
+      // Не показываем draft маркер при редактировании - выбранные tolls уже видны на карте
       onDraftPositionChange(null)
-    } else if (!selectedToll && mode === 'create') {
+    } else if (selectedTolls.length === 0 && mode === 'create') {
       // Сбрасываем форму при переключении в режим создания
       reset({
         name: '',
@@ -93,10 +172,14 @@ export const TollInspectorPanel = ({
         latitude: 0,
         longitude: 0,
         isDynamic: false,
+        iPass: undefined,
+        iPassOvernight: undefined,
+        payOnline: undefined,
+        payOnlineOvernight: undefined,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedToll, mode])
+  }, [selectedTolls, mode])
 
   // Watch latitude and longitude to update draft marker in real-time
   const latitude = watch('latitude')
@@ -136,24 +219,16 @@ export const TollInspectorPanel = ({
   const { mutateAsync: updateToll, isPending: isUpdating } =
     useUpdateTollMutation({
       onSuccess: (updatedToll) => {
-        reset()
         // Используем реальный объект из ответа сервера с всеми полями, включая key
         onTollsChange((prev) =>
           prev.map((toll) => (toll.id === updatedToll.id ? updatedToll : toll)),
         )
-        // Обновляем selectedToll, чтобы форма отобразила обновленные данные
-        onTollSelect(updatedToll)
       },
     })
 
   const { mutateAsync: deleteToll, isPending: isDeleting } =
     useDeleteTollMutation({
       onSuccess: (_, variables) => {
-        onTollSelect(null)
-        reset()
-        onDraftPositionChange(null)
-        setShowDeleteDialog(false)
-
         // Удаляем toll из списка
         onTollsChange((prev) => prev.filter((toll) => toll.id !== variables.id))
       },
@@ -161,11 +236,28 @@ export const TollInspectorPanel = ({
 
   const handleFormSubmit = async (data: AddTollPayload | UpdateTollPayload) => {
     try {
-      if (mode === 'edit' && selectedToll) {
-        await updateToll({
-          id: selectedToll.id,
-          payload: data as UpdateTollPayload,
-        })
+      if (mode === 'edit' && selectedTolls.length > 0) {
+        // При множественном выборе исключаем координаты из payload
+        const payload =
+          selectedTolls.length > 1
+            ? {
+                ...data,
+                latitude: undefined,
+                longitude: undefined,
+              }
+            : data
+
+        // Обновляем все выбранные маркеры
+        await Promise.all(
+          selectedTolls.map((toll) =>
+            updateToll({
+              id: toll.id,
+              payload: payload as UpdateTollPayload,
+            }),
+          ),
+        )
+        reset()
+        onTollsDeselect()
       } else {
         await addToll(data as AddTollPayload)
       }
@@ -175,23 +267,30 @@ export const TollInspectorPanel = ({
   }
 
   const handleClear = () => {
-    onTollSelect(null)
+    onTollsDeselect()
     reset()
     onDraftPositionChange(null)
   }
 
   const handleDelete = () => {
-    if (selectedToll) {
+    if (selectedTolls.length > 0) {
       setShowDeleteDialog(true)
     }
   }
 
   const confirmDelete = async () => {
-    if (selectedToll) {
+    if (selectedTolls.length > 0) {
       try {
-        await deleteToll({ id: selectedToll.id })
+        // Удаляем все выбранные маркеры
+        await Promise.all(
+          selectedTolls.map((toll) => deleteToll({ id: toll.id })),
+        )
+        setShowDeleteDialog(false)
+        reset()
+        onTollsDeselect()
+        onDraftPositionChange(null)
       } catch (error) {
-        console.error('Failed to delete toll:', error)
+        console.error('Failed to delete tolls:', error)
         setShowDeleteDialog(false)
       }
     }
@@ -201,14 +300,16 @@ export const TollInspectorPanel = ({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-48px)] custom-scroll pr-2">
         {/* Status Indicator */}
         <div className="flex items-center gap-2">
           {mode === 'edit' ? (
             <>
               <span className="text-lg">✏️</span>
               <h2 className="text-xl font-bold text-black">
-                Edit Toll: {selectedToll?.name || ''}
+                {selectedTolls.length === 1
+                  ? `Edit Toll: ${selectedTolls[0]?.name || ''}`
+                  : `Edit ${selectedTolls.length} Tolls`}
               </h2>
             </>
           ) : (
@@ -218,6 +319,22 @@ export const TollInspectorPanel = ({
             </>
           )}
         </div>
+        {selectedTolls.length > 1 && (
+          <div className="text-sm text-gray-600 bg-blue-50 p-2 rounded">
+            Selected {selectedTolls.length} markers with the same key. Changes
+            will be applied to all selected markers.
+            <div className="mt-1 text-xs text-gray-500">
+              💡 Tip: Use Ctrl+Click (Cmd+Click on Mac) to select a single
+              marker for individual editing.
+            </div>
+          </div>
+        )}
+        {selectedTolls.length === 0 && (
+          <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+            💡 Tip: Click on a marker to select all markers with the same key.
+            Use Ctrl+Click (Cmd+Click on Mac) to select a single marker.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           {/* Name */}
@@ -270,43 +387,169 @@ export const TollInspectorPanel = ({
             )}
           </div>
 
+          {/* iPass Prices */}
+          <div className="space-y-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <Label className="text-black font-semibold">iPass Prices</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="iPass" className="text-black text-sm">
+                  Day Price
+                </Label>
+                <Input
+                  id="iPass"
+                  type="number"
+                  step="0.01"
+                  {...register('iPass', { valueAsNumber: true })}
+                  placeholder="0.00"
+                  className={`text-black ${
+                    errors.iPass ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.iPass && (
+                  <p className="text-sm text-red-500">{errors.iPass.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="iPassOvernight" className="text-black text-sm">
+                  Overnight Price
+                </Label>
+                <Input
+                  id="iPassOvernight"
+                  type="number"
+                  step="0.01"
+                  {...register('iPassOvernight', { valueAsNumber: true })}
+                  placeholder="0.00"
+                  className={`text-black ${
+                    errors.iPassOvernight ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.iPassOvernight && (
+                  <p className="text-sm text-red-500">
+                    {errors.iPassOvernight.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* PayOnline Prices */}
+          <div className="space-y-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <Label className="text-black font-semibold">PayOnline Prices</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="payOnline" className="text-black text-sm">
+                  Day Price
+                </Label>
+                <Input
+                  id="payOnline"
+                  type="number"
+                  step="0.01"
+                  {...register('payOnline', { valueAsNumber: true })}
+                  placeholder="0.00"
+                  className={`text-black ${
+                    errors.payOnline ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.payOnline && (
+                  <p className="text-sm text-red-500">
+                    {errors.payOnline.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="payOnlineOvernight"
+                  className="text-black text-sm">
+                  Overnight Price
+                </Label>
+                <Input
+                  id="payOnlineOvernight"
+                  type="number"
+                  step="0.01"
+                  {...register('payOnlineOvernight', { valueAsNumber: true })}
+                  placeholder="0.00"
+                  className={`text-black ${
+                    errors.payOnlineOvernight ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.payOnlineOvernight && (
+                  <p className="text-sm text-red-500">
+                    {errors.payOnlineOvernight.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Latitude */}
           <div className="space-y-2">
-            <Label htmlFor="latitude" className="text-black">
+            <Label
+              htmlFor="latitude"
+              className={`text-black ${
+                selectedTolls.length > 1 ? 'text-gray-400' : ''
+              }`}>
               Latitude
+              {selectedTolls.length > 1 && (
+                <span className="ml-2 text-xs text-gray-500">
+                  (disabled for multiple selection)
+                </span>
+              )}
             </Label>
             <Input
               id="latitude"
               type="number"
-              step="0.000001"
+              step="any"
+              disabled={selectedTolls.length > 1}
               {...register('latitude', { valueAsNumber: true })}
               placeholder="0.000000"
               className={`text-black ${
                 errors.latitude ? 'border-red-500' : ''
-              }`}
+              } ${selectedTolls.length > 1 ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
             {errors.latitude && (
               <p className="text-sm text-red-500">{errors.latitude.message}</p>
+            )}
+            {selectedTolls.length > 1 && (
+              <p className="text-xs text-gray-500">
+                Coordinates cannot be changed for multiple markers. Use
+                Ctrl+Click to select a single marker to edit coordinates.
+              </p>
             )}
           </div>
 
           {/* Longitude */}
           <div className="space-y-2">
-            <Label htmlFor="longitude" className="text-black">
+            <Label
+              htmlFor="longitude"
+              className={`text-black ${
+                selectedTolls.length > 1 ? 'text-gray-400' : ''
+              }`}>
               Longitude
+              {selectedTolls.length > 1 && (
+                <span className="ml-2 text-xs text-gray-500">
+                  (disabled for multiple selection)
+                </span>
+              )}
             </Label>
             <Input
               id="longitude"
               type="number"
-              step="0.000001"
+              step="any"
+              disabled={selectedTolls.length > 1}
               {...register('longitude', { valueAsNumber: true })}
               placeholder="0.000000"
               className={`text-black ${
                 errors.longitude ? 'border-red-500' : ''
-              }`}
+              } ${selectedTolls.length > 1 ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
             {errors.longitude && (
               <p className="text-sm text-red-500">{errors.longitude.message}</p>
+            )}
+            {selectedTolls.length > 1 && (
+              <p className="text-xs text-gray-500">
+                Coordinates cannot be changed for multiple markers. Use
+                Ctrl+Click to select a single marker to edit coordinates.
+              </p>
             )}
           </div>
 
@@ -365,32 +608,13 @@ export const TollInspectorPanel = ({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-black">Delete Toll</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete &quot;{selectedToll?.name}&quot;?
-              This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              className="text-black"
-              onClick={() => setShowDeleteDialog(false)}
-              disabled={isDeleting}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteTollDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        selectedTolls={selectedTolls}
+        onConfirm={confirmDelete}
+        isDeleting={isDeleting}
+      />
     </>
   )
 }
