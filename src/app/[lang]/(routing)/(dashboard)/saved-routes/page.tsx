@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react'
 import { SavedRoutesCombinedPanel } from '@/features/saved-routes-search'
-import { MapWithSavedRoutes } from '@/widgets/map'
+import { MapWithSavedRoutes, SimplifiedRoutePanel } from '@/widgets/map'
 import { useHandleDirectionsMutation } from '@/features/directions/api/handle-direction.mutation'
 import { useSavedRoutesStore } from '@/shared/store'
 import { useGetTollsAlongPolylineSectionsMutation } from '@/features/tolls/get-tolls-along-polyline-sections'
@@ -169,6 +169,14 @@ export default function SavedRoutesPage() {
         onRouteDelete={handleRouteClear}
         onRouteUpdate={handleRouteClear}
       />
+
+      {/* Simplified Route Panel */}
+      {directionsData && (
+        <SimplifiedRoutePanel
+          directionsData={directionsData}
+          tolls={tollsData}
+        />
+      )}
 
       <MapWithSavedRoutes
         isLoading={isCreatingRoute || isTollsLoading || isTollRoadsLoading}
