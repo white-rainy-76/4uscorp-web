@@ -13,6 +13,10 @@ export const TollSchema = z.object({
   comment: z.string().nullable().optional(),
   isDynamic: z.boolean().optional(),
   nodeId: z.number().optional(),
+  iPass: z.number().optional(),
+  iPassOvernight: z.number().optional(),
+  payOnline: z.number().optional(),
+  payOnlineOvernight: z.number().optional(),
 })
 
 export const GetTollsByBoundingBoxResponseSchema = z.array(TollSchema)

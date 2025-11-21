@@ -41,6 +41,7 @@ export const RoutePolylines = ({
           strokeColor="#141414"
           strokeOpacity={0.5}
           strokeWeight={3}
+          zIndex={4}
           onMouseMove={(e) =>
             onHover(e, routeSectionIds[index + 1] || '', index + 1)
           }

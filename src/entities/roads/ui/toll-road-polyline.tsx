@@ -47,7 +47,7 @@ export const TollRoadPolyline: React.FC<TollRoadPolylineProps> = ({
       strokeColor="#FF6B35"
       strokeOpacity={0.9}
       strokeWeight={4}
-      zIndex={5}
+      zIndex={3}
       onClick={(e) => onClick?.(e)}
     />
   )

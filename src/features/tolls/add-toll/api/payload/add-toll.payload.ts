@@ -7,6 +7,10 @@ export const AddTollPayloadSchema = z.object({
   latitude: z.number().min(-90).max(90, 'latitude_invalid'),
   longitude: z.number().min(-180).max(180, 'longitude_invalid'),
   isDynamic: z.boolean().optional(),
+  iPass: z.number().min(0, 'price_must_be_positive').optional(),
+  iPassOvernight: z.number().min(0, 'price_must_be_positive').optional(),
+  payOnline: z.number().min(0, 'price_must_be_positive').optional(),
+  payOnlineOvernight: z.number().min(0, 'price_must_be_positive').optional(),
 })
 
 export type AddTollPayload = z.infer<typeof AddTollPayloadSchema>

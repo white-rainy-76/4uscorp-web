@@ -7,7 +7,7 @@ interface MapWithTollsProps {
   tolls: Toll[]
   isLoading?: boolean
   draftTollPosition?: { lat: number; lng: number } | null
-  selectedToll?: Toll | null
+  selectedTolls?: Toll[]
   onTollSelect?: (toll: Toll) => void
 }
 
@@ -15,7 +15,7 @@ export const MapWithTolls = ({
   tolls,
   isLoading,
   draftTollPosition,
-  selectedToll,
+  selectedTolls = [],
   onTollSelect,
 }: MapWithTollsProps) => {
   const [clickedOutside, setClickedOutside] = useState(false)
@@ -33,14 +33,16 @@ export const MapWithTolls = ({
             <TollMarker
               key={toll.id}
               toll={toll}
-              selectedToll={selectedToll}
+              selectedTolls={selectedTolls}
               onTollSelect={onTollSelect}
             />
           ))}
         {draftTollPosition &&
           draftTollPosition.lat != null &&
           draftTollPosition.lng != null &&
-          !selectedToll && <DraftTollMarker position={draftTollPosition} />}
+          selectedTolls.length === 0 && (
+            <DraftTollMarker position={draftTollPosition} />
+          )}
       </MapBase>
     </div>
   )

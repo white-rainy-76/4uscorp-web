@@ -26,6 +26,10 @@ export const mapToll = (dto: TollDto): Toll => {
     comment: dto.comment ?? null,
     isDynamic: dto.isDynamic,
     nodeId: dto.nodeId,
+    iPass: dto.iPass,
+    iPassOvernight: dto.iPassOvernight,
+    payOnline: dto.payOnline,
+    payOnlineOvernight: dto.payOnlineOvernight,
   }
 }
 
