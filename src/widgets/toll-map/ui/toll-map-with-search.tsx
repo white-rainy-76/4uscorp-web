@@ -16,6 +16,9 @@ interface TollMapWithSearchProps {
   tolls: Toll[]
   onTollsChange: (tolls: Toll[] | ((prev: Toll[]) => Toll[])) => void
   onTollsDeselect?: () => void
+  onDraftPositionChange?: (
+    position: { lat: number; lng: number } | null,
+  ) => void
 }
 
 export const TollMapWithSearch = ({
@@ -25,6 +28,7 @@ export const TollMapWithSearch = ({
   tolls,
   onTollsChange,
   onTollsDeselect,
+  onDraftPositionChange,
 }: TollMapWithSearchProps) => {
   const { mutate, isPending } = useGetTollsByBoundingBoxMutation({
     onSuccess: (data) => {
@@ -56,6 +60,8 @@ export const TollMapWithSearch = ({
         draftTollPosition={draftTollPosition}
         selectedTolls={selectedTolls}
         onTollSelect={onTollSelect}
+        onDraftPositionChange={onDraftPositionChange}
+        onTollsDeselect={onTollsDeselect}
       />
     </main>
   )

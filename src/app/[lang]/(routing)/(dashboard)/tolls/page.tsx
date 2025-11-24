@@ -79,6 +79,7 @@ export default function TollsPage() {
           selectedTolls={selectedTolls}
           onTollsDeselect={handleTollsDeselect}
           onDraftPositionChange={setDraftTollPosition}
+          draftTollPosition={draftTollPosition}
           tolls={tolls}
           onTollsChange={setTolls}
         />
@@ -91,6 +92,7 @@ export default function TollsPage() {
         tolls={tolls}
         onTollsChange={setTolls}
         onTollsDeselect={handleTollsDeselect}
+        onDraftPositionChange={setDraftTollPosition}
       />
     </div>
   )
