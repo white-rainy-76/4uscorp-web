@@ -23,6 +23,7 @@ interface TollInspectorPanelProps {
   selectedTolls: Toll[]
   onTollsDeselect: () => void
   onDraftPositionChange: (position: { lat: number; lng: number } | null) => void
+  draftTollPosition?: { lat: number; lng: number } | null
   tolls: Toll[]
   onTollsChange: (tolls: Toll[] | ((prev: Toll[]) => Toll[])) => void
 }
@@ -31,6 +32,7 @@ export const TollInspectorPanel = ({
   selectedTolls,
   onTollsDeselect,
   onDraftPositionChange,
+  draftTollPosition,
   tolls,
   onTollsChange,
 }: TollInspectorPanelProps) => {
@@ -177,6 +179,7 @@ export const TollInspectorPanel = ({
         payOnline: undefined,
         payOnlineOvernight: undefined,
       })
+      onDraftPositionChange(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTolls, mode])
@@ -185,7 +188,38 @@ export const TollInspectorPanel = ({
   const latitude = watch('latitude')
   const longitude = watch('longitude')
 
+  // Флаг для предотвращения циклических обновлений
+  const isUpdatingFromDraftRef = React.useRef(false)
+
+  // Обновляем координаты в форме при изменении draftTollPosition (например, при правом клике на карту)
   React.useEffect(() => {
+    if (
+      mode === 'create' &&
+      draftTollPosition &&
+      draftTollPosition.lat != null &&
+      draftTollPosition.lng != null &&
+      draftTollPosition.lat !== 0 &&
+      draftTollPosition.lng !== 0 &&
+      (Math.abs(latitude - draftTollPosition.lat) > 0.000001 ||
+        Math.abs(longitude - draftTollPosition.lng) > 0.000001)
+    ) {
+      isUpdatingFromDraftRef.current = true
+      setValue('latitude', draftTollPosition.lat, { shouldValidate: false })
+      setValue('longitude', draftTollPosition.lng, { shouldValidate: false })
+      // Сбрасываем флаг после обновления формы
+      requestAnimationFrame(() => {
+        isUpdatingFromDraftRef.current = false
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftTollPosition, mode])
+
+  React.useEffect(() => {
+    // Пропускаем обновление, если мы только что обновили форму из draftTollPosition
+    if (isUpdatingFromDraftRef.current) {
+      return
+    }
+
     // Показываем draft маркер только в режиме создания (не редактирования)
     if (mode === 'create') {
       if (
@@ -198,7 +232,14 @@ export const TollInspectorPanel = ({
         isFinite(latitude) &&
         isFinite(longitude)
       ) {
-        onDraftPositionChange({ lat: latitude, lng: longitude })
+        // Обновляем draft position только если координаты отличаются от текущего draftTollPosition
+        if (
+          !draftTollPosition ||
+          Math.abs(draftTollPosition.lat - latitude) > 0.000001 ||
+          Math.abs(draftTollPosition.lng - longitude) > 0.000001
+        ) {
+          onDraftPositionChange({ lat: latitude, lng: longitude })
+        }
       } else {
         onDraftPositionChange(null)
       }

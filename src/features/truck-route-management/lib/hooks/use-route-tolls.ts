@@ -41,10 +41,29 @@ export function useRouteTolls({
   useEffect(() => {
     if (filteredTolls.length > 0) {
       // Фильтруем дубликаты по ключу - оставляем только уникальные ключи
+      // Приоритет отдаём первому toll с ценой (payOnline или iPass)
       const uniqueTollsByKey = filteredTolls.reduce((acc, toll) => {
-        // Если у toll нет ключа или ключ уже не встречался, добавляем его
-        if (!toll.key || !acc.has(toll.key)) {
-          acc.set(toll.key || toll.id, toll)
+        const key = toll.key || toll.id
+
+        // Если ключ еще не встречался, добавляем toll
+        if (!acc.has(key)) {
+          acc.set(key, toll)
+        } else {
+          // Если ключ уже есть, проверяем цены
+          const existingToll = acc.get(key)!
+          const existingHasPrice =
+            (existingToll.payOnline !== undefined &&
+              existingToll.payOnline > 0) ||
+            (existingToll.iPass !== undefined && existingToll.iPass > 0)
+          const currentHasPrice =
+            (toll.payOnline !== undefined && toll.payOnline > 0) ||
+            (toll.iPass !== undefined && toll.iPass > 0)
+
+          // Если у текущего toll есть цена, а у существующего нет - заменяем
+          if (currentHasPrice && !existingHasPrice) {
+            acc.set(key, toll)
+          }
+          // Если у обоих нет цены или у обоих есть - оставляем первый (уже сохраненный)
         }
         return acc
       }, new Map<string | null, TollWithSection>())
