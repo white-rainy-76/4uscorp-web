@@ -200,6 +200,8 @@ export const TollInspectorPanel = ({
       draftTollPosition.lng != null &&
       draftTollPosition.lat !== 0 &&
       draftTollPosition.lng !== 0 &&
+      latitude != null &&
+      longitude != null &&
       (Math.abs(latitude - draftTollPosition.lat) > 0.000001 ||
         Math.abs(longitude - draftTollPosition.lng) > 0.000001)
     ) {
