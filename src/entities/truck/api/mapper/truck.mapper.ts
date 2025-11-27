@@ -30,20 +30,22 @@ export const mapTruck = (rawTruck: TruckDto): Truck => {
     : null
 
   const truckStatus: TruckStatus =
-    TRUCK_STATUS_MAP[rawTruck.status] ?? 'INACTIVE'
+    rawTruck.status !== null && rawTruck.status !== undefined
+      ? (TRUCK_STATUS_MAP[rawTruck.status] ?? 'INACTIVE')
+      : 'INACTIVE'
 
   return {
     id: rawTruck.id,
-    providerTruckId: rawTruck.providerTruckId,
-    licensePlate: rawTruck.licensePlate ? rawTruck.licensePlate : '',
+    providerTruckId: rawTruck.providerTruckId ?? '',
+    licensePlate: rawTruck.licensePlate ?? '',
     status: truckStatus,
-    driverId: rawTruck.driverId,
-    name: rawTruck.name,
-    vin: rawTruck.vin,
-    serial: rawTruck.serial ? rawTruck.serial : '',
-    make: rawTruck.make,
-    model: rawTruck.model,
-    year: rawTruck.year,
+    driverId: rawTruck.driverId ?? '',
+    name: rawTruck.name ?? '',
+    vin: rawTruck.vin ?? '',
+    serial: rawTruck.serial ?? '',
+    make: rawTruck.make ?? '',
+    model: rawTruck.model ?? '',
+    year: rawTruck.year ?? '',
     driver: mappedDriver,
     tankCapacityG: rawTruck.tankCapacityG,
     overWeight: rawTruck.overWeight,
