@@ -71,16 +71,25 @@ export const SimplifiedRoutePanel = ({
       (toll) => toll.routeSection === sectionId,
     )
 
-    const uniqueTollKeys = new Set<string>()
-    const uniqueTolls: TollWithSection[] = []
-
-    filteredTolls.forEach((toll) => {
+    // Оставляем по ключу первый toll, у которого есть цена (payOnline или iPass)
+    const uniqueTollsByKey = filteredTolls.reduce((acc, toll) => {
       const key = toll.key || toll.id
-      if (!uniqueTollKeys.has(key)) {
-        uniqueTollKeys.add(key)
-        uniqueTolls.push(toll)
+      if (!acc.has(key)) {
+        acc.set(key, toll)
+      } else {
+        const existingToll = acc.get(key)!
+        const existingHasPrice =
+          (existingToll.payOnline ?? 0) > 0 || (existingToll.iPass ?? 0) > 0
+        const currentHasPrice =
+          (toll.payOnline ?? 0) > 0 || (toll.iPass ?? 0) > 0
+        if (currentHasPrice && !existingHasPrice) {
+          acc.set(key, toll)
+        }
       }
-    })
+      return acc
+    }, new Map<string, TollWithSection>())
+
+    const uniqueTolls = Array.from(uniqueTollsByKey.values())
 
     const tollsOnline = uniqueTolls.reduce((sum, toll) => {
       return sum + (toll.payOnline || 0)
