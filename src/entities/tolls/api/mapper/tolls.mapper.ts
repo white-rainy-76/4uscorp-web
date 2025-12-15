@@ -41,7 +41,6 @@ export const mapToll = (dto: TollDto): Toll => {
     id: dto.id,
     name: dto.name,
     price: dto.price,
-    paymentMethod: dto.paymentMethod ?? undefined,
     websiteUrl: dto.websiteUrl ?? null,
     position: {
       lat: dto.latitude,
@@ -57,6 +56,11 @@ export const mapToll = (dto: TollDto): Toll => {
     payOnline: dto.payOnline,
     payOnlineOvernight: dto.payOnlineOvernight,
     routeSection: dto.routeSection ?? null,
+    tag: dto.tag,
+    noPlate: dto.noPlate,
+    cash: dto.cash,
+    noCard: dto.noCard,
+    app: dto.app,
     tollPrices: dto.tollPrices?.map(mapTollPrice),
   }
 }

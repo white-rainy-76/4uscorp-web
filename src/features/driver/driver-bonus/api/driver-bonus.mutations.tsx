@@ -32,7 +32,7 @@ export function useIncreaseDriverBonusMutation(
       return increaseDriverBonus(payload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
 
       // Оптимистично обновляем бонусы драйвера
@@ -54,27 +54,27 @@ export function useIncreaseDriverBonusMutation(
         )
       }
 
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем список драйверов для обновления в фоне
       queryClient.invalidateQueries({
         queryKey: driverQueries.lists(),
       })
 
-      await Promise.all([onSuccess?.(data, variables, context)])
+      await Promise.all([onSuccess?.(data, variables, context, mutation)])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       context?.abortController?.abort('Request cancelled due to error')
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       context?.abortController?.abort('Request settled')
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }
@@ -100,7 +100,7 @@ export function useDecreaseDriverBonusMutation(
       return decreaseDriverBonus(payload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
 
       // Оптимистично обновляем бонусы драйвера
@@ -122,27 +122,27 @@ export function useDecreaseDriverBonusMutation(
         )
       }
 
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем список драйверов для обновления в фоне
       queryClient.invalidateQueries({
         queryKey: driverQueries.lists(),
       })
 
-      await Promise.all([onSuccess?.(data, variables, context)])
+      await Promise.all([onSuccess?.(data, variables, context, mutation)])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       context?.abortController?.abort('Request cancelled due to error')
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       context?.abortController?.abort('Request settled')
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

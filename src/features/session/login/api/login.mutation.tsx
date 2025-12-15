@@ -34,13 +34,13 @@ export function useSignInMutation(
       return signIn(validatedPayload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Login with the access token (refresh token is handled via httpOnly cookies)
       login(data.token)
 
@@ -53,18 +53,18 @@ export function useSignInMutation(
       router.push(`/${locale}/(dashboard)/(main)`)
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request cancelled due to error')
       }
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request settled')
       }
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

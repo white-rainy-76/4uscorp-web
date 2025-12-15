@@ -50,14 +50,6 @@ export enum AxelType {
   _9L = 9,
 }
 
-export const PaymentMethodSchema = z.object({
-  tag: z.boolean().optional(),
-  noPlate: z.boolean().optional(),
-  cash: z.boolean().optional(),
-  noCard: z.boolean().optional(),
-  app: z.boolean().optional(),
-})
-
 export const TollPriceSchema = z.object({
   id: z.string(),
   tollId: z.string().nullable(),
@@ -78,7 +70,6 @@ export const TollWithSectionSchema = z.object({
   name: z.string().nullable(),
   nodeId: z.number(),
   price: z.number(),
-  paymentMethod: PaymentMethodSchema.optional(),
   websiteUrl: z.string().nullable().optional(),
   latitude: z.number(),
   longitude: z.number(),
@@ -88,7 +79,14 @@ export const TollWithSectionSchema = z.object({
   isDynamic: z.boolean(),
   routeSection: z.string().nullable(),
   payOnline: z.number().optional(),
+  payOnlineOvernight: z.number().optional(),
   iPass: z.number().optional(),
+  iPassOvernight: z.number().optional(),
+  tag: z.boolean().optional(),
+  noPlate: z.boolean().optional(),
+  cash: z.boolean().optional(),
+  noCard: z.boolean().optional(),
+  app: z.boolean().optional(),
   tollPrices: z.array(TollPriceSchema).optional(),
 })
 

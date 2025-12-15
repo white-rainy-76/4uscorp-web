@@ -31,13 +31,13 @@ export function useAssignRouteMutation(
       return assignRoute(validatedPayload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем запросы для обновления данных маршрута
       await Promise.all([
         queryClient.invalidateQueries({
@@ -46,22 +46,22 @@ export function useAssignRouteMutation(
         queryClient.invalidateQueries({
           queryKey: ['routes', 'getById'],
         }),
-        onSuccess?.(data, variables, context),
+        onSuccess?.(data, variables, context, mutation),
       ])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request cancelled due to error')
       }
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request settled')
       }
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

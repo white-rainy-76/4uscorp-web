@@ -149,16 +149,15 @@ export const TollPricesSheet = ({ open, onOpenChange, toll }: Props) => {
   }, [toll])
 
   const paymentMethodBadges = useMemo(() => {
-    const pm = toll?.paymentMethod
-    if (!pm) return []
+    if (!toll) return []
     const items: Array<{ key: string; label: string; enabled: boolean }> = [
-      { key: 'tag', label: 'Tag', enabled: !!pm.tag },
-      { key: 'app', label: 'App', enabled: !!pm.app },
-      { key: 'cash', label: 'Cash', enabled: !!pm.cash },
-      { key: 'noPlate', label: 'No plate', enabled: !!pm.noPlate },
-      { key: 'noCard', label: 'No card', enabled: !!pm.noCard },
+      { key: 'tag', label: 'Tag', enabled: !!toll.tag },
+      { key: 'app', label: 'App', enabled: !!toll.app },
+      { key: 'cash', label: 'Cash', enabled: !!toll.cash },
+      { key: 'noPlate', label: 'No plate', enabled: !!toll.noPlate },
+      { key: 'noCard', label: 'No card', enabled: !!toll.noCard },
     ]
-    return items.filter((i) => i.enabled)
+    return items
   }, [toll])
 
   return (
@@ -185,7 +184,14 @@ export const TollPricesSheet = ({ open, onOpenChange, toll }: Props) => {
                 <div className="flex flex-wrap gap-2">
                   {paymentMethodBadges.length > 0 ? (
                     paymentMethodBadges.map((b) => (
-                      <Badge key={b.key} variant="outline">
+                      <Badge
+                        key={b.key}
+                        variant="outline"
+                        className={
+                          b.enabled
+                            ? 'border-green-500 text-green-700 bg-green-50 dark:bg-green-950 dark:text-green-400 dark:border-green-600'
+                            : 'border-red-500 text-red-700 bg-red-50 dark:bg-red-950 dark:text-red-400 dark:border-red-600'
+                        }>
                         {b.label}
                       </Badge>
                     ))

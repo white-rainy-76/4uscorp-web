@@ -30,7 +30,7 @@ export function useAddCompanyMutation(
       return addCompany(payload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
 
       // Создаем временный ID для новой компании
@@ -55,20 +55,20 @@ export function useAddCompanyMutation(
         ])
       }
 
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller, newCompany }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем список компаний для получения свежих данных с сервера
       queryClient.invalidateQueries({
         queryKey: companyQueries.lists(),
       })
 
-      await Promise.all([onSuccess?.(data, variables, context)])
+      await Promise.all([onSuccess?.(data, variables, context, mutation)])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       // Откатываем оптимистичное добавление при ошибке
       if (context?.newCompany) {
         const previousCompanies = queryClient.getQueryData(
@@ -85,12 +85,12 @@ export function useAddCompanyMutation(
       }
 
       context?.abortController?.abort('Request cancelled due to error')
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       context?.abortController?.abort('Request settled')
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

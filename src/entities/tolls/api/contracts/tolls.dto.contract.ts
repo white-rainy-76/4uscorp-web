@@ -1,13 +1,5 @@
 import { z } from 'zod'
 
-export const PaymentMethodSchema = z.object({
-  tag: z.boolean().optional(),
-  noPlate: z.boolean().optional(),
-  cash: z.boolean().optional(),
-  noCard: z.boolean().optional(),
-  app: z.boolean().optional(),
-})
-
 export const TollPriceDtoSchema = z.object({
   id: z.string(),
   tollId: z.string().nullable(),
@@ -27,7 +19,6 @@ export const TollDtoSchema = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
-  paymentMethod: PaymentMethodSchema.optional(),
   websiteUrl: z.string().nullable().optional(),
   latitude: z.number(),
   longitude: z.number(),
@@ -41,6 +32,11 @@ export const TollDtoSchema = z.object({
   payOnline: z.number().optional(),
   payOnlineOvernight: z.number().optional(),
   routeSection: z.string().nullable().optional(),
+  tag: z.boolean().optional(),
+  noPlate: z.boolean().optional(),
+  cash: z.boolean().optional(),
+  noCard: z.boolean().optional(),
+  app: z.boolean().optional(),
   tollPrices: z.array(TollPriceDtoSchema).optional(),
 })
 
