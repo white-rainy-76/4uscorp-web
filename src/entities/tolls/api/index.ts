@@ -1,6 +1,16 @@
 // schemas and mappers
-export { TollDtoSchema } from './contracts/tolls.dto.contract'
-export { TollSchema } from './contracts/tolls.contract'
+export {
+  TollPriceDtoSchema,
+  TollDtoSchema,
+} from './contracts/tolls.dto.contract'
+export {
+  TollPriceSchema,
+  TollSchema,
+  TollPaymentType,
+  TollPriceTimeOfDay,
+  TollPriceDayOfWeek,
+  AxelType,
+} from './contracts/tolls.contract'
 export { mapToll, mapGetTollsByBoundingBox } from './mapper/tolls.mapper'
 
 // mutations and queries

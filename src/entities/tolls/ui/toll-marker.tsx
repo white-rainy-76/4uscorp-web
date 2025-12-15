@@ -3,17 +3,25 @@ import { AdvancedMarker } from '@vis.gl/react-google-maps'
 import classNames from 'classnames'
 import { Toll } from '../model/types/tolls'
 import { Icon } from '@/shared/ui/Icon'
+import { TollPaymentType, AxelType } from '../api'
+import { getTollPriceAmountWithPriority } from '@/entities/tolls/lib/toll-pricing'
 
 interface Props {
   toll: Toll
   selectedTolls?: Toll[]
   onTollSelect?: (toll: Toll, isSingleSelect?: boolean) => void
+  onTollOpenDetails?: (toll: Toll) => void
+  selectedAxelType?: AxelType
+  selectedPaymentType?: TollPaymentType | null
 }
 
 export const TollMarker: React.FC<Props> = ({
   toll,
   selectedTolls = [],
   onTollSelect,
+  onTollOpenDetails,
+  selectedAxelType = AxelType._5L,
+  selectedPaymentType = null,
 }) => {
   const [hovered, setHovered] = useState(false)
 
@@ -21,9 +29,29 @@ export const TollMarker: React.FC<Props> = ({
     (selectedToll) => selectedToll.id === toll.id,
   )
   const hasNoKey = !toll.key
+  const hasPrices = toll.tollPrices && toll.tollPrices.length > 0
+
+  const displayPrice = (() => {
+    // Pricing model via tollPrices (supports multiple payment types + axle types)
+    const { amount } = getTollPriceAmountWithPriority(
+      toll.tollPrices,
+      selectedAxelType,
+      selectedPaymentType,
+    )
+    if (amount != null) return amount
+
+    // Backward-compat fallback for older fields (only PayOnline/IPass exist there)
+    if (selectedPaymentType === TollPaymentType.PayOnline) return toll.payOnline
+    if (selectedPaymentType === TollPaymentType.IPass) return toll.iPass
+    return toll.payOnline ?? toll.iPass
+  })()
 
   const handleMarkerClick = (e: google.maps.MapMouseEvent) => {
     e.domEvent?.stopPropagation()
+
+    // Open details drawer if provided (primary UX for route maps)
+    onTollOpenDetails?.(toll)
+
     if (onTollSelect) {
       // Проверяем, нажата ли клавиша Ctrl (Windows/Linux) или Cmd (Mac)
       const domEvent = e.domEvent
@@ -45,7 +73,7 @@ export const TollMarker: React.FC<Props> = ({
         hovered,
         selected: isSelected,
       })}
-      zIndex={isSelected ? 2000 : 1}>
+      zIndex={isSelected ? 2000 : hasPrices ? 100 : 1}>
       <div className="relative flex items-center justify-center">
         {/* Множественные пульсирующие кольца для выбранного маркера */}
         {isSelected && (
@@ -104,7 +132,7 @@ export const TollMarker: React.FC<Props> = ({
                 'text-blue-700 scale-110': hovered && !isSelected,
               })}
             />
-            {toll.payOnline !== undefined && (
+            {displayPrice !== undefined && displayPrice !== null && (
               <span
                 className={classNames(
                   'text-[10px] font-bold leading-none whitespace-nowrap',
@@ -115,7 +143,7 @@ export const TollMarker: React.FC<Props> = ({
                     'text-yellow-800': hasNoKey,
                   },
                 )}>
-                ${toll.payOnline.toFixed(2)}
+                ${displayPrice.toFixed(2)}
               </span>
             )}
           </div>

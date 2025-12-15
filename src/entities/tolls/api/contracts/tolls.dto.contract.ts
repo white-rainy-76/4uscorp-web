@@ -1,9 +1,34 @@
 import { z } from 'zod'
 
+export const PaymentMethodSchema = z.object({
+  tag: z.boolean().optional(),
+  noPlate: z.boolean().optional(),
+  cash: z.boolean().optional(),
+  noCard: z.boolean().optional(),
+  app: z.boolean().optional(),
+})
+
+export const TollPriceDtoSchema = z.object({
+  id: z.string(),
+  tollId: z.string().nullable(),
+  calculatePriceId: z.string().nullable(),
+  paymentType: z.number().nullable(),
+  axelType: z.number(),
+  timeOfDay: z.number().nullable(),
+  dayOfWeekFrom: z.number().nullable(),
+  dayOfWeekTo: z.number().nullable(),
+  timeFrom: z.string().nullable(),
+  timeTo: z.string().nullable(),
+  description: z.string().nullable().optional(),
+  amount: z.number(),
+})
+
 export const TollDtoSchema = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
+  paymentMethod: PaymentMethodSchema.optional(),
+  websiteUrl: z.string().nullable().optional(),
   latitude: z.number(),
   longitude: z.number(),
   roadId: z.string(),
@@ -15,6 +40,8 @@ export const TollDtoSchema = z.object({
   iPassOvernight: z.number().optional(),
   payOnline: z.number().optional(),
   payOnlineOvernight: z.number().optional(),
+  routeSection: z.string().nullable().optional(),
+  tollPrices: z.array(TollPriceDtoSchema).optional(),
 })
 
 export const GetTollsByBoundingBoxResponseDtoSchema = z.array(TollDtoSchema)

@@ -10,6 +10,7 @@ import {
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
 import { TollRoad } from '@/entities/roads'
 import { TollRoadPolyline } from '@/entities/roads/ui'
+import { AxelType, TollPaymentType } from '@/entities/tolls/api'
 
 interface MapWithSavedRoutesProps {
   isLoading?: boolean
@@ -23,6 +24,8 @@ interface MapWithSavedRoutesProps {
   tolls?: TollWithSection[]
   tollRoads?: TollRoad[]
   onClearWaypointsCallback?: (clearFn: () => void) => void
+  selectedAxelType?: AxelType
+  selectedPaymentType?: TollPaymentType
 }
 
 export const MapWithSavedRoutes = ({
@@ -32,6 +35,8 @@ export const MapWithSavedRoutes = ({
   tolls,
   tollRoads,
   onClearWaypointsCallback,
+  selectedAxelType,
+  selectedPaymentType,
 }: MapWithSavedRoutesProps) => {
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -55,6 +60,8 @@ export const MapWithSavedRoutes = ({
             directionsMutation={directionsMutation}
             tolls={tolls}
             onClearWaypointsCallback={onClearWaypointsCallback}
+            selectedAxelType={selectedAxelType}
+            selectedPaymentType={selectedPaymentType}
           />
         )}
       </MapBase>

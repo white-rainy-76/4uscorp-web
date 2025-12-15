@@ -17,8 +17,10 @@ import {
 } from '@/features/directions/lib'
 import { useSavedRoutesStore } from '@/shared/store'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
-import { TollMarker } from '@/entities/tolls/ui'
+import { TollMarker, TollPricesSheet } from '@/entities/tolls/ui'
 import { convertTollWithSectionToToll } from '@/widgets/map/lib/helpers/convert-toll-with-section'
+import { AxelType, TollPaymentType } from '@/entities/tolls/api'
+import { Toll } from '@/entities/tolls'
 
 interface SavedRoutesDirectionsProps {
   data?: DirectionType | undefined
@@ -30,6 +32,8 @@ interface SavedRoutesDirectionsProps {
   >
   tolls?: TollWithSection[]
   onClearWaypointsCallback?: (clearFn: () => void) => void
+  selectedAxelType?: AxelType
+  selectedPaymentType?: TollPaymentType
 }
 
 export const SavedRoutesDirections = ({
@@ -37,6 +41,8 @@ export const SavedRoutesDirections = ({
   directionsMutation,
   tolls,
   onClearWaypointsCallback,
+  selectedAxelType,
+  selectedPaymentType,
 }: SavedRoutesDirectionsProps) => {
   const {
     origin,
@@ -57,6 +63,8 @@ export const SavedRoutesDirections = ({
     null,
   )
   const [routeSectionIds, setRouteSectionIds] = useState<string[]>([])
+  const [detailsToll, setDetailsToll] = useState<Toll | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   const dropPointMutation = useGetNearestDropPointMutation({
     onError: (error, variables, context) => {
@@ -186,6 +194,15 @@ export const SavedRoutesDirections = ({
 
   return (
     <>
+      <TollPricesSheet
+        open={detailsOpen}
+        toll={detailsToll}
+        onOpenChange={(open) => {
+          setDetailsOpen(open)
+          if (!open) setDetailsToll(null)
+        }}
+      />
+
       <RoutePolylines
         mainRoute={mainRoute}
         alternativeRoutes={alternativeRoutes}
@@ -208,9 +225,22 @@ export const SavedRoutesDirections = ({
 
       {/* Отображение tolls для выбранной секции */}
       {filteredTolls.length > 0 &&
-        filteredTolls.map((toll) => (
-          <TollMarker key={toll.id} toll={convertTollWithSectionToToll(toll)} />
-        ))}
+        filteredTolls.map((toll) => {
+          const mappedToll = convertTollWithSectionToToll(toll)
+          return (
+            <TollMarker
+              key={toll.id}
+              toll={mappedToll}
+              selectedAxelType={selectedAxelType}
+              // On the map we show price by priority, filtered by selected axles.
+              selectedPaymentType={null}
+              onTollOpenDetails={(t) => {
+                setDetailsToll(t)
+                setDetailsOpen(true)
+              }}
+            />
+          )
+        })}
     </>
   )
 }

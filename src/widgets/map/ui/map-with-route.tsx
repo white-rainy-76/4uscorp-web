@@ -23,10 +23,11 @@ import { MapErrorsOverlay, MapLoadingOverlay } from './components'
 import { useGasStationCart, useGasStationFilters } from '../lib/hooks'
 import { useRouteInfoStore } from '@/shared/store'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
-import { TollMarker } from '@/entities/tolls/ui'
+import { TollMarker, TollPricesSheet } from '@/entities/tolls/ui'
 import { convertTollWithSectionToToll } from '../lib/helpers/convert-toll-with-section'
 import { TollRoad } from '@/entities/roads'
 import { TollRoadPolyline } from '@/entities/roads/ui'
+import { Toll } from '@/entities/tolls'
 
 interface MapWithRouteProps {
   directionsData: Directions | undefined
@@ -57,6 +58,8 @@ export const MapWithRoute = ({
 
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [clickedOutside, setClickedOutside] = useState(false)
+  const [detailsToll, setDetailsToll] = useState<Toll | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [clearAlternativeRoutes, setClearAlternativeRoutes] = useState<
     (() => void) | null
   >(null)
@@ -105,6 +108,15 @@ export const MapWithRoute = ({
   return (
     <div ref={mapContainerRef}>
       <MapBase onMapClick={() => setClickedOutside(true)}>
+        <TollPricesSheet
+          open={detailsOpen}
+          toll={detailsToll}
+          onOpenChange={(open) => {
+            setDetailsOpen(open)
+            if (!open) setDetailsToll(null)
+          }}
+        />
+
         <MapLoadingOverlay isPending={isPending} />
 
         {/* Отображение ошибок поверх карты */}
@@ -136,12 +148,19 @@ export const MapWithRoute = ({
 
         {/* Отображение tolls для выбранной секции */}
         {filteredTolls.length > 0 &&
-          filteredTolls.map((toll) => (
-            <TollMarker
-              key={toll.id}
-              toll={convertTollWithSectionToToll(toll)}
-            />
-          ))}
+          filteredTolls.map((toll) => {
+            const mappedToll = convertTollWithSectionToToll(toll)
+            return (
+              <TollMarker
+                key={toll.id}
+                toll={mappedToll}
+                onTollOpenDetails={(t) => {
+                  setDetailsToll(t)
+                  setDetailsOpen(true)
+                }}
+              />
+            )
+          })}
 
         {truck && (
           <TrackTruck

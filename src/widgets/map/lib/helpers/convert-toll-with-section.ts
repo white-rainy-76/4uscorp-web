@@ -8,6 +8,8 @@ export function convertTollWithSectionToToll(
     id: tollWithSection.id,
     name: tollWithSection.name || 'Toll',
     price: tollWithSection.price,
+    paymentMethod: tollWithSection.paymentMethod,
+    websiteUrl: tollWithSection.websiteUrl ?? null,
     position: {
       lat: tollWithSection.latitude,
       lng: tollWithSection.longitude,
@@ -19,5 +21,6 @@ export function convertTollWithSectionToToll(
     nodeId: tollWithSection.nodeId,
     payOnline: tollWithSection.payOnline,
     iPass: tollWithSection.iPass,
+    tollPrices: tollWithSection.tollPrices,
   }
 }

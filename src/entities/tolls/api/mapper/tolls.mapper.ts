@@ -1,11 +1,35 @@
 import type {
   Toll,
+  TollPrice,
   GetTollsByBoundingBoxResponse,
 } from '../../model/types/tolls'
 import type {
   TollDto,
+  TollPriceDto,
   GetTollsByBoundingBoxResponseDto,
 } from '../../model/types/tolls.dto'
+
+/**
+ * Maps a single TollPriceDto from the API to a TollPrice object.
+ * @param dto The TollPriceDto object from the API response.
+ * @returns A mapped TollPrice object.
+ */
+export const mapTollPrice = (dto: TollPriceDto): TollPrice => {
+  return {
+    id: dto.id,
+    tollId: dto.tollId,
+    calculatePriceId: dto.calculatePriceId,
+    paymentType: dto.paymentType,
+    axelType: dto.axelType,
+    timeOfDay: dto.timeOfDay,
+    dayOfWeekFrom: dto.dayOfWeekFrom,
+    dayOfWeekTo: dto.dayOfWeekTo,
+    timeFrom: dto.timeFrom,
+    timeTo: dto.timeTo,
+    description: dto.description ?? null,
+    amount: dto.amount,
+  }
+}
 
 /**
  * Maps a single TollDto from the API to a Toll object.
@@ -17,6 +41,8 @@ export const mapToll = (dto: TollDto): Toll => {
     id: dto.id,
     name: dto.name,
     price: dto.price,
+    paymentMethod: dto.paymentMethod ?? undefined,
+    websiteUrl: dto.websiteUrl ?? null,
     position: {
       lat: dto.latitude,
       lng: dto.longitude,
@@ -30,6 +56,8 @@ export const mapToll = (dto: TollDto): Toll => {
     iPassOvernight: dto.iPassOvernight,
     payOnline: dto.payOnline,
     payOnlineOvernight: dto.payOnlineOvernight,
+    routeSection: dto.routeSection ?? null,
+    tollPrices: dto.tollPrices?.map(mapTollPrice),
   }
 }
 

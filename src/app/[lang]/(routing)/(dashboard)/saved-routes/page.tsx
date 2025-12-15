@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { SavedRoutesCombinedPanel } from '@/features/saved-routes-search'
 import { MapWithSavedRoutes, SimplifiedRoutePanel } from '@/widgets/map'
 import { useHandleDirectionsMutation } from '@/features/directions/api/handle-direction.mutation'
@@ -10,6 +10,8 @@ import { useGetTollRoadsMutation } from '@/entities/roads'
 import { Directions, RouteRequestPayload } from '@/features/directions'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
 import { TollRoad } from '@/entities/roads'
+import { AxelType, TollPaymentType } from '@/entities/tolls/api'
+import { getAvailablePaymentTypesForAxles } from '@/entities/tolls/lib/toll-pricing'
 
 export default function SavedRoutesPage() {
   const [hasSearched, setHasSearched] = useState(false)
@@ -17,6 +19,11 @@ export default function SavedRoutesPage() {
   const [tollRoadsData, setTollRoadsData] = useState<TollRoad[]>([])
   const [directionsData, setDirectionsData] = useState<Directions | undefined>()
   const clearWaypointsRef = useRef<(() => void) | null>(null)
+  const [selectedAxelType, setSelectedAxelType] = useState<AxelType>(
+    AxelType._5L,
+  )
+  const [selectedPaymentType, setSelectedPaymentType] =
+    useState<TollPaymentType>(TollPaymentType.PayOnline)
 
   const {
     origin,
@@ -24,6 +31,7 @@ export default function SavedRoutesPage() {
     originName,
     destinationName,
     savedRouteId,
+    sectionId,
     setSectionId,
     setRouteId,
     setSavedRouteId,
@@ -43,7 +51,6 @@ export default function SavedRoutesPage() {
   // Колбек для запроса маршрута с последующими запросами tolls и toll roads
   const handleDirectionsWithTolls = useCallback(
     async (payload: RouteRequestPayload): Promise<Directions> => {
-      // Запрашиваем маршрут
       const result = await directionsMutationAsync(payload)
 
       // Обновляем directionsData
@@ -155,6 +162,22 @@ export default function SavedRoutesPage() {
     setSavedRouteId(null)
   }, [setSectionId, setRouteId, setSavedRouteId])
 
+  const sectionTolls = useMemo(() => {
+    if (!sectionId) return []
+    return tollsData.filter((toll) => toll.routeSection === sectionId)
+  }, [tollsData, sectionId])
+
+  const availablePaymentTypes = useMemo(() => {
+    return getAvailablePaymentTypesForAxles(sectionTolls, selectedAxelType)
+  }, [sectionTolls, selectedAxelType])
+
+  useEffect(() => {
+    if (availablePaymentTypes.length === 0) return
+    if (!availablePaymentTypes.includes(selectedPaymentType)) {
+      setSelectedPaymentType(availablePaymentTypes[0])
+    }
+  }, [availablePaymentTypes, selectedPaymentType])
+
   return (
     <div
       className="fixed inset-0 h-screen"
@@ -175,6 +198,10 @@ export default function SavedRoutesPage() {
         <SimplifiedRoutePanel
           directionsData={directionsData}
           tolls={tollsData}
+          selectedAxelType={selectedAxelType}
+          selectedPaymentType={selectedPaymentType}
+          onAxelTypeChange={setSelectedAxelType}
+          onPaymentTypeChange={setSelectedPaymentType}
         />
       )}
 
@@ -184,6 +211,8 @@ export default function SavedRoutesPage() {
         directionsMutation={handleDirectionsWithTolls}
         tolls={tollsData}
         tollRoads={tollRoadsData}
+        selectedAxelType={selectedAxelType}
+        selectedPaymentType={selectedPaymentType}
         onClearWaypointsCallback={(clearFn) => {
           clearWaypointsRef.current = clearFn
         }}
