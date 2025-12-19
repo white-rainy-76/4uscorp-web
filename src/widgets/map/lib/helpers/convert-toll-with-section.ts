@@ -29,5 +29,7 @@ export function convertTollWithSectionToToll(
     noCard: tollWithSection.noCard,
     app: tollWithSection.app,
     tollPrices: tollWithSection.tollPrices,
+    isEntry: tollWithSection.isEntry ?? false,
+    isExit: tollWithSection.isExit ?? false,
   }
 }

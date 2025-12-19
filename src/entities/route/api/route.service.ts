@@ -30,12 +30,15 @@ import { RouteByIdDtoSchema } from './contracts/route-by-id.dto.contract'
 import {
   GetSavedRoutesDtoSchema,
   SavedRouteByIdDtoSchema,
+  GetAllSavedRouteDtoSchema,
 } from './contracts/saved-routes.dto.contract'
 import { mapRouteDataDtoToRouteData } from './mapper/route.mapper'
 import { mapRouteByIdDtoToRouteById } from './mapper/route-by-id.mapper'
 import { mapGetSavedRoutesDtoToData } from './mapper/saved-routes.mapper'
 import { mapSavedRouteByIdDtoToData } from './mapper/saved-route-by-id.mapper'
+import { mapGetAllSavedRouteToSavedRouteItems } from './mapper/all-saved-route.mapper'
 import { useAuthStore } from '@/shared/store/auth-store'
+import { SavedRouteItem } from '@/features/route/saved-routes-selector'
 
 export const getRoute = async (
   payload: GetRoutePayload,
@@ -137,4 +140,18 @@ export const getSavedRouteById = async (
     .then(responseContract(SavedRouteByIdDtoSchema))
 
   return mapSavedRouteByIdDtoToData(response.data)
+}
+
+export const getAllSavedRoute = async (
+  signal?: AbortSignal,
+): Promise<SavedRouteItem[]> => {
+  const config: AxiosRequestConfig = { signal }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  const response = await api
+    .get(`/fuelroutes-api/FuelRoute/GetAllSavedRoute`, authConfig)
+    .then(responseContract(GetAllSavedRouteDtoSchema))
+
+  return mapGetAllSavedRouteToSavedRouteItems(response.data)
 }

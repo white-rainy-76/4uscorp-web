@@ -76,7 +76,9 @@ export const SimplifiedRoutePanel = ({
 
   const filteredTolls = useMemo(() => {
     if (!tolls || !sectionId) return []
-    return tolls.filter((toll) => toll.routeSection === sectionId)
+    return tolls.filter(
+      (toll) => toll.routeSection === sectionId && !toll.isDynamic,
+    )
   }, [tolls, sectionId])
 
   const availablePaymentTypes = useMemo(() => {
@@ -90,24 +92,13 @@ export const SimplifiedRoutePanel = ({
     }
 
     const hasSelectedPrice = (toll: TollWithSection) => {
-      const fromTollPrices =
+      return (
         getTollPriceAmountFor(
           toll.tollPrices,
           selectedAxelType,
           selectedPaymentType,
         ) != null
-
-      if (fromTollPrices) return true
-
-      // Backward compat for older response fields
-      if (selectedPaymentType === TollPaymentType.PayOnline) {
-        return (toll.payOnline ?? 0) > 0
-      }
-      if (selectedPaymentType === TollPaymentType.IPass) {
-        return (toll.iPass ?? 0) > 0
-      }
-
-      return false
+      )
     }
 
     // Оставляем по ключу toll, у которого есть цена для выбранных осей и типа оплаты
@@ -134,14 +125,8 @@ export const SimplifiedRoutePanel = ({
         selectedAxelType,
         selectedPaymentType,
       )
-      if (amountFromTollPrices != null) return sum + amountFromTollPrices
-
-      // Backward compat
-      if (selectedPaymentType === TollPaymentType.PayOnline) {
-        return sum + (toll.payOnline || 0)
-      }
-      if (selectedPaymentType === TollPaymentType.IPass) {
-        return sum + (toll.iPass || 0)
+      if (amountFromTollPrices != null && amountFromTollPrices > 0) {
+        return sum + amountFromTollPrices
       }
       return sum
     }, 0)
@@ -175,7 +160,10 @@ export const SimplifiedRoutePanel = ({
           </div>
           <div className="flex flex-col items-start">
             <span className="font-normal">
-              Tolls ({getTollPaymentTypeLabel(selectedPaymentType)} •{' '}
+              Tolls{' '}
+              <span className="font-bold">
+                ({getTollPaymentTypeLabel(selectedPaymentType)}:
+              </span>{' '}
               {selectedAxelType} axles)
             </span>
             <span className="font-bold whitespace-nowrap">
@@ -187,7 +175,7 @@ export const SimplifiedRoutePanel = ({
         {/* Selectors */}
         <div className="mt-3 flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-text-neutral/80 font-medium">
+            <span className="text-xs text-text-neutral/80 font-medium text-text-muted">
               Axles
             </span>
             <div className="flex gap-1">
@@ -215,8 +203,8 @@ export const SimplifiedRoutePanel = ({
           </div>
 
           <div className="flex items-start justify-between gap-2">
-            <span className="text-xs text-text-neutral/80 font-medium pt-1">
-              Payment
+            <span className="text-xs text-text-neutral/80 font-medium pt-1 text-text-muted">
+              Payment Type
             </span>
             <div className="flex flex-wrap gap-1 justify-end">
               {availablePaymentTypes.length === 0 ? (

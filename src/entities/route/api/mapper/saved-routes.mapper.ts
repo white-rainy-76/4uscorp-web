@@ -8,6 +8,7 @@ export const mapGetSavedRoutesDtoToData = (
     id: item.id,
     startAddress: item.startAddress,
     endAddress: item.endAddress,
+    name: item.name,
   }))
 
   return GetSavedRoutesSchema.parse(mapped)

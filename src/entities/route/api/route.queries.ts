@@ -1,5 +1,10 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getDistance, getSavedRoutes, getSavedRouteById } from './route.service'
+import {
+  getDistance,
+  getSavedRoutes,
+  getSavedRouteById,
+  getAllSavedRoute,
+} from './route.service'
 
 import {
   GetDistancePayload,
@@ -35,6 +40,15 @@ export const routeQueries = {
       queryKey: [...ROUTES_ROOT_QUERY_KEY, 'saved-route-by-id', payload],
       queryFn: async ({ signal }) => {
         const data = await getSavedRouteById(payload, signal)
+        return data
+      },
+    }),
+
+  allSavedRoute: () =>
+    queryOptions({
+      queryKey: [...ROUTES_ROOT_QUERY_KEY, 'all-saved-route'],
+      queryFn: async ({ signal }) => {
+        const data = await getAllSavedRoute(signal)
         return data
       },
     }),

@@ -38,6 +38,8 @@ export const TollDtoSchema = z.object({
   noCard: z.boolean().optional(),
   app: z.boolean().optional(),
   tollPrices: z.array(TollPriceDtoSchema).optional(),
+  isEntry: z.boolean().optional(),
+  isExit: z.boolean().optional(),
 })
 
 export const GetTollsByBoundingBoxResponseDtoSchema = z.array(TollDtoSchema)

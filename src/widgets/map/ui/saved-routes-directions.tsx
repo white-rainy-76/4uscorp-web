@@ -186,10 +186,12 @@ export const SavedRoutesDirections = ({
     [handleAddWaypoint, clearHoverState],
   )
 
-  // Фильтруем tolls по выбранной секции
+  // Фильтруем tolls по выбранной секции и исключаем динамические толлы
   const filteredTolls = useMemo(() => {
     if (!tolls || !sectionId) return []
-    return tolls.filter((toll) => toll.routeSection === sectionId)
+    return tolls.filter(
+      (toll) => toll.routeSection === sectionId && !toll.isDynamic,
+    )
   }, [tolls, sectionId])
 
   return (

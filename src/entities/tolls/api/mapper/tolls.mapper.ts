@@ -62,6 +62,8 @@ export const mapToll = (dto: TollDto): Toll => {
     noCard: dto.noCard,
     app: dto.app,
     tollPrices: dto.tollPrices?.map(mapTollPrice),
+    isEntry: dto.isEntry ?? false,
+    isExit: dto.isExit ?? false,
   }
 }
 

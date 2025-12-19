@@ -12,6 +12,10 @@ import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-secti
 import { TollRoad } from '@/entities/roads'
 import { AxelType, TollPaymentType } from '@/entities/tolls/api'
 import { getAvailablePaymentTypesForAxles } from '@/entities/tolls/lib/toll-pricing'
+import {
+  SavedRoutesFetchRouteParams,
+  SavedRoutesRouteParams,
+} from '@/features/saved-routes-search/types'
 
 export default function SavedRoutesPage() {
   const [hasSearched, setHasSearched] = useState(false)
@@ -25,17 +29,8 @@ export default function SavedRoutesPage() {
   const [selectedPaymentType, setSelectedPaymentType] =
     useState<TollPaymentType>(TollPaymentType.PayOnline)
 
-  const {
-    origin,
-    destination,
-    originName,
-    destinationName,
-    savedRouteId,
-    sectionId,
-    setSectionId,
-    setRouteId,
-    setSavedRouteId,
-  } = useSavedRoutesStore()
+  const { sectionId, setSectionId, setRouteId, setSavedRouteId } =
+    useSavedRoutesStore()
 
   // Mutation для создания маршрута
   const { mutateAsync: directionsMutationAsync, isPending: isCreatingRoute } =
@@ -62,7 +57,7 @@ export default function SavedRoutesPage() {
         setRouteId(result.routeId)
       }
 
-      // Запрашиваем tolls и toll roads по секциям
+      // Берём tolls и toll roads по секциям
       if (result?.route && result.route.length > 0) {
         const sectionIds = result.route.map((route) => route.routeSectionId)
 
@@ -94,59 +89,55 @@ export default function SavedRoutesPage() {
     ],
   )
 
-  const handleCreateRoute = useCallback(async () => {
-    if (!origin || !destination) return
-
-    // Очищаем waypoints при создании нового маршрута
-    clearWaypointsRef.current?.()
-
-    try {
-      await handleDirectionsWithTolls({
-        origin,
-        destination,
-        originName,
-        destinationName,
-      })
-
-      // Очищаем savedRouteId после создания нового маршрута
-      setSavedRouteId(null)
-    } catch (error) {
-      console.error('Error creating route:', error)
-    }
-  }, [
-    origin,
-    destination,
-    originName,
-    destinationName,
-    handleDirectionsWithTolls,
-    setSavedRouteId,
-  ])
-
-  const handleRouteSelectAndFetch = useCallback(
-    async (savedRouteId: string) => {
-      if (!origin || !destination) return
-
-      // Очищаем waypoints при выборе сохраненного маршрута
+  // Общая логика для обработки маршрута
+  const handleRouteProcessing = useCallback(
+    async (
+      params: SavedRoutesRouteParams | SavedRoutesFetchRouteParams,
+      errorMessage: string,
+      onSuccess?: () => void,
+    ) => {
+      // Очищаем waypoints при обработке маршрута
       clearWaypointsRef.current?.()
+
       try {
-        await handleDirectionsWithTolls({
-          origin,
-          destination,
-          originName,
-          destinationName,
-          savedRouteId,
-        })
+        // Если есть savedRouteId, передаем только его
+        if ('savedRouteId' in params) {
+          await handleDirectionsWithTolls({
+            savedRouteId: params.savedRouteId,
+          })
+        } else {
+          // Иначе передаем координаты для создания нового маршрута
+          await handleDirectionsWithTolls({
+            origin: params.origin,
+            destination: params.destination,
+            originName: params.originName,
+            destinationName: params.destinationName,
+          })
+        }
+
+        onSuccess?.()
       } catch (error) {
-        console.error('Error fetching saved route:', error)
+        console.error(errorMessage, error)
       }
     },
-    [
-      origin,
-      destination,
-      originName,
-      destinationName,
-      handleDirectionsWithTolls,
-    ],
+    [handleDirectionsWithTolls],
+  )
+
+  const handleCreateRoute = useCallback(
+    async (params: SavedRoutesRouteParams) => {
+      await handleRouteProcessing(params, 'Error creating route:', () => {
+        // Очищаем savedRouteId после создания нового маршрута
+        setSavedRouteId(null)
+      })
+    },
+    [handleRouteProcessing, setSavedRouteId],
+  )
+
+  const handleRouteSelectAndFetch = useCallback(
+    async (params: SavedRoutesFetchRouteParams) => {
+      await handleRouteProcessing(params, 'Error fetching saved route:')
+    },
+    [handleRouteProcessing],
   )
 
   const handleRouteClear = useCallback(() => {
@@ -164,7 +155,9 @@ export default function SavedRoutesPage() {
 
   const sectionTolls = useMemo(() => {
     if (!sectionId) return []
-    return tollsData.filter((toll) => toll.routeSection === sectionId)
+    return tollsData.filter(
+      (toll) => toll.routeSection === sectionId && !toll.isDynamic,
+    )
   }, [tollsData, sectionId])
 
   const availablePaymentTypes = useMemo(() => {

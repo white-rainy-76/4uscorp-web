@@ -7,12 +7,14 @@ export { RouteByIdDtoSchema } from './contracts/route-by-id.dto.contract'
 export {
   GetSavedRoutesDtoSchema,
   SavedRouteByIdDtoSchema,
+  GetAllSavedRouteDtoSchema,
 } from './contracts/saved-routes.dto.contract'
 export { RouteDataSchema, GetDistanceSchema } from './contracts/route.contract'
 export { RouteByIdSchema } from './contracts/route-by-id.contract'
 export {
   GetSavedRoutesSchema,
   SavedRouteByIdSchema,
+  GetAllSavedRouteSchema,
 } from './contracts/saved-routes.contract'
 export { mapRouteDataDtoToRouteData } from './mapper/route.mapper'
 export { mapRouteByIdDtoToRouteById } from './mapper/route-by-id.mapper'
