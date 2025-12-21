@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Marker } from '@vis.gl/react-google-maps'
 import { DistanceTooltip } from '@/entities/route'
 
@@ -10,7 +10,10 @@ interface RouteMarkersProps {
   endMarker: google.maps.LatLngLiteral | null
   onMarkerDragStart: () => void
   onMarkerDragEnd: (e: google.maps.MapMouseEvent) => void
-  onExistingMarkerDragEnd: (index: number, e: google.maps.MapMouseEvent) => void
+  onExistingMarkerDragEnd: (
+    index: number,
+  ) => (e: google.maps.MapMouseEvent) => void
+  onExistingMarkerClick?: (index: number) => void
   onHoverMarkerClick?: (e: google.maps.MapMouseEvent) => void
 }
 
@@ -23,8 +26,11 @@ export const RouteMarkers = ({
   onMarkerDragStart,
   onMarkerDragEnd,
   onExistingMarkerDragEnd,
+  onExistingMarkerClick,
   onHoverMarkerClick,
 }: RouteMarkersProps) => {
+  const dragStateRef = useRef<Record<number, boolean>>({})
+
   return (
     <>
       {hoverMarker && (
@@ -32,6 +38,7 @@ export const RouteMarkers = ({
           <Marker
             position={hoverMarker}
             draggable
+            zIndex={1}
             onDragStart={onMarkerDragStart}
             onDragEnd={onMarkerDragEnd}
             onClick={onHoverMarkerClick}
@@ -56,7 +63,26 @@ export const RouteMarkers = ({
           key={`draggable-${index}`}
           position={marker}
           draggable
-          onDragEnd={(e) => onExistingMarkerDragEnd(index, e)}
+          zIndex={2}
+          onDragStart={() => {
+            dragStateRef.current[index] = false
+          }}
+          onDrag={() => {
+            dragStateRef.current[index] = true
+          }}
+          onDragEnd={(e) => {
+            if (dragStateRef.current[index]) {
+              onExistingMarkerDragEnd(index)(e)
+            }
+            dragStateRef.current[index] = false
+          }}
+          onClick={() => {
+            // onClick срабатывает только если не было drag
+            // В Google Maps API onClick не срабатывает после drag, но для надежности проверяем
+            if (!dragStateRef.current[index]) {
+              onExistingMarkerClick?.(index)
+            }
+          }}
           icon={{
             path: google.maps.SymbolPath.CIRCLE,
             scale: 6,

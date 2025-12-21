@@ -121,6 +121,24 @@ export const useWaypointManagement = ({
     [handleWaypointDrop],
   )
 
+  // Удаление waypoint
+  const handleDeleteWaypoint = useCallback(
+    async (index: number) => {
+      const updatedWayPoints = wayPoints.filter((_, i) => i !== index)
+      setWayPoints(updatedWayPoints)
+
+      // Запрашиваем новый маршрут без удаленного waypoint
+      try {
+        await directionsMutation(createDirectionsPayload(updatedWayPoints))
+      } catch (error) {
+        console.error('Error deleting waypoint:', error)
+        // Восстанавливаем waypoints в случае ошибки
+        setWayPoints(wayPoints)
+      }
+    },
+    [wayPoints, directionsMutation, createDirectionsPayload],
+  )
+
   // Очистка waypoints при изменении origin/destination
   const clearWayPoints = useCallback(() => {
     setWayPoints([])
@@ -130,6 +148,7 @@ export const useWaypointManagement = ({
     wayPoints,
     handleAddWaypoint,
     handleUpdateWaypoint,
+    handleDeleteWaypoint,
     clearWayPoints,
   }
 }

@@ -88,15 +88,20 @@ export const SavedRoutesDirections = ({
   } = useRouteHover()
 
   // Хук для управления waypoints (drag & drop)
-  const { wayPoints, handleAddWaypoint, handleUpdateWaypoint, clearWayPoints } =
-    useWaypointManagement({
-      origin,
-      destination,
-      originName,
-      destinationName,
-      directionsMutation,
-      dropPointMutation,
-    })
+  const {
+    wayPoints,
+    handleAddWaypoint,
+    handleUpdateWaypoint,
+    handleDeleteWaypoint,
+    clearWayPoints,
+  } = useWaypointManagement({
+    origin,
+    destination,
+    originName,
+    destinationName,
+    directionsMutation,
+    dropPointMutation,
+  })
 
   // Хук для переключения маршрутов
   const { switchToAlternative, ALTERNATIVE_ROUTES_START_INDEX } =
@@ -222,6 +227,7 @@ export const SavedRoutesDirections = ({
         onMarkerDragStart={clearAlternatives}
         onMarkerDragEnd={handleMarkerOnDragEnd}
         onExistingMarkerDragEnd={handleUpdateWaypoint}
+        onExistingMarkerClick={handleDeleteWaypoint}
         onHoverMarkerClick={handleHoverMarkerClick}
       />
 
