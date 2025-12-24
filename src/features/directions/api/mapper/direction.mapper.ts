@@ -7,4 +7,5 @@ export const mapDirections = (
 ): Directions => ({
   routeId: dto.routeId,
   route: dto.routeDtos,
+  waypoints: dto.waypoints,
 })

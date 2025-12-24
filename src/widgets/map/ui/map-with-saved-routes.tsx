@@ -6,11 +6,11 @@ import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import {
   Directions as DirectionType,
   RouteRequestPayload,
-} from '@/features/directions'
+} from '@/features/directions/api'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
-import { TollRoad } from '@/entities/roads'
-import { TollRoadPolyline } from '@/entities/roads/ui'
-import { AxelType, TollPaymentType } from '@/entities/tolls/api'
+import { TollRoad } from '@/entities/toll-roads'
+import { TollRoadPolyline } from '@/entities/toll-roads/ui'
+import { AxelType } from '@/entities/tolls/api'
 
 interface MapWithSavedRoutesProps {
   isLoading?: boolean
@@ -25,7 +25,6 @@ interface MapWithSavedRoutesProps {
   tollRoads?: TollRoad[]
   onClearWaypointsCallback?: (clearFn: () => void) => void
   selectedAxelType?: AxelType
-  selectedPaymentType?: TollPaymentType
 }
 
 export const MapWithSavedRoutes = ({
@@ -36,7 +35,6 @@ export const MapWithSavedRoutes = ({
   tollRoads,
   onClearWaypointsCallback,
   selectedAxelType,
-  selectedPaymentType,
 }: MapWithSavedRoutesProps) => {
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -61,7 +59,6 @@ export const MapWithSavedRoutes = ({
             tolls={tolls}
             onClearWaypointsCallback={onClearWaypointsCallback}
             selectedAxelType={selectedAxelType}
-            selectedPaymentType={selectedPaymentType}
           />
         )}
       </MapBase>

@@ -1,1 +1,1 @@
-export { useRoute } from './hooks/use-route'
+export { useAttachedRoute as useRoute } from './hooks/use-route'

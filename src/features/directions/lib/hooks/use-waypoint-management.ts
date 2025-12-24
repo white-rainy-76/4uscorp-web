@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { Coordinate } from '@/shared/types'
 import {
@@ -30,6 +30,11 @@ interface UseWaypointManagementProps {
       longitude: number
     }) => Promise<NearestPointResponse>
   }
+  initialWaypoints?: Array<{
+    latitude: number
+    longitude: number
+    stopOrder: number
+  }>
 }
 
 export const useWaypointManagement = ({
@@ -40,8 +45,20 @@ export const useWaypointManagement = ({
   destinationName,
   directionsMutation,
   dropPointMutation,
+  initialWaypoints,
 }: UseWaypointManagementProps) => {
-  const [wayPoints, setWayPoints] = useState<google.maps.LatLngLiteral[]>([])
+  // Инициализируем wayPoints из initialWaypoints, если они есть
+  const [wayPoints, setWayPoints] = useState<google.maps.LatLngLiteral[]>(
+    () => {
+      if (initialWaypoints && initialWaypoints.length > 0) {
+        // Сортируем по stopOrder и преобразуем в LatLngLiteral
+        return initialWaypoints
+          .sort((a, b) => a.stopOrder - b.stopOrder)
+          .map((wp) => ({ lat: wp.latitude, lng: wp.longitude }))
+      }
+      return []
+    },
+  )
 
   // Создание payload для directions API
   const createDirectionsPayload = useCallback(
@@ -138,6 +155,58 @@ export const useWaypointManagement = ({
     },
     [wayPoints, directionsMutation, createDirectionsPayload],
   )
+
+  // Синхронизация wayPoints с initialWaypoints из Directions
+  const prevInitialWaypointsRef = useRef<typeof initialWaypoints>(undefined)
+  const prevInitialWaypointsStringRef = useRef<string>('')
+
+  useEffect(() => {
+    // Создаём строку для сравнения
+    const currentString = initialWaypoints
+      ? JSON.stringify(
+          initialWaypoints
+            .slice()
+            .sort((a, b) => a.stopOrder - b.stopOrder)
+            .map((wp) => ({ lat: wp.latitude, lng: wp.longitude })),
+        )
+      : ''
+
+    // Проверяем, изменились ли initialWaypoints
+    // Важно: проверяем и по ссылке, и по содержимому
+    const prevWasUndefined = prevInitialWaypointsRef.current === undefined
+    const currIsDefined = initialWaypoints !== undefined
+    const referenceChanged =
+      prevInitialWaypointsRef.current !== initialWaypoints
+    const contentChanged =
+      prevInitialWaypointsStringRef.current !== currentString
+
+    // Синхронизируем если:
+    // 1. Изменилась ссылка И содержимое
+    // 2. ИЛИ изменилось состояние undefined -> определено (или наоборот)
+    const hasChanged =
+      (referenceChanged && contentChanged) ||
+      (prevWasUndefined && currIsDefined) ||
+      (!prevWasUndefined && !currIsDefined && contentChanged)
+
+    if (hasChanged) {
+      prevInitialWaypointsRef.current = initialWaypoints
+      prevInitialWaypointsStringRef.current = currentString
+
+      if (initialWaypoints && initialWaypoints.length > 0) {
+        const sortedWaypoints = initialWaypoints
+          .sort((a, b) => a.stopOrder - b.stopOrder)
+          .map((wp) => ({ lat: wp.latitude, lng: wp.longitude }))
+        setWayPoints(sortedWaypoints)
+      } else if (
+        initialWaypoints !== undefined &&
+        initialWaypoints.length === 0
+      ) {
+        // Очищаем только если initialWaypoints явно пустой массив
+        setWayPoints([])
+      }
+      // Если initialWaypoints === undefined, не трогаем wayPoints (могут быть пользовательские изменения)
+    }
+  }, [initialWaypoints])
 
   // Очистка waypoints при изменении origin/destination
   const clearWayPoints = useCallback(() => {

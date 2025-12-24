@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { Directions as DirectionType, RouteRequestPayload } from '../api'
 import { RoutePolylines } from './route-polylines'
@@ -17,7 +17,7 @@ interface DirectionsProps {
     RouteRequestPayload,
     unknown
   >
-  truckId: string
+  truckId?: string
   onClearAlternativeRoutes?: (clearFn: () => void) => void
 }
 
@@ -27,10 +27,10 @@ export const Directions = ({
   truckId,
   onClearAlternativeRoutes,
 }: DirectionsProps) => {
-  // Получаем данные из store
   const { origin, destination, originName, destinationName } =
     useRouteFormStore()
   const { setSelectedSectionId, setRouteInfo } = useRouteInfoStore()
+
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
     google.maps.LatLngLiteral[][]
@@ -64,18 +64,24 @@ export const Directions = ({
   } = useRouteHover()
 
   // Хук для управления waypoints (drag & drop)
-  const { wayPoints, handleAddWaypoint, handleUpdateWaypoint, clearWayPoints } =
-    useWaypointManagement({
-      truckId,
-      origin,
-      destination,
-      originName,
-      destinationName,
-      directionsMutation,
-      dropPointMutation,
-    })
+  const {
+    wayPoints,
+    handleAddWaypoint,
+    handleUpdateWaypoint,
+    handleDeleteWaypoint,
+    clearWayPoints,
+  } = useWaypointManagement({
+    truckId,
+    origin,
+    destination,
+    originName,
+    destinationName,
+    directionsMutation,
+    dropPointMutation,
+    initialWaypoints: data?.waypoints,
+  })
 
-  // Хук для переключения маршрутов (включает очистку hover)
+  // Хук для переключения маршрутов
   const { switchToAlternative, ALTERNATIVE_ROUTES_START_INDEX } =
     useRouteSwitching({
       mainRoute,
@@ -85,7 +91,6 @@ export const Directions = ({
       setAlternativeRoutes,
       setRouteSectionIds,
       onRouteClick: (routeSectionId: string) => {
-        // Находим данные маршрута для выбранной секции
         const selectedRoute = data?.route?.find(
           (r) => r.routeSectionId === routeSectionId,
         )
@@ -108,12 +113,12 @@ export const Directions = ({
     clearWayPoints()
   }, [origin, destination, clearWayPoints])
 
-  // Функция для очистки альтернативных маршрутов после начала перетаскивания
+  // Функция для очистки альтернативных маршрутов
   const clearAlternatives = useCallback(() => {
     setAlternativeRoutes([])
   }, [])
 
-  //? Передаем функцию очистки в родительский компонент
+  // Передаем функцию очистки в родительский компонент
   useEffect(() => {
     if (onClearAlternativeRoutes) {
       onClearAlternativeRoutes(clearAlternatives)
@@ -136,7 +141,6 @@ export const Directions = ({
           allShapes.length > 1 ? [...allShapes.slice(1)] : [],
         )
 
-        // Сохраняем routeSectionIds для всех маршрутов
         const sectionIds = data.route.map((route) => route.routeSectionId)
         setRouteSectionIds(sectionIds)
 
@@ -150,14 +154,10 @@ export const Directions = ({
     }
   }, [data])
 
-  /**
-   * Обработка клика на hover marker
-   * Переключается на альтернативный маршрут, если hover на нем
-   */
+  // Обработка клика на hover marker
   const handleHoverMarkerClick = useCallback(
     (e: google.maps.MapMouseEvent) => {
       if (hoveredRouteIndex !== null && hoveredRouteIndex > 0) {
-        // Преобразуем глобальный индекс в индекс альтернативного маршрута
         const altRouteIndex = hoveredRouteIndex - ALTERNATIVE_ROUTES_START_INDEX
         switchToAlternative(altRouteIndex)
       }
@@ -165,9 +165,7 @@ export const Directions = ({
     [hoveredRouteIndex, ALTERNATIVE_ROUTES_START_INDEX, switchToAlternative],
   )
 
-  /**
-   * Обработка drag & drop для добавления нового waypoint
-   */
+  // Обработка drag & drop для добавления нового waypoint
   const handleMarkerOnDragEnd = useCallback(
     async (e: google.maps.MapMouseEvent) => {
       await handleAddWaypoint(e)

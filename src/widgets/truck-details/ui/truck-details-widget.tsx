@@ -1,21 +1,22 @@
 'use client'
 
-import React from 'react'
 import { InfoCard } from '@/shared/ui/info-card'
 import { useDictionary } from '@/shared/lib/hooks'
 import { RouteList } from '@/widgets/refueling-details'
 import { TruckRouteInfo } from '@/widgets/truck-route/ui'
 import { MapWithRoute } from '@/widgets/map'
-import { useRoute } from '@/entities/route/lib/hooks/use-route'
+import { useAttachedRoute } from '@/entities/route/lib/hooks/use-route'
 import { Truck } from '@/entities/truck'
 import { DriverInfo, DriverInfoSkeleton } from '@/widgets/info/driver-info'
 import { useRouteFormStore } from '@/shared/store'
-import { useCurrentDirections } from '@/features/truck-route-management/lib/hooks/use-current-directions'
-import { useCombinedGasStations } from '@/features/truck-route-management/lib/hooks/use-combined-gas-stations'
-import { useSubmitRoute } from '@/features/truck-route-management/lib/hooks/use-submit-route'
-import { useRouteFuelManagement } from '@/features/truck-route-management/lib/hooks/use-route-fuel-management'
-import { useRouteTolls } from '@/features/truck-route-management/lib/hooks/use-route-tolls'
-import { useRouteTollRoads } from '@/features/truck-route-management/lib/hooks/use-route-toll-roads'
+import { useCurrentDirections } from '@/features/directions/lib/hooks'
+import {
+  useCombinedGasStations,
+  useRouteFuelManagement,
+} from '@/entities/gas-station/lib/hooks'
+import { useSubmitRoute } from '@/features/route/submit-route'
+import { useRouteTolls } from '@/features/tolls/lib/hooks'
+import { useRouteTollRoads } from '@/features/toll-roads/lib/hooks'
 import { useCleanupStores } from '../lib/hooks/use-cleanup-stores'
 
 interface TruckDetailsWidgetProps {
@@ -33,17 +34,17 @@ export function TruckDetailsWidget({
 
   // Cleanup stores on unmount
   useCleanupStores()
-
+  // Hook to get assigned to truck route data
   const {
     routeData,
     routeByIdData,
     isRouteLoading,
     isRouteByIdLoading,
     refetchRouteData,
-  } = useRoute({
+  } = useAttachedRoute({
     truckId: truckData?.id,
   })
-
+  // Hook to get gas stations data and directions data
   const {
     updateGasStations,
     gasStationsData,
@@ -54,16 +55,16 @@ export function TruckDetailsWidget({
   } = useRouteFuelManagement({
     routeData,
   })
-
+  // Hook to get tolls along route
   const { tollsData, isTollsLoading } = useRouteTolls({
     routeByIdData,
     directionsResponseData,
   })
-
+  // Hook to get toll roads data
   const { tollRoadsData, isTollRoadsLoading } = useRouteTollRoads({
     directionsResponseData,
   })
-
+  // Hook to get either routeByIdData or directionsResponseData
   const currentDirectionsData = useCurrentDirections({
     routeByIdData,
     directionsResponseData,

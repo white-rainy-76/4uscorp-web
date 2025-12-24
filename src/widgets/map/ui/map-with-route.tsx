@@ -5,8 +5,11 @@ import { MapBase, Polyline } from '@/shared/ui'
 import { ClusteredGasStationMarkers } from '@/entities/gas-station/ui/clustered-gas-station-markers'
 import { FullScreenController } from './controlers/fullscreen'
 import { ZoomControl } from './controlers/zoom'
-import { Directions, RouteRequestPayload } from '@/features/directions/api'
-import { DirectionsRoutes } from '@/features/directions'
+import {
+  Directions as DirectionType,
+  RouteRequestPayload,
+} from '@/features/directions/api'
+import { Directions } from '@/features/directions'
 import { Truck } from '@/entities/truck'
 import { RoutePanelOnMap } from './route-panel'
 import { useMap } from '@vis.gl/react-google-maps'
@@ -25,16 +28,16 @@ import { useRouteInfoStore } from '@/shared/store'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
 import { TollMarker, TollPricesSheet } from '@/entities/tolls/ui'
 import { convertTollWithSectionToToll } from '../lib/helpers/convert-toll-with-section'
-import { TollRoad } from '@/entities/roads'
-import { TollRoadPolyline } from '@/entities/roads/ui'
+import { TollRoad } from '@/entities/toll-roads'
+import { TollRoadPolyline } from '@/entities/toll-roads/ui'
 import { Toll } from '@/entities/tolls'
 
 interface MapWithRouteProps {
-  directionsData: Directions | undefined
+  directionsData: DirectionType | undefined
   gasStations: GasStation[] | undefined
   isPending: boolean
   truck: Truck
-  mutateAsync: (variables: RouteRequestPayload) => Promise<Directions>
+  mutateAsync: (variables: RouteRequestPayload) => Promise<DirectionType>
   updateGasStations: (
     variables: GetGasStationsPayload,
   ) => Promise<GetGasStationsResponse>
@@ -122,7 +125,7 @@ export const MapWithRoute = ({
         {/* Отображение ошибок поверх карты */}
         <MapErrorsOverlay />
 
-        <DirectionsRoutes
+        <Directions
           data={directionsData}
           directionsMutation={mutateAsync}
           truckId={truck.id}
@@ -185,6 +188,7 @@ export const MapWithRoute = ({
           onFilterChange={handleFilterChange}
           onGasStationClick={handleGasStationClick}
           gasStations={filteredGasStations}
+          tolls={tolls}
         />
 
         <FullScreenController mapRef={mapContainerRef} />

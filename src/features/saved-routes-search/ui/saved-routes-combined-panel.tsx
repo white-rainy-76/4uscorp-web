@@ -91,13 +91,13 @@ export const SavedRoutesCombinedPanel = ({
   }
 
   const handleRouteActionSuccess = () => {
-    // Очищаем waypoints при сохранении маршрута
-    onClearWaypoints?.()
+    // При сохранении маршрута ничего не очищаем - данные остаются как есть
     setSavedRouteId(null)
   }
 
   const handleRouteUpdateSuccess = () => {
-    // Очищаем все данные маршрута при обновлении
+    // При обновлении ничего не очищаем - данные остаются как есть
+    // При следующем клике на маршрут данные загрузятся заново
     onRouteUpdate?.()
   }
 
@@ -143,7 +143,7 @@ export const SavedRoutesCombinedPanel = ({
               </div>
 
               {/* Action Buttons */}
-              {hasSearched && (
+              {(hasSearched || savedRouteId) && (
                 <div className="flex-shrink-0 mt-4 pt-4 border-t border-separator">
                   {savedRouteId ? (
                     // Показываем Edit и Delete когда маршрут выбран
@@ -159,11 +159,13 @@ export const SavedRoutesCombinedPanel = ({
                       />
                     </div>
                   ) : (
-                    // Показываем Add когда маршрут не выбран
-                    <AddSavedRouteButton
-                      routeSectionId={sectionId}
-                      onSuccess={handleRouteActionSuccess}
-                    />
+                    // Показываем Add когда маршрут не выбран (только после поиска)
+                    hasSearched && (
+                      <AddSavedRouteButton
+                        routeSectionId={sectionId}
+                        onSuccess={handleRouteActionSuccess}
+                      />
+                    )
                   )}
                 </div>
               )}

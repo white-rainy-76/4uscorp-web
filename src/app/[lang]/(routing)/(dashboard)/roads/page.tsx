@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useGetTollRoadsByBoundingBoxMutation } from '@/entities/roads'
+import { useGetTollRoadsByBoundingBoxMutation } from '@/entities/toll-roads'
 import { MapWithTollRoads } from '@/widgets/map'
 import {
   BoundingBoxSearchForm,

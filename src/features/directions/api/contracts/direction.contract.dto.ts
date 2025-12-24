@@ -6,6 +6,12 @@ export const RouteInfoDtoSchema = z.object({
   driveTime: z.number().min(0),
 })
 
+export const WaypointDtoSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  stopOrder: z.number(),
+})
+
 export const RouteDtoSchema = z.object({
   routeSectionId: z.string(),
   mapPoints: z.array(CoordinatePairSchema),
@@ -15,4 +21,5 @@ export const RouteDtoSchema = z.object({
 export const DirectionsDtoSchema = z.object({
   routeId: z.string(),
   routeDtos: z.array(RouteDtoSchema),
+  waypoints: z.array(WaypointDtoSchema).optional(),
 })

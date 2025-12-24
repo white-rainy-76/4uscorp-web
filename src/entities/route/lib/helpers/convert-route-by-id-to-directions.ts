@@ -16,5 +16,10 @@ export function convertRouteByIdToDirections(
         routeInfo: routeByIdData.routeInfo,
       },
     ],
+    waypoints: routeByIdData.viaPoints?.map((viaPoint) => ({
+      latitude: viaPoint.latitude,
+      longitude: viaPoint.longitude,
+      stopOrder: viaPoint.stopOrder,
+    })),
   }
 }

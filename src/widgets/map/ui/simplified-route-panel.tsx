@@ -7,11 +7,9 @@ import { Directions } from '@/features/directions/api'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
 import { useSavedRoutesStore } from '@/shared/store'
 import { AxelType, TollPaymentType } from '@/entities/tolls/api'
-import {
-  getAvailablePaymentTypesForAxles,
-  getTollPaymentTypeLabel,
-  getTollPriceAmountFor,
-} from '@/entities/tolls/lib/toll-pricing'
+import { getTollPaymentTypeLabel } from '@/entities/tolls/lib'
+import { TollSelectors } from './toll-selectors'
+import { useTollsCalculation } from '../lib/hooks'
 
 interface SimplifiedRoutePanelProps {
   directionsData?: Directions
@@ -81,58 +79,13 @@ export const SimplifiedRoutePanel = ({
     )
   }, [tolls, sectionId])
 
-  const availablePaymentTypes = useMemo(() => {
-    return getAvailablePaymentTypesForAxles(filteredTolls, selectedAxelType)
-  }, [filteredTolls, selectedAxelType])
-
-  // Суммируем tolls для выбранной секции по выбранным осям и типу оплаты
-  const tollsInfo = useMemo(() => {
-    if (!filteredTolls || filteredTolls.length === 0) {
-      return { total: 0 }
-    }
-
-    const hasSelectedPrice = (toll: TollWithSection) => {
-      return (
-        getTollPriceAmountFor(
-          toll.tollPrices,
-          selectedAxelType,
-          selectedPaymentType,
-        ) != null
-      )
-    }
-
-    // Оставляем по ключу toll, у которого есть цена для выбранных осей и типа оплаты
-    const uniqueTollsByKey = filteredTolls.reduce((acc, toll) => {
-      const key = toll.key || toll.id
-      if (!acc.has(key)) {
-        acc.set(key, toll)
-      } else {
-        const existingToll = acc.get(key)!
-        const existingHasPrice = hasSelectedPrice(existingToll)
-        const currentHasPrice = hasSelectedPrice(toll)
-        if (currentHasPrice && !existingHasPrice) {
-          acc.set(key, toll)
-        }
-      }
-      return acc
-    }, new Map<string, TollWithSection>())
-
-    const uniqueTolls = Array.from(uniqueTollsByKey.values())
-
-    const total = uniqueTolls.reduce((sum, toll) => {
-      const amountFromTollPrices = getTollPriceAmountFor(
-        toll.tollPrices,
-        selectedAxelType,
-        selectedPaymentType,
-      )
-      if (amountFromTollPrices != null && amountFromTollPrices > 0) {
-        return sum + amountFromTollPrices
-      }
-      return sum
-    }, 0)
-
-    return { total }
-  }, [filteredTolls, selectedAxelType, selectedPaymentType])
+  // Используем переиспользуемый хук для вычисления стоимости tolls
+  const tollsInfo = useTollsCalculation({
+    tolls: filteredTolls,
+    selectedAxelType,
+    selectedPaymentType,
+    sectionId,
+  })
 
   if (!directionsData) return null
 
@@ -173,60 +126,17 @@ export const SimplifiedRoutePanel = ({
         </div>
 
         {/* Selectors */}
-        <div className="mt-3 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-text-neutral/80 font-medium text-text-muted">
-              Axles
-            </span>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() => onAxelTypeChange(AxelType._5L)}
-                className={
-                  selectedAxelType === AxelType._5L
-                    ? 'px-2 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white'
-                    : 'px-2 py-1 rounded-md text-xs font-semibold bg-muted text-text-neutral hover:bg-muted/70'
-                }>
-                5
-              </button>
-              <button
-                type="button"
-                onClick={() => onAxelTypeChange(AxelType._6L)}
-                className={
-                  selectedAxelType === AxelType._6L
-                    ? 'px-2 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white'
-                    : 'px-2 py-1 rounded-md text-xs font-semibold bg-muted text-text-neutral hover:bg-muted/70'
-                }>
-                6
-              </button>
-            </div>
+        {filteredTolls.length > 0 && (
+          <div className="mt-3">
+            <TollSelectors
+              tolls={filteredTolls}
+              selectedAxelType={selectedAxelType}
+              selectedPaymentType={selectedPaymentType}
+              onAxelTypeChange={onAxelTypeChange}
+              onPaymentTypeChange={onPaymentTypeChange}
+            />
           </div>
-
-          <div className="flex items-start justify-between gap-2">
-            <span className="text-xs text-text-neutral/80 font-medium pt-1 text-text-muted">
-              Payment Type
-            </span>
-            <div className="flex flex-wrap gap-1 justify-end">
-              {availablePaymentTypes.length === 0 ? (
-                <span className="text-xs text-text-neutral/60">-</span>
-              ) : (
-                availablePaymentTypes.map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => onPaymentTypeChange(type)}
-                    className={
-                      selectedPaymentType === type
-                        ? 'px-2 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white'
-                        : 'px-2 py-1 rounded-md text-xs font-semibold bg-muted text-text-neutral hover:bg-muted/70'
-                    }>
-                    {getTollPaymentTypeLabel(type)}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+        )}
       </InfoCard>
     </div>
   )

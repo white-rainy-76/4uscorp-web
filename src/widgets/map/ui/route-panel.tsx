@@ -1,18 +1,27 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { GasStation } from '@/entities/gas-station/model/types/gas-station'
 import { ScrollArea } from '@/shared/ui/scroll-area'
 import { MultiSelect } from '@/shared/ui'
 import { MapControl, ControlPosition } from '@vis.gl/react-google-maps'
 import { useDictionary } from '@/shared/lib/hooks'
 import { useCartStore, useRouteInfoStore } from '@/shared/store'
+import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
+import { AxelType, TollPaymentType } from '@/entities/tolls/api'
+import {
+  getAvailablePaymentTypesForAxles,
+  getTollPaymentTypeLabel,
+} from '@/entities/tolls/lib'
+import { TollSelectors } from './toll-selectors'
+import { useTollsCalculation } from '../lib/hooks'
 
 interface Props {
   onDeleteGasStation: (id: string) => void
   onFilterChange: (providers: string[]) => void
   onGasStationClick: (lat: number, lng: number) => void
   gasStations?: GasStation[]
+  tolls?: TollWithSection[]
 }
 
 const FUEL_PROVIDERS = ['TA', 'Pilot', 'Loves'].map((provider) => ({
@@ -25,18 +34,48 @@ export const RoutePanelOnMap = ({
   onFilterChange,
   onGasStationClick,
   gasStations,
+  tolls,
 }: Props) => {
   const { dictionary } = useDictionary()
-  const {
-    fuelLeft,
-    gallons,
-    totalPrice,
-    driveTime,
-    miles,
-    tollsOnline,
-    tollsIPass,
-  } = useRouteInfoStore()
+  const { fuelLeft, gallons, totalPrice, driveTime, miles, selectedSectionId } =
+    useRouteInfoStore()
   const { cart, selectedProviders } = useCartStore()
+
+  // Состояние для выбранных осей и типа оплаты
+  const [selectedAxelType, setSelectedAxelType] = useState<AxelType>(
+    AxelType._5L,
+  )
+  const [selectedPaymentType, setSelectedPaymentType] =
+    useState<TollPaymentType>(TollPaymentType.PayOnline)
+
+  // Фильтруем tolls по выбранной секции
+  const filteredTolls = useMemo(() => {
+    if (!tolls || !selectedSectionId) return []
+    return tolls.filter(
+      (toll) => toll.routeSection === selectedSectionId && !toll.isDynamic,
+    )
+  }, [tolls, selectedSectionId])
+
+  // Вычисляем стоимость tolls
+  const tollsInfo = useTollsCalculation({
+    tolls: filteredTolls,
+    selectedAxelType,
+    selectedPaymentType,
+    sectionId: selectedSectionId,
+  })
+
+  // Доступные типы оплаты для выбранных осей
+  const availablePaymentTypes = useMemo(() => {
+    return getAvailablePaymentTypesForAxles(filteredTolls, selectedAxelType)
+  }, [filteredTolls, selectedAxelType])
+
+  // Автоматически обновляем selectedPaymentType, если текущий недоступен
+  useEffect(() => {
+    if (availablePaymentTypes.length === 0) return
+    if (!availablePaymentTypes.includes(selectedPaymentType)) {
+      setSelectedPaymentType(availablePaymentTypes[0])
+    }
+  }, [availablePaymentTypes, selectedPaymentType])
 
   const displayDriveTime = useMemo(() => {
     if (typeof driveTime !== 'number' || driveTime < 0) return ''
@@ -61,8 +100,8 @@ export const RoutePanelOnMap = ({
 
   return (
     <MapControl position={ControlPosition.TOP_RIGHT}>
-      <div className="w-[341px] p-4 bg-white rounded-xl shadow-lg space-y-5 border border-[#E1E5EA] z-[100] pointer-events-auto font-nunito">
-        <div className="grid grid-cols-4 gap-x-2 text-sm text-text-neutral font-semibold">
+      <div className="w-[341px] p-4 bg-white rounded-xl shadow-lg space-y-5 border border-[#E1E5EA] z-[100] pointer-events-auto font-nunito mt-[15px] mr-[15px]">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-3 text-sm text-text-neutral font-semibold">
           <div className="flex flex-col items-start">
             <span className="font-normal">
               {dictionary.home.route_panel.drive_time}
@@ -104,18 +143,31 @@ export const RoutePanelOnMap = ({
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-normal ">Tolls Online</span>
-            <span className=" font-bold whitespace-nowrap">
-              {tollsOnline !== undefined ? `$${tollsOnline.toFixed(2)}` : '-'}
+            <span className="font-normal ">
+              Tolls{' '}
+              <span className="font-bold">
+                ({getTollPaymentTypeLabel(selectedPaymentType)}:
+              </span>{' '}
+              {selectedAxelType} axles)
             </span>
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-normal ">IPass</span>
             <span className=" font-bold whitespace-nowrap">
-              {tollsIPass !== undefined ? `$${tollsIPass.toFixed(2)}` : '-'}
+              {tollsInfo.total > 0 ? `$${tollsInfo.total.toFixed(2)}` : '-'}
             </span>
           </div>
         </div>
+
+        {/* Toll Selectors */}
+        {tolls && filteredTolls.length > 0 && (
+          <div className="mt-3">
+            <TollSelectors
+              tolls={filteredTolls}
+              selectedAxelType={selectedAxelType}
+              selectedPaymentType={selectedPaymentType}
+              onAxelTypeChange={setSelectedAxelType}
+              onPaymentTypeChange={setSelectedPaymentType}
+            />
+          </div>
+        )}
 
         {/* Filter Section */}
         <div className="space-y-2">

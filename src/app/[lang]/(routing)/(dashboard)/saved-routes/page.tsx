@@ -6,12 +6,15 @@ import { MapWithSavedRoutes, SimplifiedRoutePanel } from '@/widgets/map'
 import { useHandleDirectionsMutation } from '@/features/directions/api/handle-direction.mutation'
 import { useSavedRoutesStore } from '@/shared/store'
 import { useGetTollsAlongPolylineSectionsMutation } from '@/features/tolls/get-tolls-along-polyline-sections'
-import { useGetTollRoadsMutation } from '@/entities/roads'
-import { Directions, RouteRequestPayload } from '@/features/directions'
+import { useGetTollRoadsMutation } from '@/entities/toll-roads'
+import {
+  Directions as DirectionType,
+  RouteRequestPayload,
+} from '@/features/directions/api'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
-import { TollRoad } from '@/entities/roads'
+import { TollRoad } from '@/entities/toll-roads'
 import { AxelType, TollPaymentType } from '@/entities/tolls/api'
-import { getAvailablePaymentTypesForAxles } from '@/entities/tolls/lib/toll-pricing'
+import { getAvailablePaymentTypesForAxles } from '@/entities/tolls/lib'
 import {
   SavedRoutesFetchRouteParams,
   SavedRoutesRouteParams,
@@ -21,7 +24,9 @@ export default function SavedRoutesPage() {
   const [hasSearched, setHasSearched] = useState(false)
   const [tollsData, setTollsData] = useState<TollWithSection[]>([])
   const [tollRoadsData, setTollRoadsData] = useState<TollRoad[]>([])
-  const [directionsData, setDirectionsData] = useState<Directions | undefined>()
+  const [directionsData, setDirectionsData] = useState<
+    DirectionType | undefined
+  >()
   const clearWaypointsRef = useRef<(() => void) | null>(null)
   const [selectedAxelType, setSelectedAxelType] = useState<AxelType>(
     AxelType._5L,
@@ -45,7 +50,7 @@ export default function SavedRoutesPage() {
 
   // Колбек для запроса маршрута с последующими запросами tolls и toll roads
   const handleDirectionsWithTolls = useCallback(
-    async (payload: RouteRequestPayload): Promise<Directions> => {
+    async (payload: RouteRequestPayload): Promise<DirectionType> => {
       const result = await directionsMutationAsync(payload)
 
       // Обновляем directionsData
@@ -96,8 +101,11 @@ export default function SavedRoutesPage() {
       errorMessage: string,
       onSuccess?: () => void,
     ) => {
-      // Очищаем waypoints при обработке маршрута
-      clearWaypointsRef.current?.()
+      // Очищаем waypoints только при создании нового маршрута (не при загрузке сохранённого)
+      // При загрузке сохранённого маршрута waypoints должны загрузиться из data.waypoints
+      if (!('savedRouteId' in params)) {
+        clearWaypointsRef.current?.()
+      }
 
       try {
         // Если есть savedRouteId, передаем только его
@@ -141,7 +149,7 @@ export default function SavedRoutesPage() {
   )
 
   const handleRouteClear = useCallback(() => {
-    // Очищаем все данные маршрута, tolls и toll roads после удаления или обновления
+    // Очищаем все данные маршрута только при удалении
     setDirectionsData(undefined)
     setTollsData([])
     setTollRoadsData([])
@@ -152,6 +160,12 @@ export default function SavedRoutesPage() {
     setRouteId(null)
     setSavedRouteId(null)
   }, [setSectionId, setRouteId, setSavedRouteId])
+
+  // При обновлении маршрута ничего не очищаем - данные просто обновятся при следующей загрузке
+  const handleRouteUpdate = useCallback(() => {
+    // Ничего не делаем - данные остаются как есть
+    // При следующем клике на маршрут данные загрузятся заново
+  }, [])
 
   const sectionTolls = useMemo(() => {
     if (!sectionId) return []
@@ -183,7 +197,7 @@ export default function SavedRoutesPage() {
         isCreatingRoute={isCreatingRoute}
         onClearWaypoints={() => clearWaypointsRef.current?.()}
         onRouteDelete={handleRouteClear}
-        onRouteUpdate={handleRouteClear}
+        onRouteUpdate={handleRouteUpdate}
       />
 
       {/* Simplified Route Panel */}
@@ -205,7 +219,6 @@ export default function SavedRoutesPage() {
         tolls={tollsData}
         tollRoads={tollRoadsData}
         selectedAxelType={selectedAxelType}
-        selectedPaymentType={selectedPaymentType}
         onClearWaypointsCallback={(clearFn) => {
           clearWaypointsRef.current = clearFn
         }}

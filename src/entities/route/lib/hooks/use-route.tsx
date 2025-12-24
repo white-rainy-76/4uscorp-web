@@ -11,7 +11,7 @@ type useRouteProps = {
   truckId: string | undefined
 }
 
-export function useRoute({ truckId }: useRouteProps) {
+export function useAttachedRoute({ truckId }: useRouteProps) {
   const { setRouteForm } = useRouteFormStore()
   const { setRouteInfo } = useRouteInfoStore()
   const { addToCart, setFuelPlanId } = useCartStore()

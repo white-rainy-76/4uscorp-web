@@ -81,7 +81,9 @@ export function SavedRoutesModal({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="font-extrabold text-sm text-text-heading tracking-wide">
-                        ROUTE #{route.id}
+                        {route.name ||
+                          route.startAddress ||
+                          `ROUTE #${route.id}`}
                       </span>
                     </div>
                     <div className="space-y-2">

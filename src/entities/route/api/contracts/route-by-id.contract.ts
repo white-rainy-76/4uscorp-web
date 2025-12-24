@@ -11,6 +11,12 @@ export const RouteInfoSchema = z.object({
   driveTime: z.number(),
 })
 
+export const ViaPointSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  stopOrder: z.number(),
+})
+
 export const RouteByIdSchema = z.object({
   routeId: z.string().uuid(),
   originName: z.string(),
@@ -26,4 +32,5 @@ export const RouteByIdSchema = z.object({
   totalFuelAmmount: z.number(),
   totalPriceAmmount: z.number(),
   fuelPlanId: z.string().optional().nullable(),
+  viaPoints: z.array(ViaPointSchema).optional(),
 })

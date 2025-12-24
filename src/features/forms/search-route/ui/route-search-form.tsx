@@ -16,6 +16,7 @@ import { FieldError } from './field-error'
 import { useRouteFormStore } from '@/shared/store'
 import { useConnection } from '@/shared/lib/context'
 import { SavedRouteSelector } from './saved-route-selector'
+import { AllSavedRoutesButton } from './all-saved-routes-button'
 
 interface RouteSearchFormProps {
   truck?: Truck
@@ -71,6 +72,7 @@ export const RouteSearchForm = ({
     formState: { errors },
     setError,
     watch,
+    setValue,
   } = useForm<RouteSearchFormValues>({
     resolver: zodResolver(routeSearchSchema),
     defaultValues: {
@@ -231,6 +233,19 @@ export const RouteSearchForm = ({
         origin={selectedStartPoint || origin}
         destination={selectedEndPoint || destination}
         onRouteSelect={setSavedRouteId}
+      />
+
+      {/* All Saved Routes Button */}
+      <AllSavedRoutesButton
+        onRouteSelect={setSavedRouteId}
+        onOriginDestinationUpdate={(originName, destinationName) => {
+          // Обновляем поля формы
+          setValue('startPoint', originName)
+          setValue('endPoint', destinationName)
+          // Очищаем выбранные точки, так как координаты уже в store
+          setSelectedStartPoint(null)
+          setSelectedEndPoint(null)
+        }}
       />
 
       {/* Calculate Button */}

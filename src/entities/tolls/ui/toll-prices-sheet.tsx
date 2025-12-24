@@ -9,7 +9,7 @@ import {
 import {
   getTollPaymentTypeLabel,
   TOLL_PAYMENT_TYPE_PRIORITY,
-} from '@/entities/tolls/lib/toll-pricing'
+} from '@/entities/tolls/lib'
 import {
   Sheet,
   SheetContent,

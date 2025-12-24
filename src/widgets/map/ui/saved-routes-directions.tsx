@@ -19,7 +19,7 @@ import { useSavedRoutesStore } from '@/shared/store'
 import { TollWithSection } from '@/features/tolls/get-tolls-along-polyline-sections'
 import { TollMarker, TollPricesSheet } from '@/entities/tolls/ui'
 import { convertTollWithSectionToToll } from '@/widgets/map/lib/helpers/convert-toll-with-section'
-import { AxelType, TollPaymentType } from '@/entities/tolls/api'
+import { AxelType } from '@/entities/tolls/api'
 import { Toll } from '@/entities/tolls'
 
 interface SavedRoutesDirectionsProps {
@@ -33,7 +33,6 @@ interface SavedRoutesDirectionsProps {
   tolls?: TollWithSection[]
   onClearWaypointsCallback?: (clearFn: () => void) => void
   selectedAxelType?: AxelType
-  selectedPaymentType?: TollPaymentType
 }
 
 export const SavedRoutesDirections = ({
@@ -42,7 +41,6 @@ export const SavedRoutesDirections = ({
   tolls,
   onClearWaypointsCallback,
   selectedAxelType,
-  selectedPaymentType,
 }: SavedRoutesDirectionsProps) => {
   const {
     origin,
@@ -53,6 +51,7 @@ export const SavedRoutesDirections = ({
     setSectionId,
     setRouteId,
   } = useSavedRoutesStore()
+
   const [mainRoute, setMainRoute] = useState<google.maps.LatLngLiteral[]>([])
   const [alternativeRoutes, setAlternativeRoutes] = useState<
     google.maps.LatLngLiteral[][]
@@ -101,6 +100,7 @@ export const SavedRoutesDirections = ({
     destinationName,
     directionsMutation,
     dropPointMutation,
+    initialWaypoints: data?.waypoints,
   })
 
   // Хук для переключения маршрутов
@@ -113,28 +113,23 @@ export const SavedRoutesDirections = ({
       setAlternativeRoutes,
       setRouteSectionIds,
       onRouteClick: (routeSectionId: string) => {
-        // Обновляем sectionId в SavedRoutesStore
         setSectionId(routeSectionId)
+        if (data?.routeId) {
+          setRouteId(data.routeId)
+        }
       },
       clearHoverState,
     })
 
-  // Передаем функцию очистки waypoints в родительский компонент
+  // В saved routes не очищаем waypoints при изменении origin/destination,
+  // так как они должны загружаться из data.waypoints при загрузке маршрута
+
+  // Передаем функцию очистки в родительский компонент
   useEffect(() => {
     if (onClearWaypointsCallback) {
       onClearWaypointsCallback(clearWayPoints)
     }
   }, [onClearWaypointsCallback, clearWayPoints])
-
-  // Сбрасываем wayPoints при изменении origin или destination
-  useEffect(() => {
-    clearWayPoints()
-  }, [origin, destination, clearWayPoints])
-
-  // Функция для очистки альтернативных маршрутов
-  const clearAlternatives = useCallback(() => {
-    setAlternativeRoutes([])
-  }, [])
 
   // Обработка данных маршрута
   useEffect(() => {
@@ -158,7 +153,9 @@ export const SavedRoutesDirections = ({
         // Обновляем sectionId первого маршрута в store при получении новых данных
         if (sectionIds.length > 0) {
           setSectionId(sectionIds[0])
-          setRouteId(data.routeId)
+          if (data.routeId) {
+            setRouteId(data.routeId)
+          }
         }
 
         if (allShapes[0].length > 0) {
@@ -191,7 +188,7 @@ export const SavedRoutesDirections = ({
     [handleAddWaypoint, clearHoverState],
   )
 
-  // Фильтруем tolls по выбранной секции и исключаем динамические толлы
+  // Фильтруем tolls по выбранной секции
   const filteredTolls = useMemo(() => {
     if (!tolls || !sectionId) return []
     return tolls.filter(
@@ -224,14 +221,14 @@ export const SavedRoutesDirections = ({
         wayPoints={wayPoints}
         startMarker={startMarker}
         endMarker={endMarker}
-        onMarkerDragStart={clearAlternatives}
+        onMarkerDragStart={() => {}}
         onMarkerDragEnd={handleMarkerOnDragEnd}
         onExistingMarkerDragEnd={handleUpdateWaypoint}
         onExistingMarkerClick={handleDeleteWaypoint}
         onHoverMarkerClick={handleHoverMarkerClick}
       />
 
-      {/* Отображение tolls для выбранной секции */}
+      {/* Отображение tolls */}
       {filteredTolls.length > 0 &&
         filteredTolls.map((toll) => {
           const mappedToll = convertTollWithSectionToToll(toll)
@@ -240,7 +237,6 @@ export const SavedRoutesDirections = ({
               key={toll.id}
               toll={mappedToll}
               selectedAxelType={selectedAxelType}
-              // On the map we show price by priority, filtered by selected axles.
               selectedPaymentType={null}
               onTollOpenDetails={(t) => {
                 setDetailsToll(t)

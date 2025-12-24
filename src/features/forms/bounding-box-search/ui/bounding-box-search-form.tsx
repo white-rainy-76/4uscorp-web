@@ -21,8 +21,8 @@ import {
   BoundingBoxSearchFormValues,
   DEFAULT_COORDINATES,
 } from '../model/schema'
-import { FormField } from './components/form-field'
-import { CoordinateField } from './components/coordinate-field'
+import { FormField } from './form-field'
+import { CoordinateField } from './coordinate-field'
 import { Label } from '@/shared/ui/label'
 
 export interface BoundingBoxCoordinates {

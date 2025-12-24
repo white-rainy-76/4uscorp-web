@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { MapBase, Spinner } from '@/shared/ui'
-import { TollRoadPolyline } from '@/entities/roads/ui'
-import { TollRoad } from '@/entities/roads'
-import { TollRoadEditor } from '@/features/roads/create-road'
-import { useAddRoadMutation } from '@/features/roads/add-road'
-import { useUpdateRoadMutation } from '@/features/roads/update-road'
-import { useDeleteRoadMutation } from '@/features/roads/delete-road'
+import { TollRoadPolyline } from '@/entities/toll-roads/ui'
+import { TollRoad } from '@/entities/toll-roads'
+import { TollRoadEditor } from '@/features/toll-roads/create-toll-road'
+import { useAddTollRoadMutation } from '@/features/toll-roads/add-toll-road'
+import { useUpdateTollRoadMutation } from '@/features/toll-roads/update-toll-road'
+import { useDeleteTollRoadMutation } from '@/features/toll-roads/delete-toll-road'
 import { toast } from 'sonner'
 
 interface MapWithTollRoadsProps {
@@ -26,39 +26,39 @@ export const MapWithTollRoads = ({
   const [isEditingTollRoad, setIsEditingTollRoad] = useState(false)
 
   // API mutations
-  const { mutate: addTollRoad, isPending: isAdding } = useAddRoadMutation({
+  const { mutate: addTollRoad, isPending: isAdding } = useAddTollRoadMutation({
     onSuccess: () => {
       toast.success('Toll road created successfully!')
       setIsEditingTollRoad(false)
       setSelectedTollRoad(null)
       onTollRoadsUpdate?.()
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(`Failed to create toll road: ${error.message}`)
     },
   })
 
   const { mutate: updateTollRoad, isPending: isUpdating } =
-    useUpdateRoadMutation({
+    useUpdateTollRoadMutation({
       onSuccess: () => {
         toast.success('Toll road updated successfully!')
         setIsEditingTollRoad(false)
         onTollRoadsUpdate?.()
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         toast.error(`Failed to update toll road: ${error.message}`)
       },
     })
 
   const { mutate: deleteTollRoad, isPending: isDeleting } =
-    useDeleteRoadMutation({
+    useDeleteTollRoadMutation({
       onSuccess: () => {
         toast.success('Toll road deleted successfully!')
         setSelectedTollRoad(null)
         setIsEditingTollRoad(false)
         onTollRoadsUpdate?.()
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         toast.error(`Failed to delete toll road: ${error.message}`)
       },
     })

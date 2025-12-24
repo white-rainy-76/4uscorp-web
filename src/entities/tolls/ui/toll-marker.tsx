@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { Toll } from '../model/types/tolls'
 import { Icon } from '@/shared/ui/Icon'
 import { TollPaymentType, AxelType } from '../api'
-import { getTollPriceAmountWithPriority } from '@/entities/tolls/lib/toll-pricing'
+import { getTollPriceAmountWithPriority } from '@/entities/tolls/lib'
 
 interface Props {
   toll: Toll

@@ -32,5 +32,6 @@ export const mapRouteByIdDtoToRouteById = (
     totalFuelAmmount: dto.totalFuelAmmount,
     totalPriceAmmount: dto.totalPriceAmmount,
     fuelPlanId: dto.fuelPlanId,
+    viaPoints: dto.viaPoints,
   }
 }
