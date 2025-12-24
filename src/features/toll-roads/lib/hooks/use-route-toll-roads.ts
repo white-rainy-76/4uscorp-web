@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Directions } from '@/features/directions'
+import { Directions } from '@/features/directions/api'
 import { useGetTollRoadsMutation, TollRoad } from '@/entities/toll-roads'
 
 type UseRouteTollRoadsParams = {
