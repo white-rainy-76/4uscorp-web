@@ -9,11 +9,23 @@ export const PointRequestPayloadSchema = z.object({
   }),
 })
 
-export const RouteRequestPayloadSchema = z.object({
-  TruckId: z.string(),
-  origin: PointRequestPayloadSchema,
-  destination: PointRequestPayloadSchema,
-  originName: z.string(),
-  destinationName: z.string(),
-  ViaPoints: z.array(PointRequestPayloadSchema).optional(),
-})
+export const RouteRequestPayloadSchema = z
+  .object({
+    TruckId: z.string().optional(),
+    origin: PointRequestPayloadSchema.optional(),
+    destination: PointRequestPayloadSchema.optional(),
+    originName: z.string().optional(),
+    destinationName: z.string().optional(),
+    ViaPoints: z.array(PointRequestPayloadSchema).optional(),
+    savedRouteId: z.string().uuid().optional(),
+  })
+  .refine(
+    (data) => {
+      // Либо есть savedRouteId, либо есть origin и destination
+      return !!data.savedRouteId || (!!data.origin && !!data.destination)
+    },
+    {
+      message:
+        'Either savedRouteId or both origin and destination must be provided',
+    },
+  )

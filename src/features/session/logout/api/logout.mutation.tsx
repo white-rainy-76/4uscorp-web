@@ -30,13 +30,13 @@ export function useLogoutMutation(
       return logout(controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Clear local authentication state
       clearAuth()
 
@@ -44,7 +44,7 @@ export function useLogoutMutation(
       router.push('/auth/sign-in')
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request cancelled due to error')
       }
@@ -53,14 +53,14 @@ export function useLogoutMutation(
       clearAuth()
       router.push('/auth/sign-in')
 
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       if (context?.abortController) {
         context.abortController.abort('Request settled')
       }
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

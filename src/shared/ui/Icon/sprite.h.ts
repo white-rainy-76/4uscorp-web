@@ -21,6 +21,7 @@ export interface SpritesMap {
     | 'marker-gray'
     | 'weight'
     | 'dollar'
+    | 'dollar-green'
     | 'calendar'
     | 'tag'
     | 'truck-model'
@@ -52,6 +53,7 @@ export const SPRITES_META: {
     | 'marker-gray'
     | 'weight'
     | 'dollar'
+    | 'dollar-green'
     | 'calendar'
     | 'tag'
     | 'truck-model'
@@ -82,6 +84,7 @@ export const SPRITES_META: {
     'marker-gray',
     'weight',
     'dollar',
+    'dollar-green',
     'calendar',
     'tag',
     'truck-model',

@@ -1,12 +1,15 @@
 import { z } from 'zod'
 import { CoordinatePairSchema } from './direction.contract'
-import { GasStationDtoSchema } from '@/entities/gas-station'
 
 export const RouteInfoDtoSchema = z.object({
-  tolls: z.number().min(0),
-  gallons: z.number().min(0),
   miles: z.number().min(0),
   driveTime: z.number().min(0),
+})
+
+export const WaypointDtoSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  stopOrder: z.number(),
 })
 
 export const RouteDtoSchema = z.object({
@@ -18,5 +21,5 @@ export const RouteDtoSchema = z.object({
 export const DirectionsDtoSchema = z.object({
   routeId: z.string(),
   routeDtos: z.array(RouteDtoSchema),
-  fuelStationDtos: z.array(GasStationDtoSchema),
+  waypoints: z.array(WaypointDtoSchema).optional(),
 })

@@ -147,7 +147,7 @@ export const TruckMarker = ({
             </div>
             <div className="mt-2 flex items-center text-sm text-[hsl(210,11%,60%)]">
               <Icon name="common/fuel" width={17} height={17} />
-              80%
+              {truckInfo.fuelPercentage}%
             </div>
           </div>
         )}

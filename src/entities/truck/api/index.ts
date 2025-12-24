@@ -6,8 +6,13 @@ export {
   TruckUnitSchema,
   TruckUnitsResponseSchema,
 } from './contracts/truck-unit.contract'
+export {
+  TruckUnitDtoSchema,
+  TruckUnitsResponseDtoSchema,
+} from './contracts/truck-unit.dto.contract'
 export { mapTruck, mapTrucks } from './mapper/truck.mapper'
 export { mapTruckGroup, mapTruckGroups } from './mapper/truck-group.mapper'
+export { mapTruckUnit, mapTruckUnits } from './mapper/truck-unit.mapper'
 
 // mutations and queries
 export {

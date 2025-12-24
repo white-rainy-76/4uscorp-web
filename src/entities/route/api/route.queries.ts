@@ -1,7 +1,16 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getDistance, getFuelStationArrived } from './route.service'
+import {
+  getDistance,
+  getSavedRoutes,
+  getSavedRouteById,
+  getAllSavedRoute,
+} from './route.service'
 
-import { GetDistancePayload } from '../model'
+import {
+  GetDistancePayload,
+  GetSavedRoutesPayload,
+  GetSavedRouteByIdPayload,
+} from '../model'
 
 export const ROUTES_ROOT_QUERY_KEY = ['routes']
 
@@ -17,14 +26,30 @@ export const routeQueries = {
       },
     }),
 
-  fuelStationArrived: (routeId: string) =>
+  savedRoutes: (payload: GetSavedRoutesPayload) =>
     queryOptions({
-      queryKey: [...ROUTES_ROOT_QUERY_KEY, 'fuel-station-arrived', routeId],
+      queryKey: [...ROUTES_ROOT_QUERY_KEY, 'saved-routes', payload],
       queryFn: async ({ signal }) => {
-        const data = await getFuelStationArrived(routeId, { signal })
+        const data = await getSavedRoutes(payload, signal)
         return data
       },
-      refetchInterval: 2000, // Обновляем каждые 2 секунды
-      refetchIntervalInBackground: true,
+    }),
+
+  savedRouteById: (payload: GetSavedRouteByIdPayload) =>
+    queryOptions({
+      queryKey: [...ROUTES_ROOT_QUERY_KEY, 'saved-route-by-id', payload],
+      queryFn: async ({ signal }) => {
+        const data = await getSavedRouteById(payload, signal)
+        return data
+      },
+    }),
+
+  allSavedRoute: () =>
+    queryOptions({
+      queryKey: [...ROUTES_ROOT_QUERY_KEY, 'all-saved-route'],
+      queryFn: async ({ signal }) => {
+        const data = await getAllSavedRoute(signal)
+        return data
+      },
     }),
 }

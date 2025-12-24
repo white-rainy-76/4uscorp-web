@@ -1,35 +1,44 @@
 import { api, authorizedRequest } from '@/shared/api/api.instance'
 import { responseContract } from '@/shared/api/api.lib'
 import { AxiosRequestConfig } from 'axios'
-import { z } from 'zod'
 import {
-  AssignRoutePayload,
   GetRouteByIdPayload,
   GetRoutePayload,
   GetDistancePayload,
+  GetSavedRoutesPayload,
+  GetSavedRouteByIdPayload,
 } from '../model'
 import {
-  AssignRoutePayloadSchema,
   GetRouteByIdPayloadSchema,
   GetRoutePayloadSchema,
   GetDistancePayloadSchema,
+  GetSavedRoutesPayloadSchema,
+  GetSavedRouteByIdPayloadSchema,
 } from './payload/route.payload'
 import {
   RouteByIdData,
   RouteData,
   GetDistanceData,
-  FuelStationStatus,
+  GetSavedRoutesData,
+  SavedRouteByIdData,
 } from '../model'
 import {
-  RouteByIdDtoSchema,
   RouteDataDtoSchema,
   GetDistanceDtoSchema,
-  FuelStationStatusResponseSchema,
 } from './contracts/route.dto.contract'
+import { RouteByIdDtoSchema } from './contracts/route-by-id.dto.contract'
+import {
+  GetSavedRoutesDtoSchema,
+  SavedRouteByIdDtoSchema,
+  GetAllSavedRouteDtoSchema,
+} from './contracts/saved-routes.dto.contract'
 import { mapRouteDataDtoToRouteData } from './mapper/route.mapper'
 import { mapRouteByIdDtoToRouteById } from './mapper/route-by-id.mapper'
-import { mapFuelStationStatusDtoToFuelStationStatus } from './mapper/fuel-station-status.mapper'
+import { mapGetSavedRoutesDtoToData } from './mapper/saved-routes.mapper'
+import { mapSavedRouteByIdDtoToData } from './mapper/saved-route-by-id.mapper'
+import { mapGetAllSavedRouteToSavedRouteItems } from './mapper/all-saved-route.mapper'
 import { useAuthStore } from '@/shared/store/auth-store'
+import { SavedRouteItem } from '@/features/route/saved-routes-selector'
 
 export const getRoute = async (
   payload: GetRoutePayload,
@@ -71,22 +80,6 @@ export const getRouteById = async (
   return mapRouteByIdDtoToRouteById(response.data)
 }
 
-export const assignRoute = async (
-  payload: AssignRoutePayload,
-  signal?: AbortSignal,
-): Promise<void> => {
-  const validatedPayload = AssignRoutePayloadSchema.parse(payload)
-  const config: AxiosRequestConfig = { signal }
-  const getAuthToken = () => useAuthStore.getState().accessToken
-  const authConfig = authorizedRequest(getAuthToken, config)
-
-  await api.post(
-    `/fuelroutes-api/FuelRoute/AssignRoute`,
-    validatedPayload,
-    authConfig,
-  )
-}
-
 export const getDistance = async (
   payload: GetDistancePayload,
   signal?: AbortSignal,
@@ -106,21 +99,59 @@ export const getDistance = async (
   return response.data
 }
 
-export const getFuelStationArrived = async (
-  routeId: string,
-  config?: AxiosRequestConfig,
-): Promise<FuelStationStatus[]> => {
+export const getSavedRoutes = async (
+  payload: GetSavedRoutesPayload,
+  signal?: AbortSignal,
+): Promise<GetSavedRoutesData> => {
+  const validatedPayload = GetSavedRoutesPayloadSchema.parse(payload)
+  const config: AxiosRequestConfig = {
+    signal,
+    params: {
+      startLatitude: validatedPayload.startLatitude,
+      startLongitude: validatedPayload.startLongitude,
+      endLatitude: validatedPayload.endLatitude,
+      endLongitude: validatedPayload.endLongitude,
+    },
+  }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  const response = await api
+    .get(`/fuelroutes-api/FuelRoute/SavedRoutes`, authConfig)
+    .then(responseContract(GetSavedRoutesDtoSchema))
+
+  return mapGetSavedRoutesDtoToData(response.data)
+}
+
+export const getSavedRouteById = async (
+  payload: GetSavedRouteByIdPayload,
+  signal?: AbortSignal,
+): Promise<SavedRouteByIdData> => {
+  const validatedPayload = GetSavedRouteByIdPayloadSchema.parse(payload)
+  const config: AxiosRequestConfig = { signal }
   const getAuthToken = () => useAuthStore.getState().accessToken
   const authConfig = authorizedRequest(getAuthToken, config)
 
   const response = await api
     .get(
-      `/truckstracking-api/TrucksTracking/GetFuelStationArrived/${routeId}`,
+      `/fuelroutes-api/FuelRoute/SavedRoutes/${validatedPayload.id}`,
       authConfig,
     )
-    .then(responseContract(FuelStationStatusResponseSchema))
+    .then(responseContract(SavedRouteByIdDtoSchema))
 
-  return response.data.fuelStations.map(
-    mapFuelStationStatusDtoToFuelStationStatus,
-  )
+  return mapSavedRouteByIdDtoToData(response.data)
+}
+
+export const getAllSavedRoute = async (
+  signal?: AbortSignal,
+): Promise<SavedRouteItem[]> => {
+  const config: AxiosRequestConfig = { signal }
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  const response = await api
+    .get(`/fuelroutes-api/FuelRoute/GetAllSavedRoute`, authConfig)
+    .then(responseContract(GetAllSavedRouteDtoSchema))
+
+  return mapGetAllSavedRouteToSavedRouteItems(response.data)
 }

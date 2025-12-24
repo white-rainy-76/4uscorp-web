@@ -33,7 +33,7 @@ export function useAttachDriverMutation(
       return attachDriver(payload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
 
       // Оптимистично обновляем данные драйвера
@@ -60,11 +60,11 @@ export function useAttachDriverMutation(
         )
       }
 
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем данные драйвера и список для получения свежих данных
       queryClient.invalidateQueries({
         queryKey: [...driverQueries.all(), 'driver', variables.driverId],
@@ -79,17 +79,17 @@ export function useAttachDriverMutation(
         queryKey: truckUnitQueries.lists(),
       })
 
-      await Promise.all([onSuccess?.(data, variables, context)])
+      await Promise.all([onSuccess?.(data, variables, context, mutation)])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       context?.abortController?.abort('Request cancelled due to error')
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       context?.abortController?.abort('Request settled')
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }
@@ -115,7 +115,7 @@ export function useDetachDriverMutation(
       return detachDriver(payload, controller.signal)
     },
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       const controller = new AbortController()
 
       // Оптимистично обновляем данные драйвера
@@ -138,11 +138,11 @@ export function useDetachDriverMutation(
         )
       }
 
-      await onMutate?.(variables)
+      await onMutate?.(variables, mutation)
       return { abortController: controller }
     },
 
-    onSuccess: async (data, variables, context) => {
+    onSuccess: async (data, variables, context, mutation) => {
       // Инвалидируем данные драйвера и список для получения свежих данных
       queryClient.invalidateQueries({
         queryKey: [...driverQueries.all(), 'driver', variables.driverId],
@@ -157,17 +157,17 @@ export function useDetachDriverMutation(
         queryKey: truckUnitQueries.lists(),
       })
 
-      await Promise.all([onSuccess?.(data, variables, context)])
+      await Promise.all([onSuccess?.(data, variables, context, mutation)])
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       context?.abortController?.abort('Request cancelled due to error')
-      onError?.(error, variables, context)
+      onError?.(error, variables, context, mutation)
     },
 
-    onSettled: (data, error, variables, context) => {
+    onSettled: (data, error, variables, context, mutation) => {
       context?.abortController?.abort('Request settled')
-      onSettled?.(data, error, variables, context)
+      onSettled?.(data, error, variables, context, mutation)
     },
   })
 }

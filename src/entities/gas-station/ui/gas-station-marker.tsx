@@ -6,6 +6,7 @@ import { CustomPin } from './custom-pin'
 import { getLogoUrl } from '../lib/getLogoUrl'
 import type { Marker as ClusterMarker } from '@googlemaps/markerclusterer'
 import { GasStation } from '../model/types/gas-station'
+import { useErrorsStore, useCartStore } from '@/shared/store'
 
 interface Props {
   gasStation: GasStation
@@ -14,9 +15,6 @@ interface Props {
   onRemoveFromCart: (stationId: string) => void
   onUpdateRefillLiters: (stationId: string, liters: number) => void
   isInCart: boolean
-  stationErrors?: { [stationId: string]: string }
-  getStationRefillLiters: (station: GasStation) => number
-  getStationFuelLeftBeforeRefill: (station: GasStation) => number
 }
 
 export const GasStationMarker: React.FC<Props> = ({
@@ -26,12 +24,10 @@ export const GasStationMarker: React.FC<Props> = ({
   onRemoveFromCart,
   onUpdateRefillLiters,
   isInCart,
-  stationErrors,
-  getStationRefillLiters,
-  getStationFuelLeftBeforeRefill,
 }) => {
   const [clicked, setClicked] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const { gasStationErrors } = useErrorsStore()
 
   const ref = useCallback(
     (marker: google.maps.marker.AdvancedMarkerElement) =>
@@ -39,7 +35,7 @@ export const GasStationMarker: React.FC<Props> = ({
     [setMarkerRef, gasStation.id],
   )
 
-  const errorMessage = stationErrors?.[gasStation.id]
+  const errorMessage = gasStationErrors[gasStation.id]
 
   return (
     <AdvancedMarker
@@ -59,8 +55,6 @@ export const GasStationMarker: React.FC<Props> = ({
           onRemoveFromCart={onRemoveFromCart}
           onUpdateRefillLiters={onUpdateRefillLiters}
           errorMessage={errorMessage}
-          getStationRefillLiters={getStationRefillLiters}
-          getStationFuelLeftBeforeRefill={getStationFuelLeftBeforeRefill}
         />
       ) : (
         <div

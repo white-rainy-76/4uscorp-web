@@ -47,7 +47,7 @@ export default function StatisticsPage() {
         {isTruckLoading ? (
           <DriverInfoSkeleton />
         ) : (
-          truckData && <DriverInfo truck={truckData} isLoadingFuel={false} />
+          truckData && <DriverInfo truck={truckData} />
         )}
       </InfoCard>
 

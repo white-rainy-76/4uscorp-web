@@ -14,7 +14,7 @@ export const useSetTruckGroupWeightFuelMutation = () => {
     mutationFn: (payload: SetTruckGroupWeightFuelPayload) =>
       setTruckGroupWeightFuel(payload),
 
-    onMutate: async (variables) => {
+    onMutate: async (variables, mutation) => {
       // Оптимистично обновляем данные truck group
       const previousTruckGroups = queryClient.getQueryData(
         truckGroupQueries.lists(),
@@ -38,7 +38,7 @@ export const useSetTruckGroupWeightFuelMutation = () => {
       return { previousTruckGroups }
     },
 
-    onSuccess: () => {
+    onSuccess: (data, variables, context, mutation) => {
       // Инвалидируем кеш truck groups после успешного обновления
       queryClient.invalidateQueries({
         queryKey: TRUCK_GROUPS_ROOT_QUERY_KEY,
@@ -49,7 +49,7 @@ export const useSetTruckGroupWeightFuelMutation = () => {
       })
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, mutation) => {
       // Откатываем оптимистичное обновление при ошибке
       if (context?.previousTruckGroups) {
         queryClient.setQueryData(

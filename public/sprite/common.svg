@@ -38,8 +38,12 @@
     <path fill-rule="evenodd" clip-rule="evenodd" d="M9.029 9.16668C9.04167 7.85251 8.967 6.01251 8.967 6.01251C8.967 6.01251 7.721 8.10751 7.229 9.16668H9.029Z" fill="#4964D8"/>
   </symbol>
   <symbol viewBox="0 0 19 33" id="dollar" fill="none"  >
-   <path d="M9.49996 1V32" stroke="#4964D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-   <path d="M15.9583 6.63635H6.27083C3.77405 6.63635 1.75 8.8444 1.75 11.5682C1.75 14.2919 3.77405 16.5 6.27083 16.5H12.7292C15.226 16.5 17.25 18.708 17.25 21.4318C17.25 24.1556 15.226 26.3636 12.7292 26.3636H1.75" stroke="#4964D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+   <path d="M9.49996 1V32" stroke="#4964D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>                                                   
+   <path d="M15.9583 6.63635H6.27083C3.77405 6.63635 1.75 8.8444 1.75 11.5682C1.75 14.2919 3.77405 16.5 6.27083 16.5H12.7292C15.226 16.5 17.25 18.708 17.25 21.4318C17.25 24.1556 15.226 26.3636 12.7292 26.3636H1.75" stroke="#4964D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>                       
+  </symbol>
+  <symbol viewBox="0 0 19 33" id="dollar-green" fill="none"  >
+   <path d="M9.49996 1V32" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>                                                   
+   <path d="M15.9583 6.63635H6.27083C3.77405 6.63635 1.75 8.8444 1.75 11.5682C1.75 14.2919 3.77405 16.5 6.27083 16.5H12.7292C15.226 16.5 17.25 18.708 17.25 21.4318C17.25 24.1556 15.226 26.3636 12.7292 26.3636H1.75" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>                       
   </symbol>
   <symbol id="calendar" viewBox="0 0 16 16">
     <path fill-rule="evenodd" clip-rule="evenodd" d="M12.6667 2.66666V1.33332C12.6667 0.965133 12.3682 0.666656 12 0.666656C11.6319 0.666656 11.3334 0.965133 11.3334 1.33332V2.66666H12.6667Z" fill="#A8A8A8"/>

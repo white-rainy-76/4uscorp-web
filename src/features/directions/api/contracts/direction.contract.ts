@@ -4,10 +4,14 @@ import { z } from 'zod'
 export const CoordinatePairSchema = z.tuple([z.number(), z.number()])
 
 export const RouteInfoSchema = z.object({
-  tolls: z.number().min(0),
-  gallons: z.number().min(0),
   miles: z.number().min(0),
   driveTime: z.number().min(0),
+})
+
+export const WaypointSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  stopOrder: z.number(),
 })
 
 export const RouteSchema = z.object({
@@ -19,5 +23,5 @@ export const RouteSchema = z.object({
 export const DirectionsSchema = z.object({
   routeId: z.string(),
   route: z.array(RouteSchema),
-  gasStations: z.array(GasStationSchema),
+  waypoints: z.array(WaypointSchema).optional(),
 })

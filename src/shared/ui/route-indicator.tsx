@@ -1,5 +1,5 @@
 import React from 'react'
-import { FuelStationStatusType } from '@/entities/route/model/types/fuel-station-status'
+import { FuelStationStatusType } from '@/entities/gas-station'
 import { Icon } from '@/shared/ui'
 
 interface RouteIndicatorProps {

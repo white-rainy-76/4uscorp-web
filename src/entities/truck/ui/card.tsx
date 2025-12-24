@@ -28,7 +28,9 @@ export const Card = ({ truck, isActive }: CardProps) => {
     router.prefetch(`/${lang}/truck/${truck.id}`)
   }
 
-  const { stats, isLoading } = useTruckStats(truck.id, isConnected)
+  const { stats, isLoading } = useTruckStats(truck.id, isConnected, {
+    trackedFields: ['fuelPercentage'],
+  })
 
   const driverInitials =
     truck.driver?.fullName

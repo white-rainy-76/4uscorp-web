@@ -1,34 +1,69 @@
 import { useEffect } from 'react'
 import { useGetRouteMutation } from '@/entities/route/api/get-route.mutation'
-import { Coordinate } from '@/shared/types'
 import { useGetRouteByIdMutation } from '../../api/get-route-by-id.mutation'
-import { useQueryClient } from '@tanstack/react-query'
+import {
+  useRouteFormStore,
+  useRouteInfoStore,
+  useCartStore,
+} from '@/shared/store'
 
 type useRouteProps = {
   truckId: string | undefined
-  setOrigin: (value: Coordinate | null) => void
-  setDestination: (value: Coordinate | null) => void
-  setFinishFuel: (value: number | undefined) => void
-  setTruckWeight: (value: number | undefined) => void
-  setOriginName: (value: string | undefined) => void
-  setDestinationName: (value: string | undefined) => void
 }
 
-export function useRoute({
-  truckId,
-  setOrigin,
-  setDestination,
-  setFinishFuel,
-  setTruckWeight,
-  setOriginName,
-  setDestinationName,
-}: useRouteProps) {
-  const queryClient = useQueryClient()
+export function useAttachedRoute({ truckId }: useRouteProps) {
+  const { setRouteForm } = useRouteFormStore()
+  const { setRouteInfo } = useRouteInfoStore()
+  const { addToCart, setFuelPlanId } = useCartStore()
+
   const {
     mutateAsync: getRouteById,
     data: routeByIdData,
     isPending: isRouteByIdLoading,
   } = useGetRouteByIdMutation({
+    onSuccess: (data) => {
+      setRouteForm({
+        origin: data.origin,
+        destination: data.destination,
+        originName: data.originName,
+        destinationName: data.destinationName,
+        truckWeight: data.weight,
+        finishFuel: data.remainingFuel,
+      })
+
+      // Update route info store
+      setRouteInfo({
+        routeId: data.routeId,
+        selectedSectionId: data.sectionId || null,
+        sectionIds: data.sectionId ? [data.sectionId] : [],
+        miles: data.routeInfo.miles,
+        driveTime: data.routeInfo.driveTime,
+        gallons: data.totalFuelAmmount,
+        fuelLeft: data.remainingFuel,
+        totalPrice: data.totalPriceAmmount,
+      })
+
+      // Set fuelPlanId in cart store
+      if (data.fuelPlanId) {
+        setFuelPlanId(data.fuelPlanId)
+      }
+
+      // Add gas stations with isAlgorithm = true to cart
+      if (data.fuelStations && data.fuelStations.length > 0) {
+        data.fuelStations.forEach((station) => {
+          if (station.isAlgorithm && station.refill) {
+            const refillLiters = parseFloat(station.refill)
+            if (!isNaN(refillLiters) && refillLiters > 0) {
+              addToCart(
+                station.id,
+                refillLiters,
+                station.fuelLeftBeforeRefill ?? undefined,
+              )
+            }
+          }
+        })
+      }
+    },
     onError: (error) => {
       console.error('Route details fetch error:', error)
     },
@@ -43,21 +78,20 @@ export function useRoute({
       console.error('Route mutation error:', error)
     },
     onSuccess: (data) => {
-      // Обновляем состояние данными о маршруте
-      setOrigin(data.origin)
-      setDestination(data.destination)
-      setFinishFuel(data.remainingFuel)
-      setTruckWeight(data.weight)
+      if (data.route.isRoute === false) {
+        const originCoordinate =
+          data.origin ||
+          (data.route.currentLocation
+            ? {
+                latitude: data.route.currentLocation.latitude,
+                longitude: data.route.currentLocation.longitude,
+              }
+            : null)
 
-      // Если маршрут есть - используем originName/destinationName
-      // Если маршрута нет - используем formattedLocation
-      if (data.route.isRoute) {
-        setOriginName(data.originName || undefined)
-        setDestinationName(data.destinationName || undefined)
-      } else {
-        // Когда маршрута нет, показываем formattedLocation как originName
-        setOriginName(data.route.formattedLocation || undefined)
-        setDestinationName(undefined)
+        setRouteForm({
+          origin: originCoordinate,
+          originName: data.route.formattedLocation,
+        })
       }
     },
   })
@@ -79,10 +113,6 @@ export function useRoute({
   // Функция для перезапроса данных маршрута (только при завершении маршрута)
   const refetchRouteData = async () => {
     if (truckId) {
-      console.log(
-        'Refetching route data after route completion for truck:',
-        truckId,
-      )
       await getRoute({ truckId })
     }
   }
@@ -92,17 +122,6 @@ export function useRoute({
     isRouteLoading,
     routeByIdData,
     isRouteByIdLoading,
-    // Возвращаем координаты напрямую из API
-    // Если маршрута нет - используем currentLocation как origin
-    apiOrigin:
-      routeData?.origin ||
-      (routeData?.route?.currentLocation
-        ? {
-            latitude: routeData.route.currentLocation.latitude,
-            longitude: routeData.route.currentLocation.longitude,
-          }
-        : null),
-    apiDestination: routeData?.destination,
     refetchRouteData,
   }
 }

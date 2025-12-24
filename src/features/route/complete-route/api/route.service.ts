@@ -1,6 +1,6 @@
 import { api } from '@/shared/api/api.instance'
 import { AxiosRequestConfig } from 'axios'
-import { completeRoutePayloadSchema } from '../payload/route.payload'
+import { completeRoutePayloadSchema } from './payload/route.payload'
 import { CompleteRoutePayload } from '../types/route.payload'
 
 export const completeRoute = async (

@@ -1,2 +1,3 @@
-export { Directions as DirectionsRoutes } from './ui'
+export { Directions } from './ui'
 export * from './api'
+export * from './lib'

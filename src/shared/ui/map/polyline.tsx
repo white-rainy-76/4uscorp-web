@@ -67,7 +67,7 @@ function usePolyline(props: PolylineProps) {
     if (path) {
       polyline.setPath(path)
     }
-  }, [path])
+  }, [path, polyline])
 
   const map = useContext(GoogleMapsContext)?.map
 
@@ -85,7 +85,7 @@ function usePolyline(props: PolylineProps) {
     return () => {
       polyline.setMap(null)
     }
-  }, [map])
+  }, [map, polyline])
 
   // Привязываем обработчики событий
   useEffect(() => {
@@ -117,7 +117,7 @@ function usePolyline(props: PolylineProps) {
 
 export const Polyline = forwardRef((props: PolylineProps, ref: PolylineRef) => {
   const polyline = usePolyline(props)
-  useImperativeHandle(ref, () => polyline, [])
+  useImperativeHandle(ref, () => polyline, [polyline])
   return null
 })
 
