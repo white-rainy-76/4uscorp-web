@@ -1,6 +1,10 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import { mapDriver, mapDrivers } from './mapper/driver.mapper'
-import { getAllDrivers, getDriverById } from './driver.service'
+import {
+  getAllDrivers,
+  getDriverById,
+  getDriversByCompanyId,
+} from './driver.service'
 
 export const DRIVERS_ROOT_QUERY_KEY = ['drivers']
 
@@ -32,5 +36,16 @@ export const driverQueries = {
         const driver = mapDriver(data)
         return driver
       },
+    }),
+
+  listByCompany: (companyId: string) =>
+    queryOptions({
+      queryKey: [...DRIVERS_ROOT_QUERY_KEY, 'listByCompany', companyId],
+      queryFn: async ({ signal }) => {
+        const { data } = await getDriversByCompanyId(companyId, { signal })
+        const drivers = mapDrivers(data)
+        return drivers
+      },
+      placeholderData: keepPreviousData,
     }),
 }

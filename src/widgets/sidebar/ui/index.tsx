@@ -7,6 +7,7 @@ import {
   UsersRound,
   Building2,
   Compass,
+  Activity,
   LogOut,
   DollarSign,
   Map,
@@ -77,6 +78,17 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname?.includes('/monitoring')}
+              tooltip={dictionary.home.navigation.monitoring}
+              asChild>
+              <Link href={`/${lang}/monitoring`}>
+                <Activity className="w-5 h-5" />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
 
           <SidebarMenuItem>
             <SidebarMenuButton

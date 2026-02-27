@@ -8,7 +8,9 @@ import {
 export const mapCompany = (rawCompany: CompanyDto): Company => {
   return {
     id: rawCompany.id,
+    parentCompanyId: rawCompany.parentCompanyId ?? null,
     name: rawCompany.name,
+    externalToken: rawCompany.externalToken ?? null,
     driversCount: rawCompany.driversCount,
     trucksCount: rawCompany.trucksCount,
     companyManagers: rawCompany.companyManagers.map(mapCompanyManager),

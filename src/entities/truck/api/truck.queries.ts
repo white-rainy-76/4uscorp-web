@@ -1,5 +1,9 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { getAllTrucks, getTruckById } from './truck.service'
+import {
+  getAllTrucks,
+  getTruckById,
+  getTrucksByCompanyId,
+} from './truck.service'
 import { getAllTruckGroups, getTruckGroupById } from './truck-group.service'
 import { getTruckUnits } from './truck-unit.service'
 import { mapTruck, mapTrucks } from './mapper/truck.mapper'
@@ -45,6 +49,17 @@ export const truckQueries = {
       //   queryClient.getQueryData<Truck>([...TRUCKS_ROOT_QUERY_KEY, 'truck', id]),
       // initialDataUpdatedAt: () =>
       //   queryClient.getQueryState([...TRUCKS_ROOT_QUERY_KEY, 'truck', id])?.dataUpdatedAt,
+    }),
+
+  listByCompany: (companyId: string) =>
+    queryOptions({
+      queryKey: [...TRUCKS_ROOT_QUERY_KEY, 'listByCompany', companyId],
+      queryFn: async ({ signal }) => {
+        const { data } = await getTrucksByCompanyId(companyId, { signal })
+        const trucks = mapTrucks(data)
+        return trucks
+      },
+      placeholderData: keepPreviousData,
     }),
 }
 

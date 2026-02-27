@@ -22,3 +22,15 @@ export function getTruckById(id: string, config?: AxiosRequestConfig) {
     .get(`/trucks-api/Trucks/get-truckBy-id?truckId=${id}`, authConfig)
     .then(responseContract(TruckDtoSchema))
 }
+
+export function getTrucksByCompanyId(
+  companyId: string,
+  config?: AxiosRequestConfig,
+) {
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  return api
+    .get(`/trucks-api/Trucks/by-company/${companyId}`, authConfig)
+    .then(responseContract(z.array(TruckDtoSchema)))
+}

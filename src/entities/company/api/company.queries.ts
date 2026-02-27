@@ -1,5 +1,9 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { getAllCompanies, getCompanyById } from './company.service'
+import {
+  getAllCompanies,
+  getCompanyById,
+  getCompaniesByPartnerId,
+} from './company.service'
 import { mapCompanies, mapCompany } from './mapper/company.mapper'
 
 export const COMPANIES_ROOT_QUERY_KEY = ['companies']
@@ -28,5 +32,18 @@ export const companyQueries = {
         const company = mapCompany(data)
         return company
       },
+    }),
+
+  byPartner: (partnerId: string) =>
+    queryOptions({
+      queryKey: [...COMPANIES_ROOT_QUERY_KEY, 'byPartner', partnerId],
+      queryFn: async ({ signal }) => {
+        const { data } = await getCompaniesByPartnerId(partnerId, {
+          signal,
+        })
+        const companies = mapCompanies(data)
+        return companies
+      },
+      placeholderData: keepPreviousData,
     }),
 }

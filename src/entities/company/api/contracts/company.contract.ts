@@ -10,7 +10,9 @@ export const CompanyManagerSchema = z.object({
 })
 export const CompanySchema = z.object({
   id: z.string().uuid(),
+  parentCompanyId: z.string().uuid().nullable().optional(),
   name: z.string(),
+  externalToken: z.string().nullable().optional(),
   driversCount: z.number(),
   trucksCount: z.number(),
   companyManagers: z.array(CompanyManagerSchema),

@@ -22,3 +22,15 @@ export function getDriverById(id: string, config?: AxiosRequestConfig) {
     .get(`/trucks-api/Driver/driver/${id}`, authConfig)
     .then(responseContract(DriverDtoSchema))
 }
+
+export function getDriversByCompanyId(
+  companyId: string,
+  config?: AxiosRequestConfig,
+) {
+  const getAuthToken = () => useAuthStore.getState().accessToken
+  const authConfig = authorizedRequest(getAuthToken, config)
+
+  return api
+    .get(`/trucks-api/Driver/by-company/${companyId}`, authConfig)
+    .then(responseContract(z.array(DriverDtoSchema)))
+}
