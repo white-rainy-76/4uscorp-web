@@ -1,7 +1,7 @@
 export enum UserRole {
-  Admin = 'Admin',
+  PartnerAdmin = 'PartnerAdmin',
   Driver = 'Driver',
-  Manager = 'Manager',
+  CompanyManager = 'CompanyManager',
   SuperAdmin = 'SuperAdmin',
   SelfDriver = 'SelfDriver',
 }
@@ -13,7 +13,3 @@ export const isSuperAdmin = (role: string): boolean => {
 export const hasAccessToCompanies = (role: string): boolean => {
   return isSuperAdmin(role)
 }
-
-
-
-
